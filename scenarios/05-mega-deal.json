@@ -1,0 +1,38 @@
+{
+  "id": "mega-deal",
+  "title": "Mega Deal",
+  "mockup": "website",
+  "content": {
+    "url": "shopzoom-deals.shop/mega-sale",
+    "store": "ShopZoom Deals",
+    "product": "Air Jumper Sneakers",
+    "oldPrice": "$120.00",
+    "price": "$12.00",
+    "popupTitle": "🔥 MEGA DEAL! 90% OFF 🔥",
+    "timer": "Ends in 09:59",
+    "popupText": "Only 3 pairs left! Enter your card details now before they're gone.",
+    "popupButton": "BUY NOW"
+  },
+  "outcomes": {
+    "do":     { "result": "red",    "text": "You used your parent's card. The money was taken, and the sneakers never arrived." },
+    "ignore": { "result": "yellow", "text": "You closed the page and kept your money. But the next 'mega deal' might be harder to spot." },
+    "tell":   { "result": "green",  "text": "Dad looked up the store and found warnings that it's fake. He reported it, and your family's money stayed safe." }
+  },
+  "buddy": {
+    "intro": "You're looking for new sneakers online, and this pops up!",
+    "reactions": {
+      "do":     { "mood": "worried",  "text": "Oh no! Let's see what happened." },
+      "ignore": { "mood": "thinking", "text": "You kept your money, but the fake store is still out there." },
+      "tell":   { "mood": "cheering", "text": "Nice work! A grown-up helped spot the fake store!" }
+    }
+  },
+  "recap": {
+    "stop": { "target": "timer", "text": "This countdown was trying to make you buy before you could think." },
+    "check": [
+      { "target": "popupTitle", "highlight": "90% OFF", "text": "90% off is too good to be true. Real stores almost never have deals this big." },
+      { "target": "url", "text": "This isn't a store you know. Shop at stores your family trusts." },
+      { "target": "popupText", "highlight": "Enter your card details", "text": "Never type in card details without a grown-up." }
+    ],
+    "tell": "Show a grown-up and say: 'I found a really cheap deal. Can you check if this store is real?'"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "id": "you-won",
+  "title": "You Won!",
+  "mockup": "sms",
+  "content": {
+    "sender": "+1 (555) 019-2834",
+    "time": "4:12 PM",
+    "message": "CONGRATS!! You have WON a FREE tablet 🎉 Claim in 5 mins befor it expires: prize-claim.co/win"
+  },
+  "outcomes": {
+    "do":     { "result": "red",    "text": "The site asked for your name and home address. Now a stranger knows where you live." },
+    "ignore": { "result": "yellow", "text": "You stayed safe, but the next day another prize text arrives..." },
+    "tell":   { "result": "green",  "text": "Mum blocked the number and reported it as spam. Scam stopped!" }
+  },
+  "buddy": {
+    "intro": "Ooh, a new text message just came in!",
+    "reactions": {
+      "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
+      "ignore": { "mood": "thinking", "text": "Safe for now… but the scam is still out there." },
+      "tell":   { "mood": "cheering", "text": "Great call! Telling a grown-up stopped it!" }
+    }
+  },
+  "recap": {
+    "stop": { "target": "message", "highlight": "Claim in 5 mins", "text": "This timer was trying to rush you, so you wouldn't stop and think." },
+    "check": [
+      { "target": "sender", "text": "You don't know this number." },
+      { "target": "message", "highlight": "WON", "text": "You never entered a contest! You can't win something you didn't enter." },
+      { "target": "message", "highlight": "befor", "text": "Spelling mistake: 'befor'. Real companies check their spelling." },
+      { "target": "message", "highlight": "prize-claim.co/win", "text": "This is a strange link from someone you don't know." }
+    ],
+    "tell": "Show a parent and say: 'I got this text and I'm not sure about it.'"
+  }
+}

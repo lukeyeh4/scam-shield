@@ -1,0 +1,37 @@
+{
+  "id": "account-locked",
+  "title": "Account Locked!",
+  "mockup": "email",
+  "content": {
+    "fromName": "PixelPals Support",
+    "fromAddress": "help@pixelpals-acount-security.com",
+    "subject": "URGENT: Your account will be DELETED in 24 hours",
+    "time": "8:14 AM",
+    "body": "Dear user,\n\nWe noticed strange activity on your account. If you do not verify your account in 24 hours, it will be deleted forever and you will lose all your stuff.\n\nClick below and enter your username and password to keep your account.",
+    "button": "VERIFY NOW",
+    "signature": "The PixelPals Team"
+  },
+  "outcomes": {
+    "do":     { "result": "red",    "text": "You typed in your password. Now someone else can log in as you and change your password so you can't get back in." },
+    "ignore": { "result": "yellow", "text": "You didn't click. But you keep worrying all day: what if your account really gets deleted?" },
+    "tell":   { "result": "green",  "text": "Your teacher helped you open the real PixelPals app. Your account was fine! Then you reported the email as a scam." }
+  },
+  "buddy": {
+    "intro": "You've got an email! Let's read it.",
+    "reactions": {
+      "do":     { "mood": "worried",  "text": "Oh no! Let's find out what happened." },
+      "ignore": { "mood": "thinking", "text": "Safe, but you're still worried, and the scam email is still out there." },
+      "tell":   { "mood": "cheering", "text": "Smart move! Now you know your account is safe." }
+    }
+  },
+  "recap": {
+    "stop": { "target": "subject", "highlight": "DELETED in 24 hours", "text": "This scary deadline was trying to make you panic and rush." },
+    "check": [
+      { "target": "fromAddress", "highlight": "acount", "text": "Look closely: 'acount' is spelled wrong. This isn't really PixelPals." },
+      { "target": "body", "highlight": "Dear user", "text": "The real PixelPals would use your name, not 'Dear user'." },
+      { "target": "body", "highlight": "enter your username and password", "text": "Real companies never ask for your password in an email." },
+      { "target": "button", "text": "Don't click buttons in surprise emails. Open the real app yourself instead." }
+    ],
+    "tell": "Show a grown-up and say: 'This email says my account will be deleted. Is it real?'"
+  }
+}
