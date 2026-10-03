@@ -1,10 +1,6 @@
-import { createContext, useContext, useEffect, useRef } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import { splitByHighlights } from '../highlight'
-
-export type Mark = { target: string; highlight?: string; state: 'active' | 'seen' }
-
-// The recap passes the red flags to highlight; mock-ups render content through <Field>.
-export const MarksContext = createContext<Mark[]>([])
+import { MarksContext } from './marks'
 
 type FieldProps = { name: string; text: string; className?: string }
 

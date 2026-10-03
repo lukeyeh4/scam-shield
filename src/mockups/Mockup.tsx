@@ -1,7 +1,7 @@
 import type { ScenarioScreen } from '../types'
 import { EmailMockup } from './EmailMockup'
 import { GameChatMockup } from './GameChatMockup'
-import { type Mark, MarksContext } from './Field'
+import { type Mark, MarksContext } from './marks'
 import { MessengerMockup } from './MessengerMockup'
 import { SmsMockup } from './SmsMockup'
 import { WebsiteMockup } from './WebsiteMockup'
