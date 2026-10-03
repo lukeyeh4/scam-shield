@@ -1,13 +1,13 @@
 import type { Choice, Result } from './types'
 
-export const CHOICES: { id: Choice; emoji: string; label: string }[] = [
-  { id: 'do', emoji: '👆', label: 'Do it' },
-  { id: 'ignore', emoji: '🙈', label: 'Ignore it' },
-  { id: 'tell', emoji: '🗣️', label: 'Tell an adult' },
+export const CHOICES: { id: Choice; label: string }[] = [
+  { id: 'do', label: 'Do it' },
+  { id: 'ignore', label: 'Ignore it' },
+  { id: 'tell', label: 'Tell an adult' },
 ]
 
-export const RESULTS: Record<Result, { emoji: string; label: string }> = {
-  red: { emoji: '🔴', label: 'Uh oh' },
-  yellow: { emoji: '🟡', label: 'Safe… for now' },
-  green: { emoji: '🟢', label: 'Scam stopped!' },
+export const RESULTS: Record<Result, { label: string }> = {
+  red: { label: 'Uh oh' },
+  yellow: { label: 'Safe… for now' },
+  green: { label: 'Scam stopped!' },
 }

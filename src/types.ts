@@ -5,7 +5,11 @@ export type Mood = 'happy' | 'curious' | 'thinking' | 'worried' | 'cheering' | '
 export type SmsContent = {
   sender: string
   time: string
-  message: string
+  // Separate texts, in order. Recap targets name them message1, message2, ...
+  messages: string[]
+  // A notification banner from someone else that drops down after the last text.
+  // Recap targets name its parts notificationSender and notificationText.
+  notification?: { sender: string; text: string }
 }
 
 export type GameChatContent = {

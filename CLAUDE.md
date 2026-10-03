@@ -35,6 +35,6 @@ Planned layout:
 - Write at about an 8-year-old reading level. Keep one idea per screen, with big buttons and large text.
 - Consequences should feel realistic but not frightening or graphic.
 - No shame. Wrong choices get "Here's what to watch for next time," never "You failed."
-- Use icons and colours (🔴🟡🟢, 🛑🔍🗣️) alongside the words.
+- No emojis in the game's own interface (buttons, labels, headings): keep it plain, large, readable text. Emojis are fine inside the fake scam screens and scam messages, where they make them look real.
 - Shield Buddy never hints before the choice (screens 1–2 stay neutral). It isn't a trusted adult: its lines always send kids to a real grown-up. All its lines are scripted, never generated.
 - Keep the key lesson: Ignore keeps *you* safe once, but Tell stops the scam. The yellow outcomes should show why ignoring isn't the full answer.

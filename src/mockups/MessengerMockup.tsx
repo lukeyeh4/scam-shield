@@ -1,13 +1,10 @@
 import type { MessengerContent } from '../types'
 import { Field } from './Field'
+import { PhoneFrame } from './PhoneFrame'
 
 export function MessengerMockup({ content }: { content: MessengerContent }) {
   return (
-    <div className="phone">
-      <div className="phone-status">
-        <span>9:41</span>
-        <span>📶 🔋</span>
-      </div>
+    <PhoneFrame inputLabel="Message…">
       <div className="messenger-app">{content.app}</div>
       <div className="messenger-header">
         <div className="avatar avatar-purple">{content.sender.charAt(0)}</div>
@@ -27,7 +24,6 @@ export function MessengerMockup({ content }: { content: MessengerContent }) {
           <Field name="message2" text={content.message2} />
         </div>
       </div>
-      <div className="sms-input">Message…</div>
-    </div>
+    </PhoneFrame>
   )
 }

@@ -88,7 +88,7 @@ Ordered from easiest to hardest:
 
 | # | Scenario | Looks like | The scam | 👆 Do it → | 🙈 Ignore it → |
 |---|----------|------------|----------|-----------|---------------|
-| 1 | **"You Won!"** | Phone text messages | "You won a free tablet! Claim in 5 mins: prize-claim.co" | Enter your address, and now strangers know where you live | You're safe, but more scam texts keep coming |
+| 1 | **"It's Mom, New Number"** | Phone text messages | "Mom" texts from a new number and asks for the code that just came to your phone | The code unlocks your game account, and now a stranger can log in as you | You're safe, but the scammer keeps texting and might trick someone else |
 | 2 | **Free Coins** | Game chat in "BlockCraft" | A player offers 10,000 free coins if you log in on their site | Your account is stolen, along with all your items | Safe, but your friend falls for it next |
 | 3 | **"It's Me, New Account"** | Messaging app | A "friend" on a new account asks for a gift card code | The code is gone, and so is the money | Safe, but your real friend never finds out their account was copied |
 | 4 | **Account Locked!** | Email inbox | "Your account will be deleted! Verify now" from a look-alike address | You enter your password, and now someone else has it | Safe, but you're still worried your account might really get deleted |
@@ -100,7 +100,7 @@ Telling an adult always leads to the 🟢 outcome: the scam is blocked or report
 
 - **Simple and bright.** Use big buttons, large text, and one idea per screen.
 - **Realistic where it matters.** The scam screens should look like the real thing, while the rest of the game stays simple and friendly.
-- **Use icons and colours alongside words.** 🔴 🟡 🟢 and 🛑 🔍 🗣️ help younger readers.
+- **Plain, readable text.** No emojis in the game's own buttons and labels: large, clear words are easier for kids to read. Emojis only appear inside the fake scam screens, to make them look real.
 - **Realistic, not frightening.** Consequences should feel real without being scary or graphic.
 - **No shame.** Wrong choices are part of learning, so say "Here's what to watch for next time," not "You failed."
 - **Simple language.** Aim for a reading level of about 8 years old.
@@ -116,7 +116,7 @@ Telling an adult always leads to the 🟢 outcome: the scam is blocked or report
 scam-shield/
 ├── README.md
 ├── scenarios/            # One data file per scenario
-│   ├── 01-you-won.json
+│   ├── 01-new-number.json
 │   ├── 02-free-coins.json
 │   ├── 03-new-account.json
 │   ├── 04-account-locked.json
@@ -133,40 +133,44 @@ Each scenario picks a mock-up type and fills it with its own content, so adding 
 
 ```json
 {
-  "id": "you-won",
-  "title": "You Won!",
+  "id": "new-number",
+  "title": "It's Mom, New Number",
   "mockup": "sms",
   "content": {
     "sender": "+1 (555) 019-2834",
-    "message": "CONGRATS!! You have WON a FREE tablet 🎉 Claim in 5 mins befor it expires: prize-claim.co/win"
+    "time": "4:12 PM",
+    "messages": [
+      "Hey sweetie, it’s Mom. I had to get a new number because my phone stopped working.",
+      "I need a favor really quick.",
+      "Can you send me the code that just came to your phone?"
+    ]
   },
   "outcomes": {
-    "do":     { "result": "red",    "text": "The site asked for your name and home address. Now a stranger knows where you live." },
-    "ignore": { "result": "yellow", "text": "You stayed safe, but the next day another prize text arrives..." },
-    "tell":   { "result": "green",  "text": "Mum blocked the number and reported it as spam. Scam stopped!" }
+    "do":     { "result": "red",    "text": "You sent the code. It was the key to your game account. Now a stranger can log in as you." },
+    "ignore": { "result": "yellow", "text": "You didn't send the code. But the scammer keeps texting, and might trick someone else." },
+    "tell":   { "result": "green",  "text": "Dad called Mom on her old number. Her phone was fine! They blocked the fake number and reported it. Scam stopped!" }
   },
   "buddy": {
-    "intro": "Ooh, a new text! What would you do?",
+    "intro": "Ooh, a new text message just came in!",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
       "ignore": { "mood": "thinking", "text": "Safe for now… but the scam is still out there." },
-      "tell":   { "mood": "cheering", "text": "Great call! Telling a grown-up stopped it!" }
+      "tell":   { "mood": "cheering", "text": "Great call! Checking with a grown-up stopped it!" }
     }
   },
   "recap": {
-    "stop":  { "target": "message", "highlight": "Claim in 5 mins", "text": "This timer was trying to rush you." },
+    "stop": { "target": "message2", "highlight": "really quick", "text": "'Really quick' was trying to rush you, so you wouldn't stop and think." },
     "check": [
-      { "target": "sender",  "text": "You don't know this number." },
-      { "target": "message", "highlight": "WON", "text": "You never entered a contest!" },
-      { "target": "message", "highlight": "befor", "text": "Spelling mistake: 'befor'." },
-      { "target": "message", "highlight": "prize-claim.co/win", "text": "This is a strange link." }
+      { "target": "sender", "text": "This number isn't saved as Mom in your phone." },
+      { "target": "message1", "highlight": "I had to get a new number", "text": "'I got a new number' is a trick scammers use a lot. Anyone can say they're your mom." },
+      { "target": "message3", "highlight": "send me the code", "text": "Never share a code sent to your phone. Codes are like keys to your accounts." }
     ],
-    "tell":  "Show a parent and say: 'I got this text and I'm not sure about it.'"
+    "tell": "Show a grown-up and say: 'Someone says they're Mom and wants my code. Can we call her old number?'"
   }
 }
 ```
 
-Shield Buddy shows the existing `outcomes` and `recap` text in its speech bubble, so each scenario only adds a few extra Buddy lines. Each recap item points at part of the scam screen. `target` names a field in `content`, and the optional `highlight` is the exact text inside that field to circle. The "spot the clues" mini-game uses the same targets.
+Shield Buddy shows the existing `outcomes` and `recap` text in its speech bubble, so each scenario only adds a few extra Buddy lines. Each recap item points at part of the scam screen. `target` names a field in `content` (separate texts in a list are `message1`, `message2`, and so on), and the optional `highlight` is the exact text inside that field to circle. The "spot the clues" mini-game uses the same targets.
 
 ## Open questions
 

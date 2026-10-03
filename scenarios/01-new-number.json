@@ -1,0 +1,41 @@
+{
+  "id": "new-number",
+  "title": "It's Mom, New Number",
+  "mockup": "sms",
+  "content": {
+    "sender": "+1 (555) 019-2834",
+    "time": "4:12 PM",
+    "messages": [
+      "Hey sweetie, it’s Mom. I had to get a new number because my phone stopped working.",
+      "I need a favor really quick.",
+      "Can you send me the code that just came to your phone?"
+    ],
+    "notification": {
+      "sender": "+1 (555) 386-7720",
+      "text": "Your Apple Account code is: 482913. Use it to reset your password. Don't share it with anyone."
+    }
+  },
+  "outcomes": {
+    "do":     { "result": "red",    "text": "You sent the code. It was the key to your game account. Now a stranger can log in as you." },
+    "ignore": { "result": "yellow", "text": "You didn't send the code. But the scammer keeps texting, and might trick someone else." },
+    "tell":   { "result": "green",  "text": "Dad called Mom on her old number. Her phone was fine! They blocked the fake number and reported it. Scam stopped!" }
+  },
+  "buddy": {
+    "intro": "Ooh, a new text message just came in!",
+    "reactions": {
+      "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
+      "ignore": { "mood": "thinking", "text": "Safe for now… but the scam is still out there." },
+      "tell":   { "mood": "cheering", "text": "Great call! Checking with a grown-up stopped it!" }
+    }
+  },
+  "recap": {
+    "stop": { "target": "message2", "highlight": "really quick", "text": "'Really quick' was trying to rush you, so you wouldn't stop and think." },
+    "check": [
+      { "target": "sender", "text": "This number isn't saved as Mom in your phone." },
+      { "target": "message1", "highlight": "I had to get a new number", "text": "'I got a new number' is a trick scammers use a lot. Anyone can say they're your mom." },
+      { "target": "message3", "highlight": "send me the code", "text": "Never share a code sent to your phone. Codes are like keys to your accounts." },
+      { "target": "notificationText", "highlight": "Don't share it with anyone", "text": "The code itself says not to share it. Someone is trying to get into your account." }
+    ],
+    "tell": "Show a grown-up and say: 'Someone says they're Mom and wants my code. Can we call her old number?'"
+  }
+}

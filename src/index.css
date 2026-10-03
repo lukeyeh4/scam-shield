@@ -1,10 +1,20 @@
-/* Wireframe styles: greyscale boxes for layout only, not the final look. */
+/* Wireframe styles: neutral greys for layout and sizing, not the final colours. */
 :root {
-  --line: #9a9a9a;
-  --fill: #f2f2f2;
-  --ink: #222;
-  --muted: #777;
-  font-family: system-ui, sans-serif;
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-soft: #eef0f3;
+  --surface-hover: #e4e7ec;
+  --ink: #1d2433;
+  --muted: #5b6475;
+  --hairline: #e6e8ec;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05), 0 2px 8px rgb(16 24 40 / 0.05);
+  --shadow-md: 0 2px 4px rgb(16 24 40 / 0.05), 0 10px 28px rgb(16 24 40 / 0.08);
+  --radius: 20px;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* Large, easy-to-read text that grows a little on bigger screens */
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: clamp(18px, 1rem + 0.5vw, 22px);
+  line-height: 1.5;
   color: var(--ink);
 }
 
@@ -14,31 +24,120 @@
 
 body {
   margin: 0;
-  background: #fff;
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
 
-.app {
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+button {
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    transform 150ms var(--ease),
+    box-shadow 150ms var(--ease),
+    background-color 150ms var(--ease);
+}
+
+button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Shield Buddy: the bot, with its speech bubbles beside it */
+.buddy {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.buddy-image {
+  flex: none;
+  width: 128px;
+  height: 128px;
+  /* The artwork has empty space around the shield */
+  margin: -16px -12px -20px;
+}
+
+.buddy-messages {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  gap: 10px;
+  min-width: 0;
 }
 
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 2px dashed var(--line);
-  font-weight: 600;
+/* A new bubble grows into place, so the older ones glide up to make room */
+.buddy-row {
+  display: grid;
+  grid-template-rows: 1fr;
+  animation: bubble-grow 400ms var(--ease) both;
 }
 
-.back {
-  padding: 6px 12px;
-  border: 2px solid var(--ink);
-  border-radius: 8px;
-  background: var(--fill);
-  font: inherit;
-  cursor: pointer;
+.buddy-bubble {
+  display: grid;
+  min-height: 0;
+  max-width: 30ch;
+  padding: 12px 18px;
+  border-radius: 22px 22px 22px 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transform-origin: bottom left;
+  animation: bubble-pop 400ms var(--ease) both;
+}
+
+.buddy-row-old .buddy-bubble {
+  border-radius: 22px;
+  color: var(--muted);
+  transition: color 300ms var(--ease);
+}
+
+/* Typed text sits on top of the hidden full text, so the bubble doesn't grow as it types */
+.buddy-text-full,
+.buddy-text-typed {
+  grid-area: 1 / 1;
+}
+
+.buddy-text-full {
+  visibility: hidden;
+}
+
+@keyframes bubble-grow {
+  from {
+    grid-template-rows: 0fr;
+  }
+}
+
+@keyframes bubble-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .buddy-row,
+  .buddy-bubble {
+    animation: none;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Main menu */
@@ -46,20 +145,34 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  max-width: 480px;
+  gap: 28px;
+  max-width: 560px;
   margin: 0 auto;
-  padding: 32px 16px;
+  padding: 40px 16px 48px;
 }
 
 .menu-title {
-  margin: 0;
-  font-size: 40px;
+  font-size: 2.4em;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.menu .buddy {
+  align-self: stretch;
+  justify-content: center;
+}
+
+.menu .buddy-image {
+  width: 160px;
+  height: 160px;
 }
 
 .menu-steps {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+  width: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -69,35 +182,49 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 88px;
-  padding: 8px;
-  border: 2px dashed var(--line);
-  border-radius: 12px;
-  font-weight: 600;
+  padding: 14px 8px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
 }
 
-.menu-step-emoji {
-  font-size: 28px;
+.menu-step-label {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.menu-step-hint {
+  font-size: 0.85em;
+  color: var(--muted);
 }
 
 .menu-start {
   width: 100%;
-  min-height: 64px;
-  border: 3px solid var(--ink);
-  border-radius: 16px;
-  background: var(--fill);
-  font: inherit;
-  font-size: 24px;
+  min-height: 72px;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--surface);
+  font-size: 1.4em;
   font-weight: 700;
-  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+.menu-start:hover {
+  background: #2c3547;
+}
+
+.menu-heading {
+  align-self: flex-start;
+  font-size: 1.2em;
 }
 
 .menu-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  margin: 0;
+  margin: -16px 0 0;
   padding: 0;
   list-style: none;
 }
@@ -105,67 +232,337 @@ body {
 .menu-scenario {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
-  min-height: 52px;
-  padding: 8px 12px;
-  border: 2px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-  font: inherit;
-  font-size: 18px;
+  min-height: 64px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
   text-align: left;
-  cursor: pointer;
+}
+
+.menu-scenario:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .menu-scenario-number {
   display: grid;
+  flex: none;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 2px solid var(--line);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  background: var(--surface-soft);
   font-weight: 700;
 }
 
-/* Phone in the middle; the bottom padding leaves room for Buddy */
-.app-main {
-  flex: 1;
+/* Scenario: header, the scam screen with Buddy beside it, then the choices.
+   Everything fits on one screen; the scam screen shrinks to fit. */
+.scenario {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100dvh;
+  /* Keeps the hidden choices panel from making the page scroll */
+  overflow: hidden;
+}
+
+.scenario-header {
   display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 16px 4px;
+}
+
+.scenario-title {
+  font-size: 1.3em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.back {
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+.back:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Tablets and up: the scam screen and Shield Buddy side by side */
+.scenario-main {
+  display: grid;
+  grid-template-columns: minmax(0, 360px) minmax(0, 380px);
+  /* One row the height of the space available, so the phone fits on screen */
+  grid-template-rows: minmax(0, 1fr);
   justify-content: center;
-  align-items: flex-start;
-  padding: 24px 16px 160px;
+  gap: 32px;
+  padding: 16px;
+  overflow: auto;
 }
 
-.mockup {
-  width: 100%;
-  max-width: 360px;
+.scenario-main .mockup {
+  justify-content: flex-end;
 }
 
-/* Phone */
-.phone {
+.scenario-buddy {
+  align-self: end;
+  padding-bottom: 8px;
+}
+
+.scenario-footer {
   display: flex;
   flex-direction: column;
-  min-height: 560px;
-  border: 3px solid var(--ink);
-  border-radius: 32px;
+  gap: 14px;
+  padding: 20px 16px;
+  border-radius: 28px 28px 0 0;
+  background: var(--surface);
+  box-shadow: 0 -4px 24px rgb(16 24 40 / 0.06);
+  transition:
+    transform 550ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 300ms ease-out;
+}
+
+/* Waiting below the screen until Shield Buddy has finished talking */
+.scenario-footer-hidden {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scenario-footer {
+    transition: none;
+  }
+}
+
+.choices-question {
+  font-size: 1.3em;
+  font-weight: 800;
+  text-align: center;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.choice {
+  min-height: 72px;
+  padding: 8px;
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.choice:hover {
+  background: var(--surface-hover);
+}
+
+/* Narrower screens: Shield Buddy gets its own row under the scam screen,
+   showing just its newest message */
+@media (max-width: 860px) {
+  .scenario-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .scenario-main .mockup {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    justify-content: center;
+  }
+
+  .scenario-buddy {
+    align-self: stretch;
+    padding-bottom: 0;
+  }
+
+  .scenario-buddy .buddy-row-old {
+    display: none;
+  }
+}
+
+/* Phones: tighter spacing so the fake phone keeps as much room as possible */
+@media (max-width: 560px) {
+  .scenario-footer {
+    gap: 10px;
+    padding: 14px 12px 16px;
+  }
+
+  .choices {
+    gap: 8px;
+  }
+
+  .choice {
+    min-height: 64px;
+    padding: 6px;
+    font-size: 1em;
+    line-height: 1.2;
+  }
+
+  .buddy-image {
+    width: 96px;
+    height: 96px;
+  }
+
+  .menu .buddy-image {
+    width: 128px;
+    height: 128px;
+  }
+}
+
+/* Fake screens keep realistic, slightly enlarged text, whatever the screen size */
+.mockup {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 360px;
+  height: 100%;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+/* Phone: a modern smartphone with a black bezel, at a real phone's proportions.
+   It grows to fill the height available. */
+.phone {
+  --phone-bg: #ffffff;
+  height: 100%;
+  max-height: 720px;
+  aspect-ratio: 292 / 536;
+  max-width: 100%;
+  padding: 9px;
+  border-radius: 52px;
+  background: #0f0f11;
+  box-shadow:
+    0 0 0 2.5px #c9ccd1,
+    var(--shadow-md);
+}
+
+.phone-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 43px;
+  background: var(--phone-bg);
+  color: #000;
   overflow: hidden;
 }
 
 .phone-status {
+  position: relative;
   display: flex;
   justify-content: space-between;
-  padding: 10px 20px 4px;
-  font-size: 13px;
+  align-items: center;
+  min-height: 46px;
+  padding: 10px 20px 4px 26px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
+/* The camera notch scales with the phone so it never covers the time or icons */
+.phone-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  width: 28%;
+  height: 26px;
+  border-radius: 999px;
+  background: #000;
+  transform: translateX(-50%);
+}
+
+.phone-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.phone-compose {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 6px;
+}
+
+.phone-camera {
+  flex: none;
+  color: #a1a1a6;
+}
+
+.phone-input {
+  flex: 1;
+  padding: 6px 14px;
+  border: 1px solid #d1d1d6;
+  border-radius: 999px;
+  color: #a1a1a6;
+  font-size: 16px;
+}
+
+.phone-home-bar {
+  align-self: center;
+  width: 38%;
+  height: 5px;
+  margin: 8px 0 8px;
+  border-radius: 999px;
+  background: #000;
+}
+
+/* Text messages */
 .sms-header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 8px 0 12px;
-  border-bottom: 1px solid var(--line);
+  gap: 4px;
+  padding: 6px 0 10px;
+}
+
+.sms-avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 8px;
+  border-radius: 50%;
+  background: #5b9cf0;
+  color: #fff;
+}
+
+.sms-sender {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sms-thread {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+  padding: 8px 16px 12px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.sms-time {
+  margin-bottom: 4px;
+  text-align: center;
+  font-size: 12px;
+  color: #8e8e93;
 }
 
 .avatar {
@@ -174,113 +571,223 @@ body {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--fill);
-  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  color: var(--muted);
   font-weight: 600;
 }
 
-.sms-sender {
-  font-size: 14px;
-}
-
-.sms-thread {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-}
-
-.sms-time {
-  text-align: center;
-  font-size: 12px;
-  color: var(--muted);
-}
-
+/* Message bubbles, with the little curled tail at the bottom corner */
 .bubble {
-  max-width: 80%;
-  padding: 10px 14px;
-  border-radius: 18px;
-  line-height: 1.4;
+  position: relative;
+  max-width: 78%;
+  padding: 9px 14px;
+  border-radius: 20px;
 }
 
 .bubble-in {
   align-self: flex-start;
-  background: var(--fill);
-  border: 1px solid var(--line);
+  background: #e5e5ea;
+  color: #000;
 }
 
-.sms-input {
-  margin: 8px 12px 16px;
-  padding: 8px 14px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  color: var(--muted);
-}
-
-/* Shield Buddy */
-.buddy {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  max-width: min(360px, calc(100% - 32px));
-}
-
-/* In a scenario, Buddy stays in the bottom-right corner, just above the choices */
-.buddy-corner {
-  position: fixed;
-  right: 16px;
-  bottom: 116px;
-}
-
-.buddy-bubble {
-  margin: 0;
-  padding: 10px 14px;
-  border: 2px dashed var(--line);
-  border-radius: 14px;
-  background: #fff;
-}
-
-.buddy-image {
-  flex: none;
-  width: 96px;
-  height: 96px;
-}
-
-/* Three choices at the bottom */
-.choices {
-  position: sticky;
+.bubble-in::before,
+.bubble-in::after {
+  content: '';
+  position: absolute;
   bottom: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  padding: 12px 16px 16px;
-  border-top: 2px dashed var(--line);
-  background: #fff;
+  height: 20px;
 }
 
-.choice {
+.bubble-in::before {
+  left: -7px;
+  width: 20px;
+  border-bottom-right-radius: 16px 14px;
+  background: #e5e5ea;
+}
+
+.bubble-in::after {
+  left: -10px;
+  width: 10px;
+  border-bottom-right-radius: 10px;
+  background: var(--phone-bg);
+}
+
+/* Messages in a row sit close together, and only the newest has a tail */
+.bubble-in + .bubble-in {
+  margin-top: -4px;
+}
+
+.bubble-no-tail::before,
+.bubble-no-tail::after {
+  display: none;
+}
+
+/* Incoming text, like a real phone: the "typing…" bubble, then the message pops in */
+.typing-indicator {
+  position: relative;
+  align-self: flex-start;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-height: 72px;
-  border: 2px solid var(--ink);
-  border-radius: 12px;
-  background: var(--fill);
-  font: inherit;
+  gap: 5px;
+  padding: 13px 15px;
+  border-radius: 20px;
+  background: #e5e5ea;
+  transform-origin: bottom left;
+  animation: message-pop 300ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+/* The two little "thought bubble" circles under the typing bubble */
+.typing-indicator::before,
+.typing-indicator::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: #e5e5ea;
+}
+
+.typing-indicator::before {
+  left: -2px;
+  bottom: -2px;
+  width: 12px;
+  height: 12px;
+}
+
+.typing-indicator::after {
+  left: -7px;
+  bottom: -7px;
+  width: 6px;
+  height: 6px;
+}
+
+.typing-indicator span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #8e8e93;
+  animation: typing-dot 1.2s ease-in-out infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.sms-arrive-pop {
+  transform-origin: bottom left;
+  animation: message-pop 450ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+.sms-arrive-fade {
+  animation: message-fade 300ms ease-out both;
+}
+
+@keyframes message-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.6);
+  }
+}
+
+@keyframes message-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* iPhone notification banner: frosted glass, dropping down from the top */
+.notification {
+  position: absolute;
+  top: 46px;
+  left: 6px;
+  right: 6px;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 11px 12px 12px 10px;
+  border-radius: 24px;
+  background: rgb(246 246 248 / 0.82);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.16);
+  color: #000;
+  animation: banner-drop 550ms cubic-bezier(0.32, 1.25, 0.5, 1) both;
+}
+
+.notification-icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin-top: 2px;
+}
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+/* The number is a clue, so it gets as much room as possible on one line */
+.notification-sender {
+  overflow: hidden;
+  font-size: 15px;
   font-weight: 600;
-  cursor: pointer;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.choice-emoji {
-  font-size: 24px;
+.notification-time {
+  flex: none;
+  font-size: 13px;
+  color: rgb(60 60 67 / 0.6);
 }
 
-@media (max-width: 600px) {
-  .buddy-image {
-    width: 64px;
-    height: 64px;
+.notification-text {
+  display: block;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+@keyframes banner-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-130%) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification {
+    animation: none;
+  }
+}
+
+/* Narrow screens: let the phone fill the width so its text stays readable */
+@media (max-width: 560px) {
+  .phone {
+    width: 100%;
+    aspect-ratio: auto;
   }
 }
 
