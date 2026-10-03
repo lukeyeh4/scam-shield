@@ -7,5 +7,14 @@ export default function App() {
   const [current, setCurrent] = useState<number | null>(null)
 
   if (current === null) return <MainMenu onPlay={setCurrent} />
-  return <ScenarioScreen scenario={scenarios[current]} onBack={() => setCurrent(null)} />
+  const isLast = current === scenarios.length - 1
+  return (
+    <ScenarioScreen
+      key={scenarios[current].id}
+      scenario={scenarios[current]}
+      isLast={isLast}
+      onBack={() => setCurrent(null)}
+      onNext={() => setCurrent(isLast ? null : current + 1)}
+    />
+  )
 }

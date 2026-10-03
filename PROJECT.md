@@ -10,18 +10,28 @@ What's done, what's next, and what's still undecided. The design itself lives in
 - [x] All 5 scenarios written in `scenarios/`, including Buddy's lines and the red flags to highlight
 - [x] Fake-screen components for text messages, game chat, a messaging app, email and a shopping website (`src/mockups/`)
 - [x] Wireframe: main menu, plus a scenario screen with the text-message screen, three choice buttons and Buddy in the corner
+- [x] iPhone-style text-message screen: texts arrive one by one with typing dots, plus a notification banner
+- [x] Shield Buddy speaks in typed-out chat bubbles; the choices slide up once it has finished
 
 ## 1. Make the game playable
 
 Get one scenario working all the way through, using the wireframe style.
 
-- [ ] Make the three choice buttons work (screen 2)
-- [ ] **What happened** (screen 3): Buddy reacts to the choice, all three outcomes are shown, and the player's pick is highlighted
-- [ ] **Stop, Check, Tell recap** (screen 4): step through STOP, each CHECK flag, then TELL, highlighting each red flag on the scam screen as Buddy explains it. Highlighting is already supported in `src/mockups/Field.tsx` and just needs connecting to the screens.
-- [ ] Screen 1 vs. screen 2: show the scam on its own first (with Buddy's intro), then the choices. The wireframe currently puts them on one screen.
-- [ ] At the end of a scenario: "Next scenario" and "Back to menu"
+- [x] Make the three choice buttons work (screen 2)
+- [x] **What happened** (screen 3, wireframe, on branch `try/result-screens`): Buddy explains the result of the player's choice, then "What if you had…" cards show the other two
+- [x] **Stop, Check, Tell recap** (screen 4, wireframe, on branch `try/result-screens`): a 3-step progress bar; each step highlights a red flag on the scam screen while Buddy explains it, with Back and Next buttons
+- [x] Screen 1 vs. screen 2: the scam plays on its own first, then the choices slide up
+- [x] At the end of a scenario: "Next scenario" (or "Finish" after the last one); "Menu" is always in the header
+- [ ] Decide whether to keep the two result screens (merge `try/result-screens` into `main`, or drop it)
 - [ ] Remember finished scenarios and show ✅ on the menu
 - [ ] Check all 5 scenarios play through correctly
+
+## Potential simplifications
+
+Ideas to make the game shorter or gentler, to try after kids have played it.
+
+- [ ] Remove the "What if you had…" cards from the What happened screen, if it feels like too much reading. Only do this if the difference between Ignore and Tell is still taught somewhere (it's the main lesson).
+- [ ] Add a "Try again" button so kids who pick Do it or Ignore it can go back and choose again, so a wrong pick doesn't feel like a punishment. For now, the end of each scenario only offers "Next scenario".
 
 ## 2. Fake screens
 
@@ -34,9 +44,8 @@ Replace the grey wireframe with the real look.
 
 - [ ] Bright, friendly style with big buttons and large text (see "Look and feel" in `README.md`)
 - [ ] Make each fake screen look realistic
-- [ ] Colours for the outcomes (🔴 🟡 🟢) and the Stop, Check, Tell steps
-- [ ] Fix Shield Buddy's speech bubble overlapping the fake phone on tablets
-- [ ] Check the layout at a real phone width (390px). Only tablet width and 500px have been checked so far.
+- [ ] Colours for the outcomes and the Stop, Check, Tell steps (the wireframe has soft placeholder tints)
+- [ ] In the recap the phone is a little smaller, so the notification's phone number gets cut off on tablets
 - [ ] Shrink Buddy's images. Each is a 1000×1000 PNG of about 360 KB, much bigger than they're shown.
 
 ## 4. Tests and checks

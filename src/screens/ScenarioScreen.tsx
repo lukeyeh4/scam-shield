@@ -3,16 +3,33 @@ import { Buddy } from '../buddy/Buddy'
 import { CHOICES } from '../labels'
 import { arrivalDelay } from '../mockups/arrival'
 import { Mockup } from '../mockups/Mockup'
-import type { Scenario } from '../types'
+import type { Choice, Scenario } from '../types'
+import { OutcomeScreen } from './OutcomeScreen'
+import { RecapScreen } from './RecapScreen'
 
 // Said after every scenario's intro. Stays neutral: no hints before the choice.
 const CHOOSE_PROMPT = 'Read it carefully. Then pick what you would do.'
 
+type ScenarioScreenProps = {
+  scenario: Scenario
+  isLast: boolean
+  onBack: () => void
+  onNext: () => void
+}
+
 // Wireframe: the scam screen with Shield Buddy beside it. Once Buddy has finished
-// talking, the three choices slide up from the bottom.
-export function ScenarioScreen({ scenario, onBack }: { scenario: Scenario; onBack: () => void }) {
+// talking, the three choices slide up from the bottom. Picking one leads to
+// "What happened", then "Stop, Check, Tell".
+export function ScenarioScreen({ scenario, isLast, onBack, onNext }: ScenarioScreenProps) {
   const [showChoices, setShowChoices] = useState(false)
   const revealChoices = useCallback(() => setShowChoices(true), [])
+  const [choice, setChoice] = useState<Choice | null>(null)
+  const [showRecap, setShowRecap] = useState(false)
+
+  if (showRecap) return <RecapScreen scenario={scenario} isLast={isLast} onBack={onBack} onNext={onNext} />
+  if (choice) {
+    return <OutcomeScreen scenario={scenario} choice={choice} onBack={onBack} onContinue={() => setShowRecap(true)} />
+  }
 
   return (
     <div className="scenario">
@@ -41,7 +58,7 @@ export function ScenarioScreen({ scenario, onBack }: { scenario: Scenario; onBac
         <h2 className="choices-question">What would you do?</h2>
         <div className="choices">
           {CHOICES.map((c) => (
-            <button key={c.id} className="choice" type="button">
+            <button key={c.id} className="choice" type="button" onClick={() => setChoice(c.id)}>
               {c.label}
             </button>
           ))}

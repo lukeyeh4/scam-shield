@@ -1,20 +1,29 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { reduceMotion } from '../motion'
 import type { SmsContent } from '../types'
 import { Field } from './Field'
+import { MarksContext } from './marks'
 import { NotificationBanner } from './NotificationBanner'
 import { PersonIcon, PhoneFrame } from './PhoneFrame'
 import { smsNotificationAt, smsTimeline } from './smsTimeline'
 
-export function SmsMockup({ content }: { content: SmsContent }) {
+export function SmsMockup({ content, animate }: { content: SmsContent; animate: boolean }) {
+  const playIn = animate && !reduceMotion()
   const total = content.messages.length
-  const [delivered, setDelivered] = useState(() => (reduceMotion() ? total : 0))
+  const [delivered, setDelivered] = useState(playIn ? 0 : total)
   const [typing, setTyping] = useState(false)
-  const [notified, setNotified] = useState(() => reduceMotion())
+  const [notified, setNotified] = useState(!playIn)
   const threadRef = useRef<HTMLDivElement>(null)
+  const marks = useContext(MarksContext)
+
+  // Without the animation (the recap), the banner only shows while it's being pointed at,
+  // so it doesn't cover the texts the other clues point at
+  const showBanner = animate
+    ? notified
+    : marks.some((m) => m.target.startsWith('notification') && m.state === 'active')
 
   useEffect(() => {
-    if (reduceMotion()) return
+    if (!playIn) return
     const timers = smsTimeline(content.messages).flatMap(({ typingAt, deliveredAt }, i) => [
       setTimeout(() => setTyping(true), typingAt),
       setTimeout(() => {
@@ -24,7 +33,7 @@ export function SmsMockup({ content }: { content: SmsContent }) {
     ])
     if (content.notification) timers.push(setTimeout(() => setNotified(true), smsNotificationAt(content)))
     return () => timers.forEach(clearTimeout)
-  }, [content])
+  }, [content, playIn])
 
   // Like a real phone, keep the newest message (or the typing dots) in view
   useEffect(() => {
@@ -45,7 +54,7 @@ export function SmsMockup({ content }: { content: SmsContent }) {
 
   return (
     <PhoneFrame inputLabel="Message">
-      {content.notification && notified && (
+      {content.notification && showBanner && (
         <NotificationBanner sender={content.notification.sender} text={content.notification.text} />
       )}
       <div className="sms-header">
@@ -56,7 +65,7 @@ export function SmsMockup({ content }: { content: SmsContent }) {
       </div>
       <div className="sms-thread" ref={threadRef}>
         {delivered > 0 && (
-          <div className="sms-time sms-arrive-fade">
+          <div className={playIn ? 'sms-time sms-arrive-fade' : 'sms-time'}>
             Text Message
             <br />
             Today {content.time}
@@ -64,7 +73,10 @@ export function SmsMockup({ content }: { content: SmsContent }) {
         )}
         {content.messages.slice(0, delivered).map((message, i) => (
           // Only the newest message in a row has the curled tail, like a real phone
-          <div key={i} className={`bubble bubble-in sms-arrive-pop ${i === delivered - 1 ? '' : 'bubble-no-tail'}`}>
+          <div
+            key={i}
+            className={`bubble bubble-in ${playIn ? 'sms-arrive-pop' : ''} ${i === delivered - 1 ? '' : 'bubble-no-tail'}`}
+          >
             <Field name={`message${i + 1}`} text={message} />
           </div>
         ))}

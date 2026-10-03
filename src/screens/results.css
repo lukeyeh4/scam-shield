@@ -1,0 +1,297 @@
+/* Styles for the "What happened" and "Stop, Check, Tell" screens (wireframe). */
+
+/* Each new screen eases in */
+.screen-enter {
+  animation: screen-in 450ms var(--ease) both;
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-enter {
+    animation: none;
+  }
+}
+
+/* Buttons */
+.primary-button,
+.secondary-button {
+  min-height: 64px;
+  padding: 0 28px;
+  border-radius: var(--radius);
+  font-size: 1.2em;
+  font-weight: 700;
+}
+
+.primary-button {
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.primary-button:hover {
+  background: #2c3547;
+}
+
+.secondary-button {
+  background: var(--surface-soft);
+}
+
+.secondary-button:hover {
+  background: var(--surface-hover);
+}
+
+.secondary-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Result tags: soft colours so the three results are easy to tell apart */
+.result-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.9em;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.result-red {
+  background: #fde2e1;
+  color: #9b1c1c;
+}
+
+.result-yellow {
+  background: #fdf1c4;
+  color: #7a5600;
+}
+
+.result-green {
+  background: #dcf5e3;
+  color: #1c6b38;
+}
+
+/* What happened */
+.outcome-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  overflow: auto;
+}
+
+.outcome-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.outcome-chosen {
+  font-size: 1.4em;
+}
+
+.outcome-main .buddy {
+  align-self: stretch;
+  justify-content: center;
+}
+
+.outcome-main .buddy-image {
+  width: 150px;
+  height: 150px;
+}
+
+.outcome-others {
+  width: 100%;
+  transition:
+    opacity 400ms ease-out,
+    transform 500ms var(--ease);
+}
+
+.outcome-others.is-hidden {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.outcome-others-title {
+  margin-bottom: 12px;
+  font-size: 1.2em;
+}
+
+.outcome-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.outcome-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.outcome-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.outcome-card p {
+  color: var(--muted);
+  font-size: 0.95em;
+}
+
+/* Stop, Check, Tell */
+.recap-main {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 640px;
+  margin: 8px auto 0;
+  padding: 0 16px;
+  list-style: none;
+}
+
+.stepper-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* The line joining one step to the next */
+.stepper-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 19px;
+  left: calc(50% + 26px);
+  right: calc(-50% + 26px);
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface-hover);
+}
+
+.stepper-step.is-done:not(:last-child)::after {
+  background: var(--ink);
+}
+
+.stepper-dot {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--surface-hover);
+  font-weight: 700;
+  transition:
+    background-color 300ms var(--ease),
+    color 300ms var(--ease),
+    transform 300ms var(--ease);
+}
+
+.stepper-step.is-done .stepper-dot {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.stepper-step.is-current {
+  color: var(--ink);
+}
+
+.stepper-step.is-current .stepper-dot {
+  background: var(--ink);
+  color: var(--surface);
+  transform: scale(1.12);
+}
+
+.stepper-label {
+  margin-top: 6px;
+  font-size: 1.1em;
+  font-weight: 700;
+}
+
+.stepper-hint {
+  font-size: 0.8em;
+}
+
+.recap-footer {
+  flex-direction: row;
+  justify-content: center;
+}
+
+.recap-footer .primary-button {
+  min-width: 220px;
+}
+
+/* Red flags highlighted on the fake screen */
+.flag {
+  border-radius: 6px;
+  color: inherit;
+  transition:
+    background-color 300ms var(--ease),
+    box-shadow 300ms var(--ease);
+}
+
+mark.flag {
+  padding: 0 2px;
+}
+
+.flag-active {
+  background: #ffe066;
+  box-shadow: 0 0 0 3px #f5b700;
+}
+
+.flag-seen {
+  background: rgb(255 224 102 / 0.4);
+}
+
+@media (max-width: 560px) {
+  .outcome-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .outcome-main .buddy-image {
+    width: 110px;
+    height: 110px;
+  }
+
+  .stepper-hint {
+    display: none;
+  }
+
+  .primary-button,
+  .secondary-button {
+    min-height: 56px;
+    padding: 0 20px;
+    font-size: 1.05em;
+  }
+
+  .recap-footer .primary-button {
+    min-width: 0;
+    flex: 1;
+  }
+}

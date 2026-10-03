@@ -6,12 +6,20 @@ import { MessengerMockup } from './MessengerMockup'
 import { SmsMockup } from './SmsMockup'
 import { WebsiteMockup } from './WebsiteMockup'
 
+type MockupProps = {
+  screen: ScenarioScreen
+  // Red flags to highlight (used by the recap)
+  marks?: Mark[]
+  // false shows the finished screen straight away, without the arrival animation
+  animate?: boolean
+}
+
 // Renders a scenario's fake screen. Nothing inside is a real link or button.
-export function Mockup({ screen, marks = [] }: { screen: ScenarioScreen; marks?: Mark[] }) {
+export function Mockup({ screen, marks = [], animate = true }: MockupProps) {
   return (
     <MarksContext.Provider value={marks}>
       <div className="mockup" aria-label="The message you got">
-        {screen.mockup === 'sms' && <SmsMockup content={screen.content} />}
+        {screen.mockup === 'sms' && <SmsMockup content={screen.content} animate={animate} />}
         {screen.mockup === 'game-chat' && <GameChatMockup content={screen.content} />}
         {screen.mockup === 'messenger' && <MessengerMockup content={screen.content} />}
         {screen.mockup === 'email' && <EmailMockup content={screen.content} />}
