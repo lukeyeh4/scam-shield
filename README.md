@@ -63,6 +63,25 @@ The scam screen comes back, this time with explanations added to it:
 
 Optional: before the recap, the player taps the red flags themselves as a mini "spot the clues" game.
 
+## Shield Buddy
+
+Shield Buddy is a friendly shield with a face who guides the player through each scenario. It talks in short speech bubbles and its face changes to match what's happening.
+
+| Screen | What Shield Buddy does | Mood |
+|--------|------------------------|------|
+| 1. The scam | Says one neutral line, like "Ooh, a new message!" | `curious` |
+| 2. The choice | Asks "What would you do?" | `thinking` |
+| 3. What happened | Reacts to each outcome and explains it | `worried` (🔴), `thinking` (🟡), `cheering` (🟢) |
+| 4. Recap | Narrates Stop, Check, Tell while each red flag is highlighted on the scam screen | `neutral` |
+
+Rules for Shield Buddy:
+
+- **No hints before the choice.** On screens 1 and 2 it stays neutral, so kids learn to find the clues themselves.
+- **It isn't a trusted adult.** It always sends kids to a real grown-up: *"I can't block scammers, but a grown-up can!"*
+- **One or two short sentences per bubble**, at the same reading level as the rest of the game.
+- **Every line is scripted** in the scenario files. Nothing is generated on the fly.
+- **It starts with a fixed set of moods:** `happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`. Each mood is one image of the character, stored in `shield_buddy/`.
+
 ## The 5 scenarios
 
 Ordered from easiest to hardest:
@@ -86,6 +105,11 @@ Telling an adult always leads to the 🟢 outcome: the scam is blocked or report
 - **No shame.** Wrong choices are part of learning, so say "Here's what to watch for next time," not "You failed."
 - **Simple language.** Aim for a reading level of about 8 years old.
 
+## Tech stack
+
+- **React + TypeScript**, built with **Vite**. Every scenario reuses the same screens, fake-screen mock-ups and Shield Buddy, so reusable components are a good fit. TypeScript checks the scenario files against one shared format.
+- **A web app that works on tablets.** Layouts adapt to the screen, and the buttons are big enough to tap easily. It can be hosted as plain static files (for example, on GitHub Pages).
+
 ## Proposed structure
 
 ```
@@ -99,6 +123,7 @@ scam-shield/
 │   └── 05-mega-deal.json
 └── src/
     ├── mockups/          # Reusable fake screens: phone SMS, email, game chat, website
+    ├── buddy/            # Shield Buddy: one image per mood, plus the speech bubble
     └── ...               # Game screens: choice, results, recap
 ```
 
@@ -120,21 +145,36 @@ Each scenario picks a mock-up type and fills it with its own content, so adding 
     "ignore": { "result": "yellow", "text": "You stayed safe, but the next day another prize text arrives..." },
     "tell":   { "result": "green",  "text": "Mum blocked the number and reported it as spam. Scam stopped!" }
   },
+  "buddy": {
+    "intro": "Ooh, a new text! What would you do?",
+    "reactions": {
+      "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
+      "ignore": { "mood": "thinking", "text": "Safe for now… but the scam is still out there." },
+      "tell":   { "mood": "cheering", "text": "Great call! Telling a grown-up stopped it!" }
+    }
+  },
   "recap": {
-    "stop":  "The '5 mins' timer was trying to rush you.",
-    "check": ["Unknown number", "You never entered a contest", "Spelling mistake: 'befor'", "Strange link"],
+    "stop":  { "target": "message", "highlight": "Claim in 5 mins", "text": "This timer was trying to rush you." },
+    "check": [
+      { "target": "sender",  "text": "You don't know this number." },
+      { "target": "message", "highlight": "WON", "text": "You never entered a contest!" },
+      { "target": "message", "highlight": "befor", "text": "Spelling mistake: 'befor'." },
+      { "target": "message", "highlight": "prize-claim.co/win", "text": "This is a strange link." }
+    ],
     "tell":  "Show a parent and say: 'I got this text and I'm not sure about it.'"
   }
 }
 ```
 
+Shield Buddy shows the existing `outcomes` and `recap` text in its speech bubble, so each scenario only adds a few extra Buddy lines. Each recap item points at part of the scam screen. `target` names a field in `content`, and the optional `highlight` is the exact text inside that field to circle. The "spot the clues" mini-game uses the same targets.
+
 ## Open questions
 
-- [ ] Platform: web, tablet, or both?
-- [ ] Tech stack (for example, plain HTML/JS or React)
-- [ ] Mascot or guide character for the recap screens?
+- [x] Platform: a web app that works on tablets
+- [x] Tech stack: React + TypeScript + Vite
+- [x] Mascot: Shield Buddy (artwork in `shield_buddy/`)
 - [ ] Should there be an end screen or certificate after all 5 scenarios?
-- [ ] Read-aloud audio for younger readers?
+- [ ] Read-aloud audio for younger readers? (Planned for later. Shield Buddy's lines would be read aloud.)
 
 ## Getting started
 
