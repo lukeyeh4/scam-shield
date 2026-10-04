@@ -124,10 +124,10 @@ export function RecapScreen({ scenario, isLast, onBack, onNext, startAtSummary }
             />
           )}
           <div className="scenario-buddy">
+            {/* Everything said so far stays, so the player can scroll back up */}
             <Buddy
-              key={index}
               mood={step.summary ? 'cheering' : step.phase === 'tell' ? 'happy' : 'neutral'}
-              messages={step.messages}
+              messages={steps.slice(0, index + 1).flatMap((s) => s.messages)}
             />
           </div>
         </div>
