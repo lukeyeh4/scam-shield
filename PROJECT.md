@@ -70,7 +70,7 @@ Vitest is installed, but there's no test script or tests yet.
 
 ## Later
 
-- [ ] "Spot the clues" mini-game: tap the red flags before the recap (being tried on branch `try/spot-clues`: `SpotScreen`, between What happened and the recap)
+- [ ] "Spot the clues" mini-game, being tried on branch `try/spot-clues` (`SpotScreen`, between What happened and the recap): a checklist of about 3 easy clues per scenario (recap items with a `spot` name), kind replies to wrong taps, and the recap still covers every clue. On narrow phones the checklist takes a lot of room under the iPad screen.
 - [ ] Read-aloud audio for Shield Buddy's lines
 - [ ] More scenarios
 

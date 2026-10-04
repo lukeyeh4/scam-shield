@@ -93,12 +93,14 @@
     "stop": {
       "target": "adText",
       "highlight": "Limited time!",
-      "text": "'Limited time' was trying to make you rush."
+      "text": "'Limited time' was trying to make you rush.",
+      "spot": "Someone rushing you"
     },
     "check": [
       {
         "target": "adLabel",
-        "text": "'Sponsored' means someone paid to put this at the top. Scammers can buy ads too."
+        "text": "'Sponsored' means someone paid to put this at the top. Scammers can buy ads too.",
+        "spot": "'Sponsored' at the top"
       },
       {
         "target": "adUrl",
@@ -107,7 +109,8 @@
       {
         "target": "adTitle",
         "highlight": "10,000 Free Robux",
-        "text": "Free stuff that sounds too good to be true usually isn't real."
+        "text": "Free stuff that sounds too good to be true usually isn't real.",
+        "spot": "Free stuff"
       },
       {
         "target": "result3",

@@ -53,11 +53,11 @@
     }
   },
   "recap": {
-    "stop": { "target": "caption", "highlight": "Only for the first 100 people", "text": "'Only for the first 100 people' was trying to make you rush." },
+    "stop": { "target": "caption", "highlight": "Only for the first 100 people", "text": "'Only for the first 100 people' was trying to make you rush.", "spot": "Someone rushing you" },
     "check": [
       { "target": "video", "text": "This video could be made with AI. Computers can copy a famous person's face and voice. Seeing it doesn't mean it's real." },
-      { "target": "channel", "text": "Look at the name. This isn't the real channel, and there's no check mark next to it." },
-      { "target": "caption", "highlight": "FREE gift card", "text": "Famous people don't give free gift cards to strangers who tap a link. If it sounds too good to be true, it probably is." },
+      { "target": "channel", "text": "Look at the name. This isn't the real channel, and there's no check mark next to it.", "spot": "A fake channel name" },
+      { "target": "caption", "highlight": "FREE gift card", "text": "Famous people don't give free gift cards to strangers who tap a link. If it sounds too good to be true, it probably is.", "spot": "A free prize" },
       { "target": "link", "text": "This link goes to a strange website, not YouTube. Real prizes don't ask you to fill in a form there." },
       { "screen": "doIt", "target": "summary", "text": "This is where the link goes. It wants you to pay for 'shipping' with a card. A real prize never costs money." },
       { "screen": "doIt", "target": "comments", "text": "These happy comments are fake. Scammers write them so you'll trust the site." }
