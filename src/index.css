@@ -84,6 +84,8 @@ button:active {
   padding: 2.5em 6px 1em;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* The browser mustn't shift the bubbles as new ones arrive; Buddy.tsx keeps the newest in view */
+  overflow-anchor: none;
   scrollbar-width: none;
   mask-image: linear-gradient(to bottom, transparent, #000 4em, #000 calc(100% - 1em), transparent);
 }

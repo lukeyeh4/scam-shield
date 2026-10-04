@@ -63,17 +63,19 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
     const scroller = scrollerRef.current
     const track = scroller?.firstElementChild
     if (!scroller || !track) return
-    // Where this code last scrolled to, so its own scrolling isn't mistaken for the player's
-    let scrolledTo = -1
+    // Only scrolling up means the player is reading older bubbles; anything else
+    // (this code following the newest bubble, or the browser nudging things as
+    // bubbles grow) keeps following
+    let lastTop = scroller.scrollTop
     const follow = () => {
-      if (!atBottom.current) return
-      scroller.scrollTop = scroller.scrollHeight
-      scrolledTo = scroller.scrollTop
+      if (atBottom.current) scroller.scrollTop = scroller.scrollHeight
+      lastTop = scroller.scrollTop
     }
     const onScroll = () => {
-      if (Math.abs(scroller.scrollTop - scrolledTo) > 1) {
-        atBottom.current = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 8
-      }
+      const top = scroller.scrollTop
+      if (scroller.scrollHeight - top - scroller.clientHeight < 8) atBottom.current = true
+      else if (top < lastTop - 1) atBottom.current = false
+      lastTop = top
     }
     const observer = new ResizeObserver(follow)
     observer.observe(track)
