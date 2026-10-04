@@ -23,6 +23,7 @@ The game is data-driven. Every scenario uses the same screens, and scenarios dif
 2. `ScenarioScreen`: the scam plays in on a fake screen; Shield Buddy says `buddy.intro`, `buddy.explain` and `buddy.choices`; then the Do it / Ignore it / Tell an adult buttons slide up.
 3. `DoItScreen` (only after Do it, only if the scenario has `doIt`): where the scam leads, e.g. a fake website.
 4. `OutcomeScreen`: Buddy explains the result, then "What if you had…" cards (worded by `whatIf`) show the other two choices. Results are always `do` → red, `ignore` → yellow, `tell` → green.
+   Then `SpotScreen`: the scam comes back and the player taps the clues on a short checklist.
 5. `RecapScreen`: Stop, Check, Tell with a 3-step progress bar. Each step highlights a red flag on the fake screen while Buddy explains it. Tell ends with `recap.tip` (what you can do, e.g. a family code word), then `SummaryCard` (`recap.summary`: "What you can do" and "Make sure to check for").
 6. `EndScreen`: after "Finish" on the last scenario.
 
@@ -30,7 +31,7 @@ The game is data-driven. Every scenario uses the same screens, and scenarios dif
 
 **Recap targets:** recap items are `{ target, highlight?, text, screen? }`. `target` names a content field, `highlight` is an exact piece of text inside it, and `screen: "doIt"` points at the Do it screen instead. Mock-ups render text through `<Field name=...>` (`Field.tsx`), and non-text parts (a video, a box of comments) use `useMark` (`marks.ts`); both highlight and scroll into view. A list of texts is targeted as `message1`, `message2`, and so on. A recap item with a `spot` name (e.g. "Someone rushing you") is also on the "Spot the clues" checklist (`SpotScreen`).
 
-**Shield Buddy** (`src/buddy/`): one image per mood from `shield_buddy/` (`happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`), with typed-out speech bubbles (`useTypewriter`). It shows the two newest bubbles at most. Read-aloud is planned, so keep Buddy's lines in the scenario data, not in markup.
+**Shield Buddy** (`src/buddy/`): one image per mood from `shield_buddy/` (`happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`), with typed-out speech bubbles (`useTypewriter`). Every bubble stays: messages added later type out under the earlier ones, and the stack fades out at the top and scrolls (no scroll bar). Buddy does a move per mood with each new message (CSS in `index.css`). Read-aloud is planned, so keep Buddy's lines in the scenario data, not in markup.
 
 Animations respect `prefers-reduced-motion` (`src/motion.ts`).
 

@@ -20,6 +20,8 @@ What's done, what's next, and what's still undecided. The design itself lives in
 - [x] **Stop, Check, Tell**: a 3-step progress bar; each step highlights a red flag on the fake screen (or the Do it screen) while Buddy explains it; each step only highlights its own clues
 - [x] Every scenario ends Tell with what you can do next time (`tip`, e.g. a family code word), then a summary card: "What you can do" and "Make sure to check for" (`summary`)
 - [x] "Next scenario" (or "Finish" after the last one); "Menu" is always in the header
+- [x] **Spot the clues** (`SpotScreen`, between What happened and the recap): the player taps about 3 easy clues from a checklist (recap items with a `spot` name); Buddy answers every tap kindly; "Show me the clues" skips ahead, and the recap still covers every clue
+- [x] Shield Buddy moves to match its mood with each new message (a hop, a wobble, a spin…), bobs while talking and floats when quiet; all bubbles stay, fading out at the top, and can be scrolled back to
 - [x] End screen after the last scenario (`EndScreen`): Buddy cheers, Stop, Check, Tell in kid words, "What you can do" from each scenario's summary, then Play again or Menu (wireframe style)
 - [ ] End screen: decide whether it becomes a certificate (e.g. with the player's name), and give it the real look
 - [ ] Remember how far the player got, so Start can pick up where they left off (the menu no longer lists the scenarios)
@@ -70,7 +72,7 @@ Vitest is installed, but there's no test script or tests yet.
 
 ## Later
 
-- [ ] "Spot the clues" mini-game, being tried on branch `try/spot-clues` (`SpotScreen`, between What happened and the recap): a checklist of about 3 easy clues per scenario (recap items with a `spot` name), kind replies to wrong taps, and the recap still covers every clue. On narrow phones the checklist takes a lot of room under the iPad screen.
+- [ ] Spot the clues: on narrow phones the checklist takes a lot of room under the iPad screen
 - [ ] Read-aloud audio for Shield Buddy's lines
 - [ ] More scenarios
 
