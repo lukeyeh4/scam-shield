@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Buddy } from '../buddy/Buddy'
-import { CHOICES, RESULTS } from '../labels'
+import { CHOICES, RESULTS, WHAT_IF } from '../labels'
 import type { Choice, Scenario } from '../types'
 import './results.css'
 
@@ -49,7 +49,7 @@ export function OutcomeScreen({ scenario, choice, onBack, onContinue }: OutcomeS
               return (
                 <div key={c.id} className="outcome-card">
                   <div className="outcome-card-top">
-                    <strong>{c.label}</strong>
+                    <strong>…{scenario.whatIf?.[c.id] ?? WHAT_IF[c.id]}</strong>
                     <span className={`result-tag result-${other.result}`}>{RESULTS[other.result].label}</span>
                   </div>
                   <p>{other.text}</p>

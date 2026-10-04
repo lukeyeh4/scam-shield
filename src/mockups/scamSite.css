@@ -1,0 +1,105 @@
+/* Fake prize website in Safari on an iPad (see ScamSiteMockup) */
+/* The page: dark and minimal, made to look official */
+.scam-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-height: 0;
+  padding: 10px 16px 22px;
+  overflow: auto;
+  background: #232527;
+  color: #fff;
+  scrollbar-width: none;
+}
+
+.safari-loading-in .scam-page {
+  animation: scam-page-in 600ms ease-out 400ms both;
+}
+
+@keyframes scam-page-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Auto margins centre the page when it fits, and keep its top visible when it doesn't */
+.scam-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+
+/* The supplied logo is black; turn it white for the dark page. The image has a lot
+   of empty space above and below the wordmark, so the negative margins crop it:
+   the wordmark itself ends up about 26px tall. */
+.scam-brand-logo {
+  height: 80px;
+  margin: -27px 0;
+  filter: invert(1);
+}
+
+.scam-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: min(320px, 100%);
+  margin-bottom: auto;
+  padding: 4px 12px 12px;
+  border-bottom: 1px solid #3a3c3f;
+}
+
+.scam-heading {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.scam-text {
+  margin: 0 0 4px;
+  color: #b9bbbe;
+}
+
+.scam-label {
+  align-self: flex-start;
+  color: #b9bbbe;
+  font-size: 12px;
+}
+
+.scam-input {
+  height: 24px;
+  background: #fff;
+}
+
+.scam-button {
+  margin-top: 6px;
+  padding: 6px;
+  background: #5cfc47;
+  color: #111;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.scam-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8e9297;
+  font-size: 11px;
+}
+
+.scam-note svg {
+  color: #1da1f2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .safari-loading-in .scam-page {
+    animation: none;
+  }
+}

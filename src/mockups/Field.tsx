@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef } from 'react'
 import { splitByHighlights } from '../highlight'
-import { MarksContext } from './marks'
+import { MarksContext, scrollMarkIntoView } from './marks'
 
 type FieldProps = { name: string; text: string; className?: string }
 
@@ -15,7 +15,7 @@ export function Field({ name, text, className = '' }: FieldProps) {
   const isActive = whole?.state === 'active' || parts.some(({ m }) => m.state === 'active')
 
   useEffect(() => {
-    if (isActive) ref.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    if (isActive) return scrollMarkIntoView(ref.current)
   }, [isActive])
 
   const segments = splitByHighlights(text, parts.map(({ m, index }) => ({ index, text: m.highlight! })))

@@ -12,12 +12,12 @@ export type SmsContent = {
   notification?: { sender: string; text: string }
 }
 
-export type GameChatContent = {
-  game: string
-  channel: string
-  friend: string
-  friendMessage: string
-  player: string
+// A direct message in a chat app, from someone you don't know
+export type ChatAppContent = {
+  sender: string
+  // An image in /public for the sender's profile picture (otherwise their first letter)
+  avatar?: string
+  time: string
   message: string
   link: string
 }
@@ -53,33 +53,132 @@ export type WebsiteContent = {
   popupButton: string
 }
 
+// A scam website, shown in Safari on an iPad. Everything on it is drawn,
+// not real form fields, so nothing typed can go anywhere.
+export type ScamSiteContent = {
+  url: string
+  brand: string
+  // An image in /public for the site's logo, shown white on the dark page
+  logo?: string
+  heading: string
+  text: string
+  usernameLabel: string
+  passwordLabel: string
+  button: string
+  note: string
+}
+
+// One search result: the site's name and address, the blue title, and the snippet under it.
+// `icon` is an image in /public for the site's little round icon; `iconFill` makes the
+// image fill the whole circle instead of sitting on white.
+export type SearchResult = { site: string; url: string; title: string; text: string; icon?: string; iconFill?: boolean }
+
+// Search results in Safari on an iPad, with a sponsored ad at the top.
+// Recap targets: query, adLabel, adSite, adUrl, adTitle, adText, and result1, result2, ...
+// (each result's title).
+export type SearchContent = {
+  query: string
+  ad: SearchResult
+  results: SearchResult[]
+}
+
+// A scam website in Safari on a phone (address bar at the bottom, like an iPhone).
+// Everything on it is drawn, not real form fields, so nothing typed can go anywhere.
+export type PhoneSiteContent = {
+  url: string
+  brand: string
+  // An image in /public for the site's round logo
+  logo?: string
+  prize: string
+  heading: string
+  // The order summary: what you "get" and what you pay
+  summary: { label: string; value: string }[]
+  total: string
+  paymentLabel: string
+  button: string
+  comments: { name: string; text: string }[]
+}
+
+// A YouTube Shorts video on a phone. Recap targets can point at the video
+// itself with "video".
+export type ShortsContent = {
+  channel: string
+  // Images in /public: the channel's profile picture and the video's picture
+  avatar?: string
+  video?: string
+  caption: string
+  link: string
+  comments: string
+  remixes: string
+}
+
 // Each mock-up type has its own content fields; recap targets name one of them.
 export type ScenarioScreen =
   | { mockup: 'sms'; content: SmsContent }
-  | { mockup: 'game-chat'; content: GameChatContent }
+  | { mockup: 'chat-app'; content: ChatAppContent }
   | { mockup: 'messenger'; content: MessengerContent }
   | { mockup: 'email'; content: EmailContent }
   | { mockup: 'website'; content: WebsiteContent }
+  | { mockup: 'scam-site'; content: ScamSiteContent }
+  | { mockup: 'shorts'; content: ShortsContent }
+  | { mockup: 'phone-site'; content: PhoneSiteContent }
+  | { mockup: 'search'; content: SearchContent }
 
 export type MockupType = ScenarioScreen['mockup']
 
 export type RecapItem = {
+  // 'doIt' points at the screen "Do it" leads to (e.g. the scam website) instead of the scam itself
+  screen?: 'doIt'
   target: string
   highlight?: string
   text: string
+}
+
+// A text added to the phone during the recap, from the player ('me') or the scammer ('them')
+export type ExtraMessage = { from: 'me' | 'them'; text: string }
+
+// What to remember from a scenario, shown on a card at the very end of the recap:
+// "What you can do" (`solution`) and "Make sure to check for" (`checks`)
+export type RecapSummary = {
+  solution: string
+  // Short warning signs to look out for next time
+  checks: string[]
+}
+
+// What you can do instead, at the end of the Tell step (e.g. a family code word)
+export type RecapTip = {
+  label: string
+  buddy: string[]
+  // Part of the scam screen to highlight while Buddy explains
+  target?: string
+  highlight?: string
+  // Texts that appear on the phone while Buddy explains (text-message scenarios)
+  phone?: ExtraMessage[]
 }
 
 export type Scenario = ScenarioScreen & {
   id: string
   title: string
   outcomes: Record<Choice, { result: Result; text: string }>
+  // Finishes "What if you had…" for each choice, e.g. "clicked the link"
+  whatIf?: Record<Choice, string>
   buddy: {
     intro: string
+    // Before the choice, in simple words: what's happening, then what the player
+    // could do. Both stay neutral: no hints about which choice is safest.
+    explain?: string
+    choices?: string
     reactions: Record<Choice, { mood: Mood; text: string }>
   }
   recap: {
     stop: RecapItem
     check: RecapItem[]
     tell: string
+    tip?: RecapTip
+    // The last step: a short summary card to remember
+    summary?: RecapSummary
   }
+  // Optional extra step after "Do it": where the scam takes you (e.g. a website),
+  // with what Shield Buddy says there
+  doIt?: ScenarioScreen & { buddy: string[] }
 }

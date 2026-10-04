@@ -1,0 +1,171 @@
+/* Google search results in Safari on an iPad (see SearchMockup) */
+.search-page {
+  flex: 1;
+  min-height: 0;
+  padding: 10px 20px 60px;
+  overflow: auto;
+  /* When the recap scrolls to a result, keep it clear of the home bar */
+  scroll-padding-bottom: 70px;
+  background: #fff;
+  color: #202124;
+  font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+  scrollbar-width: none;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.search-logo {
+  font-family: 'Product Sans', Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+}
+
+.search-box {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  max-width: 460px;
+  padding: 7px 14px;
+  border: 1px solid #dfe1e5;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgb(32 33 36 / 0.12);
+}
+
+.search-query {
+  flex: 1;
+  font-size: 15px;
+}
+
+.search-box-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #70757a;
+}
+
+/* Your own profile picture, blurred out but colourful */
+.search-you {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 35%, #ffd166 0 25%, transparent 45%),
+    linear-gradient(135deg, #06d6a0, #118ab2);
+  filter: blur(1.5px);
+}
+
+.search-tabs {
+  display: flex;
+  gap: 22px;
+  margin: 10px 0 0;
+  padding-left: 2px;
+  border-bottom: 1px solid #ebebeb;
+  font-size: 13px;
+  color: #70757a;
+}
+
+.search-tab {
+  padding: 6px 0 9px;
+}
+
+.search-tab.is-active {
+  border-bottom: 3px solid #1a73e8;
+  color: #1a73e8;
+  font-weight: 700;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+  padding-top: 14px;
+}
+
+.search-result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.search-sponsored {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.search-source {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-favicon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  overflow: hidden;
+  border: 1px solid #dadce0;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* A logo on the white circle */
+.search-favicon img {
+  width: 64%;
+  height: 64%;
+  object-fit: contain;
+}
+
+/* A logo that fills the whole circle (e.g. Roblox's blue icon) */
+.search-favicon-fill {
+  border: none;
+}
+
+.search-favicon-fill img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.search-source-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.search-site {
+  font-size: 13px;
+}
+
+.search-url {
+  color: #4d5156;
+  font-size: 12px;
+}
+
+.search-title {
+  margin-top: 3px;
+  color: #1a0dab;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.search-text {
+  margin: 0;
+  color: #4d5156;
+  font-size: 13px;
+  line-height: 1.45;
+}

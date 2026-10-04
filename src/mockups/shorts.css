@@ -1,0 +1,319 @@
+/* YouTube Shorts on a phone (see ShortsMockup) */
+
+/* Dark full-screen phone apps: the status bar floats over the app in white */
+.phone-dark .phone-screen {
+  background: #000;
+  color: #fff;
+}
+
+.phone-dark .phone-status {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  color: #fff;
+}
+
+.phone-dark .phone-home-bar {
+  background: #fff;
+}
+
+/* Lets the Shorts text shrink a little when the phone is shown small */
+.phone-dark .phone-screen {
+  container-type: inline-size;
+}
+
+.shorts {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  font-size: 14px;
+}
+
+/* The video fills the screen above the bottom bar (red until it has a picture) */
+.shorts-video {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  /* Lets the buttons on the right shrink when the video area is short */
+  container-type: size;
+  background: linear-gradient(#b8231a 0%, #a01e17 45%, #4a100c 78%, #120606 100%);
+}
+
+/* A dark fade at the bottom keeps the white text readable over the picture */
+.shorts-video::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0;
+  z-index: 1;
+  background: linear-gradient(transparent, rgb(0 0 0 / 0.75));
+  pointer-events: none;
+}
+
+.shorts-top,
+.shorts-actions,
+.shorts-info {
+  z-index: 2;
+}
+
+/* A blurred, enlarged copy of the picture fills the space above and below it */
+.shorts-backdrop {
+  position: absolute;
+  inset: -30px;
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  object-fit: cover;
+  filter: blur(24px) brightness(0.8) saturate(1.2);
+}
+
+/* The whole square picture, centred in the video */
+.shorts-picture {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+}
+
+.shorts-picture img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* In the recap, a thick yellow frame around the picture */
+.shorts-picture.flag {
+  background: none;
+  box-shadow: none;
+}
+
+.shorts-picture.flag::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 4px solid #f5b700;
+  opacity: 0.5;
+}
+
+.shorts-picture.flag-active::after {
+  opacity: 1;
+}
+
+.shorts-picture.flag-seen::after {
+  opacity: 0;
+}
+
+.shorts-top {
+  position: absolute;
+  top: 50px;
+  right: 14px;
+  display: flex;
+  gap: 16px;
+}
+
+.shorts-actions {
+  position: absolute;
+  right: 8px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.shorts-action svg {
+  width: 26px;
+  height: 26px;
+}
+
+.shorts-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+.shorts-sound {
+  width: 30px;
+  height: 30px;
+  border: 2px solid #fff;
+  border-radius: 6px;
+  background: #9a9a9a;
+  object-fit: cover;
+  filter: blur(1.5px);
+}
+
+.shorts-info {
+  position: absolute;
+  left: 12px;
+  right: 54px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.shorts-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.2);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.shorts-channel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.shorts-avatar {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #9a9a9a;
+  object-fit: cover;
+}
+
+.shorts-handle {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.shorts-subscribe {
+  flex: none;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #fff;
+  color: #0f0f0f;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shorts-caption {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* Bottom bar: Home, Shorts, create, Subscriptions, You. Five equal columns, so
+   every icon sits evenly; the create button is centred in the bar. */
+.shorts-nav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  justify-items: center;
+  padding: 6px 2px 2px;
+  background: #0f0f0f;
+}
+
+.shorts-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.shorts-nav-item svg,
+.shorts-nav-item .shorts-you {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.shorts-create {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid #fff;
+  border-radius: 50%;
+}
+
+/* Your own profile picture, blurred out but colourful */
+.shorts-you {
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 35%, #ffd166 0 25%, transparent 45%),
+    radial-gradient(circle at 70% 65%, #ef476f 0 25%, transparent 50%),
+    linear-gradient(135deg, #06d6a0, #118ab2);
+  filter: blur(1.5px);
+}
+
+/* A small phone: slightly smaller text so the channel name and caption still fit */
+@container (max-width: 280px) {
+  .shorts-avatar {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* The channel name is a clue, so it always shows in full: if it doesn't fit
+     next to Subscribe, Subscribe moves under it */
+  .shorts-channel {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .shorts-handle {
+    overflow: visible;
+    font-size: clamp(11px, 4.6cqw, 12.5px);
+  }
+
+  .shorts-subscribe {
+    padding: 3px 8px;
+    font-size: clamp(10.5px, 4.2cqw, 11.5px);
+  }
+
+  .shorts-caption,
+  .shorts-link {
+    font-size: 12.5px;
+  }
+
+  /* "Subscriptions" is the longest label: give its column a bit more room */
+  .shorts-nav {
+    grid-template-columns: 1fr 1fr 1fr 1.5fr 1fr;
+  }
+
+  .shorts-nav-item {
+    font-size: 9px;
+  }
+}
+
+/* A short video area: tighter buttons on the right so they don't reach the top icons */
+@container (max-height: 380px) {
+  .shorts-actions {
+    gap: 4px;
+  }
+
+  .shorts-action svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .shorts-sound {
+    width: 26px;
+    height: 26px;
+  }
+}

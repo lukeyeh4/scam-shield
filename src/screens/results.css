@@ -263,13 +263,95 @@ mark.flag {
 .flag-active {
   background: #ffe066;
   box-shadow: 0 0 0 3px #f5b700;
+  /* Dark text so it stays readable on yellow, even inside dark apps */
+  color: #1d1d1f;
 }
 
 .flag-seen {
   background: rgb(255 224 102 / 0.4);
 }
 
+/* The summary card at the end of the recap: a wider column than the phone, so the
+   card stays short; auto margins centre it when it fits and start it at the top
+   (scrollable) when it doesn't */
+.scenario-main.summary-layout {
+  grid-template-columns: minmax(0, 520px) minmax(0, 340px);
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-self: start;
+  justify-self: end;
+  width: 100%;
+  max-width: 520px;
+  margin-block: auto;
+  padding: 22px;
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  animation: screen-in 450ms var(--ease) both;
+}
+
+.summary-title {
+  font-size: 1.5em;
+  font-weight: 800;
+}
+
+.summary-label {
+  color: var(--muted);
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.summary-solution {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: #dcf5e3;
+  color: #14532d;
+}
+
+.summary-solution .summary-label {
+  color: #1c6b38;
+}
+
+.summary-solution p {
+  font-weight: 700;
+}
+
+.summary-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.summary-checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.summary-checks svg {
+  flex: none;
+  margin-top: 3px;
+}
+
 @media (max-width: 560px) {
+  .summary-card {
+    padding: 16px;
+    font-size: 0.95em;
+  }
+
   .outcome-cards {
     grid-template-columns: 1fr;
   }

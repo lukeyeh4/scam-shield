@@ -1,10 +1,17 @@
 import type { ReactNode } from 'react'
 
+type PhoneFrameProps = {
+  children: ReactNode
+  // Placeholder for a message box at the bottom (messaging apps); no box without it
+  inputLabel?: string
+  // Full-screen dark apps (e.g. videos): the status bar floats over the app in white
+  dark?: boolean
+}
+
 // A modern smartphone: black bezel, camera notch, status bar, home bar.
-// `inputLabel` is the placeholder in the message box at the bottom.
-export function PhoneFrame({ children, inputLabel }: { children: ReactNode; inputLabel: string }) {
+export function PhoneFrame({ children, inputLabel, dark = false }: PhoneFrameProps) {
   return (
-    <div className="phone">
+    <div className={dark ? 'phone phone-dark' : 'phone'}>
       <div className="phone-screen">
         <div className="phone-status" aria-hidden="true">
           <span className="phone-time">9:41</span>
@@ -18,10 +25,12 @@ export function PhoneFrame({ children, inputLabel }: { children: ReactNode; inpu
 
         {children}
 
-        <div className="phone-compose" aria-hidden="true">
-          <CameraIcon />
-          <span className="phone-input">{inputLabel}</span>
-        </div>
+        {inputLabel && (
+          <div className="phone-compose" aria-hidden="true">
+            <CameraIcon />
+            <span className="phone-input">{inputLabel}</span>
+          </div>
+        )}
         <span className="phone-home-bar" aria-hidden="true" />
       </div>
     </div>
@@ -48,7 +57,7 @@ function SignalIcon() {
   )
 }
 
-function WifiIcon() {
+export function WifiIcon() {
   return (
     <svg viewBox="0 0 16 12" width="15" height="11">
       <path d="M8 2.2c2.3 0 4.4.9 6 2.4l1.3-1.4A10.6 10.6 0 0 0 8 .3 10.6 10.6 0 0 0 .7 3.2L2 4.6a8.6 8.6 0 0 1 6-2.4z" fill="currentColor" />
@@ -58,7 +67,7 @@ function WifiIcon() {
   )
 }
 
-function BatteryIcon() {
+export function BatteryIcon() {
   return (
     <svg viewBox="0 0 27 12" width="24" height="11">
       <rect x="0.5" y="0.5" width="23" height="11" rx="3.5" fill="none" stroke="currentColor" opacity="0.4" />

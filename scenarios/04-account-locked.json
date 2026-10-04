@@ -11,6 +11,7 @@
     "button": "VERIFY NOW",
     "signature": "The PixelPals Team"
   },
+  "whatIf": { "do": "clicked the button", "ignore": "ignored the email", "tell": "told an adult" },
   "outcomes": {
     "do":     { "result": "red",    "text": "You typed in your password. Now someone else can log in as you and change your password so you can't get back in." },
     "ignore": { "result": "yellow", "text": "You didn't click. But you keep worrying all day: what if your account really gets deleted?" },
@@ -18,6 +19,8 @@
   },
   "buddy": {
     "intro": "You've got an email! Let's read it.",
+    "explain": "It says your account will be deleted soon. It wants you to click a button and log in.",
+    "choices": "You can click the button, ignore the email, or tell an adult. What would you do?",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Oh no! Let's find out what happened." },
       "ignore": { "mood": "thinking", "text": "Safe, but you're still worried, and the scam email is still out there." },
@@ -25,13 +28,30 @@
     }
   },
   "recap": {
-    "stop": { "target": "subject", "highlight": "DELETED in 24 hours", "text": "This scary deadline was trying to make you panic and rush." },
+    "stop": { "target": "subject", "highlight": "DELETED in 24 hours", "text": "This scary time limit was trying to make you rush." },
     "check": [
       { "target": "fromAddress", "highlight": "acount", "text": "Look closely: 'acount' is spelled wrong. This isn't really PixelPals." },
       { "target": "body", "highlight": "Dear user", "text": "The real PixelPals would use your name, not 'Dear user'." },
       { "target": "body", "highlight": "enter your username and password", "text": "Real companies never ask for your password in an email." },
-      { "target": "button", "text": "Don't click buttons in surprise emails. Open the real app yourself instead." }
+      { "target": "button", "text": "This button would take you to a fake page that asks for your password." }
     ],
-    "tell": "Show a grown-up and say: 'This email says my account will be deleted. Is it real?'"
+    "tell": "Show a grown-up and say: 'This email says my account will be deleted. Is it real?'",
+    "tip": {
+      "label": "Check in the real app",
+      "buddy": [
+        "Don't tap buttons in surprise emails. Open the real app yourself instead.",
+        "If something is wrong with your account, the app will tell you."
+      ],
+      "target": "button"
+    },
+    "summary": {
+      "solution": "Don't tap buttons in surprise emails. Open the real app yourself.",
+      "checks": [
+        "Scary time limits",
+        "Spelling mistakes in the email address",
+        "'Dear user' instead of your name",
+        "Emails asking for your password"
+      ]
+    }
   }
 }

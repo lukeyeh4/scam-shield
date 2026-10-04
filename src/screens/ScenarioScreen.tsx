@@ -4,10 +4,12 @@ import { CHOICES } from '../labels'
 import { arrivalDelay } from '../mockups/arrival'
 import { Mockup } from '../mockups/Mockup'
 import type { Choice, Scenario } from '../types'
+import { DoItScreen } from './DoItScreen'
 import { OutcomeScreen } from './OutcomeScreen'
 import { RecapScreen } from './RecapScreen'
 
-// Said after every scenario's intro. Stays neutral: no hints before the choice.
+// Said after a scenario's intro if it doesn't spell out its own choices.
+// Stays neutral: no hints before the choice.
 const CHOOSE_PROMPT = 'Read it carefully. Then pick what you would do.'
 
 type ScenarioScreenProps = {
@@ -25,8 +27,13 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext }: ScenarioScr
   const revealChoices = useCallback(() => setShowChoices(true), [])
   const [choice, setChoice] = useState<Choice | null>(null)
   const [showRecap, setShowRecap] = useState(false)
+  // Some scenarios show where "Do it" takes you (e.g. a fake website) before the outcome
+  const [doItSeen, setDoItSeen] = useState(false)
 
   if (showRecap) return <RecapScreen scenario={scenario} isLast={isLast} onBack={onBack} onNext={onNext} />
+  if (choice === 'do' && scenario.doIt && !doItSeen) {
+    return <DoItScreen scenario={scenario} doIt={scenario.doIt} onBack={onBack} onContinue={() => setDoItSeen(true)} />
+  }
   if (choice) {
     return <OutcomeScreen scenario={scenario} choice={choice} onBack={onBack} onContinue={() => setShowRecap(true)} />
   }
@@ -46,7 +53,11 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext }: ScenarioScr
           <Buddy
             key={scenario.id}
             mood="curious"
-            messages={[scenario.buddy.intro, CHOOSE_PROMPT]}
+            messages={[
+              scenario.buddy.intro,
+              ...(scenario.buddy.explain ? [scenario.buddy.explain] : []),
+              scenario.buddy.choices ?? CHOOSE_PROMPT,
+            ]}
             delayMs={arrivalDelay(scenario)}
             onDone={revealChoices}
           />

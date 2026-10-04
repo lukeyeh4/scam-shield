@@ -101,6 +101,11 @@ button:active {
   transition: color 300ms var(--ease);
 }
 
+/* Only the two newest bubbles stay, so a long conversation doesn't grow off the screen */
+.buddy-row:not(:nth-last-child(-n + 2)) {
+  display: none;
+}
+
 /* Typed text sits on top of the hidden full text, so the bubble doesn't grow as it types */
 .buddy-text-full,
 .buddy-text-typed {
@@ -309,6 +314,14 @@ button:active {
 
 .scenario-main .mockup {
   justify-content: flex-end;
+}
+
+/* A sideways iPad takes most of the width, with Shield Buddy in a narrower column */
+.scenario-main:has(.mockup-tablet) {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 300px);
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .scenario-buddy {
@@ -612,6 +625,39 @@ button:active {
   background: var(--phone-bg);
 }
 
+/* Your own texts: green (a text message, not iMessage), on the right, tail on the right */
+.bubble-out {
+  align-self: flex-end;
+  background: #34c759;
+  color: #fff;
+}
+
+.bubble-out::before,
+.bubble-out::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  height: 20px;
+}
+
+.bubble-out::before {
+  right: -7px;
+  width: 20px;
+  border-bottom-left-radius: 16px 14px;
+  background: #34c759;
+}
+
+.bubble-out::after {
+  right: -10px;
+  width: 10px;
+  border-bottom-left-radius: 10px;
+  background: var(--phone-bg);
+}
+
+.bubble-out.sms-arrive-pop {
+  transform-origin: bottom right;
+}
+
 /* Messages in a row sit close together, and only the newest has a tail */
 .bubble-in + .bubble-in {
   margin-top: -4px;
@@ -781,6 +827,378 @@ button:active {
   .notification {
     animation: none;
   }
+}
+
+/* iPad, held sideways. The mockup box is a size container, so the iPad can be
+   as large as fits while keeping a real iPad's shape (2360 × 1640). */
+.mockup-tablet {
+  max-width: none;
+  align-items: center;
+  container-type: size;
+}
+
+.tablet {
+  --w: min(100cqw, calc(100cqh * 1.439));
+  position: relative;
+  flex: none;
+  width: var(--w);
+  height: calc(var(--w) / 1.439);
+  padding: calc(var(--w) * 0.026);
+  border-radius: calc(var(--w) * 0.052);
+  background: #0f0f11;
+  box-shadow:
+    0 0 0 calc(var(--w) * 0.005) #c9ccd1,
+    var(--shadow-md);
+}
+
+/* Front camera, centred on the top edge */
+.tablet-camera {
+  position: absolute;
+  top: calc(var(--w) * 0.0105);
+  left: 50%;
+  width: calc(var(--w) * 0.008);
+  height: calc(var(--w) * 0.008);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #3a3f4a 0 30%, #15161a 35%);
+  transform: translateX(-50%);
+}
+
+.tablet-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: calc(var(--w) * 0.027);
+  background: #f2f2f7;
+  color: #000;
+  overflow: hidden;
+}
+
+.tablet-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 22px 3px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tablet-date {
+  margin-left: 4px;
+}
+
+.tablet-icons {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tablet-battery-level {
+  font-size: 12px;
+}
+
+.tablet-content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  font-size: 16px;
+}
+
+.tablet-home-bar {
+  position: absolute;
+  bottom: 7px;
+  left: 50%;
+  width: 22%;
+  height: 5px;
+  border-radius: 999px;
+  background: #000;
+  transform: translateX(-50%);
+}
+
+/* Dark apps: white status bar text and home bar on a dark screen */
+.tablet-dark .tablet-screen {
+  background: #1e1f22;
+  color: #fff;
+}
+
+.tablet-dark .tablet-home-bar {
+  background: #fff;
+}
+
+/* Chat app (like Discord): a direct message from a stranger, everyone else blurred */
+.chat {
+  --chat-rail: #1e1f22;
+  --chat-side: #2b2d31;
+  --chat-main: #313338;
+  --chat-hover: #404249;
+  --chat-text: #dbdee1;
+  --chat-muted: #949ba4;
+  --chat-brand: #5865f2;
+  display: flex;
+  height: 100%;
+  background: var(--chat-main);
+  color: var(--chat-text);
+  font-size: 15px;
+  line-height: 1.375;
+}
+
+.blurred {
+  filter: blur(3px);
+}
+
+.chat-servers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 64px;
+  flex: none;
+  padding: 10px 0;
+  background: var(--chat-rail);
+}
+
+.chat-home,
+.chat-server,
+.chat-add {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+}
+
+.chat-home {
+  background: var(--chat-brand);
+  color: #fff;
+}
+
+.chat-server {
+  border-radius: 50%;
+}
+
+.chat-add {
+  border-radius: 50%;
+  background: var(--chat-side);
+  color: #23a55a;
+  font-size: 24px;
+}
+
+.chat-divider {
+  width: 30px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--chat-hover);
+}
+
+.chat-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 190px;
+  flex: none;
+  padding: 8px;
+  background: var(--chat-side);
+}
+
+.chat-search {
+  margin-bottom: 8px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: var(--chat-rail);
+  color: var(--chat-muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.chat-nav-item,
+.chat-dm,
+.chat-me {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 8px;
+  border-radius: 4px;
+  color: var(--chat-muted);
+}
+
+.chat-section {
+  margin: 12px 0 4px 8px;
+  color: var(--chat-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.chat-dm.is-selected {
+  background: var(--chat-hover);
+  color: #fff;
+}
+
+.chat-dm-name {
+  overflow: hidden;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.blurred-bar {
+  width: 90px;
+  height: 12px;
+  border-radius: 6px;
+  background: #5a5d66;
+}
+
+.chat-me {
+  margin-top: auto;
+  padding-bottom: 14px;
+}
+
+.chat-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e67e22;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* An image as the profile picture, cropped to the circle */
+.chat-avatar-image {
+  overflow: hidden;
+  background: #000;
+}
+
+.chat-avatar-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chat-avatar-small {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.chat-avatar-large {
+  width: 64px;
+  height: 64px;
+  font-size: 28px;
+}
+
+.chat-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 16px;
+  border-bottom: 1px solid #26282c;
+  font-weight: 600;
+  color: #fff;
+}
+
+.chat-at {
+  color: var(--chat-muted);
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.chat-online {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #23a55a;
+}
+
+.chat-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 16px;
+  min-height: 0;
+  padding: 12px 16px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.chat-welcome-name {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.chat-welcome-text {
+  color: var(--chat-muted);
+  font-size: 14px;
+}
+
+.chat-message {
+  display: flex;
+  gap: 14px;
+}
+
+.chat-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.chat-name {
+  color: #f0b232;
+  font-weight: 600;
+}
+
+.chat-time {
+  color: var(--chat-muted);
+  font-size: 12px;
+}
+
+.chat-text {
+  color: var(--chat-text);
+}
+
+.chat-link {
+  color: #00a8fc;
+}
+
+.chat-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 16px 20px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #383a40;
+  color: var(--chat-muted);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.chat-input-plus {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #b5bac1;
+  color: #383a40;
+  font-weight: 800;
 }
 
 /* Narrow screens: let the phone fill the width so its text stays readable */

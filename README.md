@@ -1,6 +1,6 @@
 # Scam Shield: Stop, Check, Tell
 
-A simple game that teaches kids aged 8–12 how to spot and handle scams. Each scenario shows a scam the way it would really appear: a text on a phone, an email in an inbox, a message in game chat, or a pop-up on a shopping site. The player picks one of three choices and sees what happens. The game then walks back through the scam to show how **Stop, Check, Tell** would have helped them spot it.
+A simple game that teaches kids aged 8–12 how to spot and handle scams. Each scenario shows a scam the way it would really appear: texts on a phone, search results on a tablet, a video on YouTube, an email in an inbox, or a pop-up on a shopping site. The player picks one of three choices and sees what happens. The game then walks back through the scam to show how **Stop, Check, Tell** would have helped them spot it.
 
 ## The strategy: Stop, Check, Tell
 
@@ -25,11 +25,13 @@ Every scenario follows the same four screens, so kids always know what to expect
 
 ### 1. The scam screen
 
-This is a realistic mock-up of wherever the scam would actually appear: a phone's text messages, an email inbox, game chat, or a web page. It should look and feel real, with a few changes:
+This is a realistic mock-up of wherever the scam would actually appear: a phone's text messages, Safari on an iPad, YouTube Shorts, an email inbox, or a web page. It should look and feel real, with a few rules:
 
-- **Made-up names and brands** (for example "BlockCraft" instead of a real game, or "ShopZoom" instead of a real store)
+- **Real apps where it helps.** Scenarios 1–3 show real apps and brands (iPhone, Safari, Google, Roblox, YouTube) so they look like what kids actually see. Scenarios 4–5 use made-up names ("PixelPals", "ShopZoom"). Whether to keep real brands is still being decided.
 - **Red flags planted in it**: a countdown timer, an odd link, a spelling mistake, an unknown sender, a request for a password or code
-- **No real working links**
+- **No real working links**, buttons or form fields
+
+Shield Buddy then says what's happening in simple words, and lists the choices in the scenario's own words (for example "You can tap the link, scroll past the video, or tell an adult. What would you do?"), without hinting which is best.
 
 ### 2. The choice
 
@@ -37,13 +39,13 @@ There are always the same three big, simple buttons:
 
 | Button | Meaning |
 |--------|---------|
-| 👆 **Do it** | Click the link, reply, send the code, or buy the thing |
+| 👆 **Do it** | Click the link, reply, send the code, or buy the thing. In some scenarios this first shows where the scam leads, like a fake website. |
 | 🙈 **Ignore it** | Close it and move on |
 | 🗣️ **Tell an adult** | Show it to a parent, teacher or other trusted grown-up |
 
 ### 3. What happened
 
-After the player chooses, the game reveals **all three outcomes**, with the player's choice highlighted. Kids learn from the paths they didn't take as well.
+After the player chooses, Shield Buddy explains what happened. Then **"What if you had…"** cards show the other two outcomes, worded for the scenario (for example "What if you had… …tapped the link"). Kids learn from the paths they didn't take as well.
 
 | Choice | Result | Why |
 |--------|--------|-----|
@@ -61,6 +63,10 @@ The scam screen comes back, this time with explanations added to it:
 - 🔍 **CHECK**: circles each red flag one at a time. *"This link doesn't match the real website." "You never entered a contest!"*
 - 🗣️ **TELL**: names who they could tell and what to say. *"Show Mum or Dad and say: 'I got this message and I'm not sure about it.'"*
 
+Every scenario ends TELL with **what you can do** next time (the `tip` in its file), with the matching part of the scam screen highlighted. For example, scenario 1 teaches a **family code word**: Shield Buddy explains it, and the phone shows the player asking *"What's our code word?"* and the scammer failing to answer. Scenario 2 shows the safe way to get Robux, scenario 3 checking the real channel, scenario 4 checking in the real app, and scenario 5 shopping only at stores your family trusts.
+
+The recap ends with a **summary card** (the `summary` in each scenario file): **Remember**, then **What you can do** in one sentence, and a short list under **Make sure to check for**.
+
 Optional: before the recap, the player taps the red flags themselves as a mini "spot the clues" game.
 
 ## Shield Buddy
@@ -69,10 +75,10 @@ Shield Buddy is a friendly shield with a face who guides the player through each
 
 | Screen | What Shield Buddy does | Mood |
 |--------|------------------------|------|
-| 1. The scam | Says one neutral line, like "Ooh, a new message!" | `curious` |
-| 2. The choice | Asks "What would you do?" | `thinking` |
+| 1. The scam | Says a neutral intro, then what's happening in simple words, like "Someone says they're your mom. They want the code that just came to your phone." | `curious` |
+| 2. The choice | Lists the choices in the scenario's own words, with no hints: "You can send them the code, ignore the texts, or tell an adult. What would you do?" | `curious` |
 | 3. What happened | Reacts to each outcome and explains it | `worried` (🔴), `thinking` (🟡), `cheering` (🟢) |
-| 4. Recap | Narrates Stop, Check, Tell while each red flag is highlighted on the scam screen | `neutral` |
+| 4. Recap | Narrates Stop, Check, Tell while each red flag is highlighted on the scam screen, then what you can do next time | `neutral`, then `happy` and `cheering` |
 
 Rules for Shield Buddy:
 
@@ -89,8 +95,8 @@ Ordered from easiest to hardest:
 | # | Scenario | Looks like | The scam | 👆 Do it → | 🙈 Ignore it → |
 |---|----------|------------|----------|-----------|---------------|
 | 1 | **"It's Mom, New Number"** | Phone text messages | "Mom" texts from a new number and asks for the code that just came to your phone | The code unlocks your game account, and now a stranger can log in as you | You're safe, but the scammer keeps texting and might trick someone else |
-| 2 | **Free Coins** | Game chat in "BlockCraft" | A player offers 10,000 free coins if you log in on their site | Your account is stolen, along with all your items | Safe, but your friend falls for it next |
-| 3 | **"It's Me, New Account"** | Messaging app | A "friend" on a new account asks for a gift card code | The code is gone, and so is the money | Safe, but your real friend never finds out their account was copied |
+| 2 | **Free Robux** | Google search results in Safari, on an iPad | Searching "free robux", the top result is a sponsored ad for an "official giveaway"; it opens an official-looking prize site that asks for your password | Your account is stolen, along with all your Robux | Safe, but your friend falls for it next |
+| 3 | **Famous Giveaway** | A YouTube Shorts video on a phone | A fake (possibly AI-made) video of a famous YouTuber holding a sign: free gift cards from a link | The site takes a parent's card number to "pay for shipping", and no gift card comes | Safe, but the fake video keeps spreading and fools a friend |
 | 4 | **Account Locked!** | Email inbox | "Your account will be deleted! Verify now" from a look-alike address | You enter your password, and now someone else has it | Safe, but you're still worried your account might really get deleted |
 | 5 | **Mega Deal** | Shopping website with a pop-up | Sneakers 90% off, but only for 10 minutes | Your parent's card is charged and the shoes never arrive | Safe, but you might fall for the next deal |
 
@@ -110,26 +116,29 @@ Telling an adult always leads to the 🟢 outcome: the scam is blocked or report
 - **React + TypeScript**, built with **Vite**. Every scenario reuses the same screens, fake-screen mock-ups and Shield Buddy, so reusable components are a good fit. TypeScript checks the scenario files against one shared format.
 - **A web app that works on tablets.** Layouts adapt to the screen, and the buttons are big enough to tap easily. It can be hosted as plain static files (for example, on GitHub Pages).
 
-## Proposed structure
+## Project structure
 
 ```
 scam-shield/
-├── README.md
+├── README.md             # The design (this file)
+├── PROJECT.md            # Next steps
 ├── scenarios/            # One data file per scenario
 │   ├── 01-new-number.json
-│   ├── 02-free-coins.json
-│   ├── 03-new-account.json
+│   ├── 02-free-robux.json
+│   ├── 03-ai-video.json
 │   ├── 04-account-locked.json
 │   └── 05-mega-deal.json
+├── shield_buddy/         # Shield Buddy artwork, one image per mood
+├── public/images/        # Logos and photos used on the fake screens
 └── src/
-    ├── mockups/          # Reusable fake screens: phone SMS, email, game chat, website
-    ├── buddy/            # Shield Buddy: one image per mood, plus the speech bubble
-    └── ...               # Game screens: choice, results, recap
+    ├── mockups/          # Fake screens: iPhone and iPad frames, Safari, texts, search, YouTube Shorts, websites
+    ├── buddy/            # Shield Buddy: the picture and typed-out speech bubbles
+    └── screens/          # Game screens: menu, scam, Do it, What happened, Stop Check Tell
 ```
 
 Each scenario picks a mock-up type and fills it with its own content, so adding a new scenario doesn't require building a new screen.
 
-### Example scenario (draft)
+### Example scenario
 
 ```json
 {
@@ -143,8 +152,13 @@ Each scenario picks a mock-up type and fills it with its own content, so adding 
       "Hey sweetie, it’s Mom. I had to get a new number because my phone stopped working.",
       "I need a favor really quick.",
       "Can you send me the code that just came to your phone?"
-    ]
+    ],
+    "notification": {
+      "sender": "+1 (555) 386-7720",
+      "text": "Your Apple Account code is: 482913. Use it to reset your password. Don't share it with anyone."
+    }
   },
+  "whatIf": { "do": "sent the code", "ignore": "ignored the texts", "tell": "told an adult" },
   "outcomes": {
     "do":     { "result": "red",    "text": "You sent the code. It was the key to your game account. Now a stranger can log in as you." },
     "ignore": { "result": "yellow", "text": "You didn't send the code. But the scammer keeps texting, and might trick someone else." },
@@ -152,6 +166,8 @@ Each scenario picks a mock-up type and fills it with its own content, so adding 
   },
   "buddy": {
     "intro": "Ooh, a new text message just came in!",
+    "explain": "Someone says they're your mom. They want the code that just came to your phone.",
+    "choices": "You can send them the code, ignore the texts, or tell an adult. What would you do?",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
       "ignore": { "mood": "thinking", "text": "Safe for now… but the scam is still out there." },
@@ -163,14 +179,34 @@ Each scenario picks a mock-up type and fills it with its own content, so adding 
     "check": [
       { "target": "sender", "text": "This number isn't saved as Mom in your phone." },
       { "target": "message1", "highlight": "I had to get a new number", "text": "'I got a new number' is a trick scammers use a lot. Anyone can say they're your mom." },
-      { "target": "message3", "highlight": "send me the code", "text": "Never share a code sent to your phone. Codes are like keys to your accounts." }
+      { "target": "message3", "highlight": "send me the code", "text": "Never share a code sent to your phone. Codes are like keys to your accounts." },
+      { "target": "notificationText", "highlight": "Don't share it with anyone", "text": "The code itself says not to share it. Someone is trying to get into your account." }
     ],
-    "tell": "Show a grown-up and say: 'Someone says they're Mom and wants my code. Can we call her old number?'"
+    "tell": "Show a grown-up and say: 'Someone says they're Mom and wants my code. Can we call her old number?'",
+    "tip": {
+      "label": "Secret code word",
+      "buddy": [
+        "Here's a trick: pick a secret code word with your family. Only your family knows it.",
+        "If someone says they're Mom, ask for the code word. A scammer won't know it!"
+      ],
+      "phone": [
+        { "from": "me", "text": "What's our code word?" },
+        { "from": "them", "text": "I forgot. Just send the code, quick!" }
+      ]
+    },
+    "summary": {
+      "solution": "Pick a secret code word with your family. Ask for it if someone says they're family.",
+      "checks": [
+        "A new number saying it's someone you know",
+        "Someone rushing you",
+        "Anyone asking for a code sent to your phone"
+      ]
+    }
   }
 }
 ```
 
-Shield Buddy shows the existing `outcomes` and `recap` text in its speech bubble, so each scenario only adds a few extra Buddy lines. Each recap item points at part of the scam screen. `target` names a field in `content` (separate texts in a list are `message1`, `message2`, and so on), and the optional `highlight` is the exact text inside that field to circle. The "spot the clues" mini-game uses the same targets.
+Shield Buddy shows the existing `outcomes` and `recap` text in its speech bubble, so each scenario only adds a few extra Buddy lines (`intro`, `explain`, `choices` and `reactions`). `whatIf` words the "What if you had…" cards, `tip` is what you can do next time, and `summary` fills the card at the end. Each recap item points at part of the scam screen. `target` names a field in `content` (separate texts in a list are `message1`, `message2`, and so on), and the optional `highlight` is the exact text inside that field to circle. The "spot the clues" mini-game uses the same targets.
 
 ## Open questions
 
@@ -182,4 +218,9 @@ Shield Buddy shows the existing `outcomes` and `recap` text in its speech bubble
 
 ## Getting started
 
-_TBD once the tech stack is chosen._
+```
+npm install
+npm run dev      # start the game locally
+npm run build    # type-check and build for hosting
+npm run lint     # check the code
+```

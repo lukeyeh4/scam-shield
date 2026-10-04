@@ -1,0 +1,146 @@
+{
+  "id": "free-robux",
+  "title": "Free Robux",
+  "mockup": "search",
+  "content": {
+    "query": "free robux",
+    "ad": {
+      "site": "Roblox Rewards",
+      "url": "roblox-giveaway-official.net",
+      "title": "Claim 10,000 Free Robux - Official Roblox Giveaway",
+      "text": "Limited time! Log in with your Roblox account to claim your free Robux. 100% safe and official.",
+      "icon": "/images/roblox-logo-black.png"
+    },
+    "results": [
+      {
+        "site": "Roblox",
+        "url": "https://www.roblox.com › upgrades › robux",
+        "title": "Buy Robux - Roblox",
+        "text": "Buy Robux to get upgrades for your avatar or buy special abilities in experiences.",
+        "icon": "/images/roblox-logo-blue.webp",
+        "iconFill": true
+      },
+      {
+        "site": "Microsoft Rewards",
+        "url": "https://rewards.bing.com",
+        "title": "Earn Robux with Microsoft Rewards",
+        "text": "Earn points by searching and playing, then use your points for Roblox gift cards.",
+        "icon": "/images/microsoft-logo.webp"
+      },
+      {
+        "site": "Roblox Support",
+        "url": "https://en.help.roblox.com › articles",
+        "title": "Free Robux Scams - Roblox Support",
+        "text": "Roblox does not give away free Robux on other websites. Sites that promise free Robux are scams.",
+        "icon": "/images/roblox-logo-blue.webp",
+        "iconFill": true
+      }
+    ]
+  },
+  "doIt": {
+    "mockup": "scam-site",
+    "content": {
+      "url": "roblox-giveaway-official.net/claim",
+      "brand": "Rewards",
+      "logo": "/images/roblox-wordmark.png",
+      "heading": "Congratulations! You won 10,000 Robux",
+      "text": "Enter your account details to claim your prize.",
+      "usernameLabel": "Roblox username",
+      "passwordLabel": "Password",
+      "button": "Claim my Robux ✓",
+      "note": "Your prize expires in 09:59"
+    },
+    "buddy": [
+      "You tapped the link, and it opened a website.",
+      "It says you won Robux. But look at what it wants you to type in…"
+    ]
+  },
+  "whatIf": { "do": "tapped the top result", "ignore": "closed Safari", "tell": "told an adult" },
+  "outcomes": {
+    "do": {
+      "result": "red",
+      "text": "You typed in your password. The next day, you can't log in. Someone took your account and all your Robux."
+    },
+    "ignore": {
+      "result": "yellow",
+      "text": "You closed it and kept your account safe. But your friend Mia tapped the same ad, and now her account is gone."
+    },
+    "tell": {
+      "result": "green",
+      "text": "Dad showed you Roblox's real help page: there's no such thing as free Robux. You reported the ad together. Nobody lost their account!"
+    }
+  },
+  "buddy": {
+    "intro": "You searched for free Robux. Look at all these results!",
+    "explain": "The top one says you can get 10,000 free Robux. It wants you to log in on its website.",
+    "choices": "You can tap the top result, close Safari, or tell an adult. What would you do?",
+    "reactions": {
+      "do": {
+        "mood": "worried",
+        "text": "Oh no! Let's see what happened."
+      },
+      "ignore": {
+        "mood": "thinking",
+        "text": "You're safe, but the scammer is still out there."
+      },
+      "tell": {
+        "mood": "cheering",
+        "text": "Awesome! A grown-up helped stop the scam!"
+      }
+    }
+  },
+  "recap": {
+    "stop": {
+      "target": "adText",
+      "highlight": "Limited time!",
+      "text": "'Limited time' was trying to make you rush."
+    },
+    "check": [
+      {
+        "target": "adLabel",
+        "text": "'Sponsored' means someone paid to put this at the top. Scammers can buy ads too."
+      },
+      {
+        "target": "adUrl",
+        "text": "The real Roblox website is roblox.com. This one is roblox-giveaway-official.net, a different website."
+      },
+      {
+        "target": "adTitle",
+        "highlight": "10,000 Free Robux",
+        "text": "Free stuff that sounds too good to be true usually isn't real."
+      },
+      {
+        "target": "result3",
+        "text": "Look! Roblox's own help page says free Robux sites are scams."
+      },
+      {
+        "screen": "doIt",
+        "target": "heading",
+        "text": "This is where the link goes. It looks real, but anyone can copy a logo. Looking real doesn't make it real."
+      },
+      {
+        "screen": "doIt",
+        "target": "passwordLabel",
+        "text": "It wants your password, and the address bar doesn't say roblox.com. Close it!"
+      }
+    ],
+    "tell": "Show a grown-up and say: 'I found a website that gives free Robux. Is it real?'",
+    "tip": {
+      "label": "Get Robux safely",
+      "buddy": [
+        "Want Robux? Only get it in the real Roblox app or on roblox.com, with a grown-up.",
+        "Roblox will never ask for your password on another website."
+      ],
+      "target": "result1"
+    },
+    "summary": {
+      "solution": "Only get Robux in the real Roblox app or on roblox.com, with a grown-up.",
+      "checks": [
+        "'Sponsored' results at the top",
+        "Web addresses that aren't roblox.com",
+        "Offers of free Robux",
+        "Websites asking for your password"
+      ]
+    }
+  }
+}

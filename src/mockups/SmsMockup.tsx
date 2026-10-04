@@ -1,13 +1,19 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import { reduceMotion } from '../motion'
-import type { SmsContent } from '../types'
+import type { ExtraMessage, SmsContent } from '../types'
 import { Field } from './Field'
 import { MarksContext } from './marks'
 import { NotificationBanner } from './NotificationBanner'
 import { PersonIcon, PhoneFrame } from './PhoneFrame'
 import { smsNotificationAt, smsTimeline } from './smsTimeline'
 
-export function SmsMockup({ content, animate }: { content: SmsContent; animate: boolean }) {
+type SmsMockupProps = {
+  content: SmsContent
+  animate: boolean
+  extraMessages: ExtraMessage[]
+}
+
+export function SmsMockup({ content, animate, extraMessages }: SmsMockupProps) {
   const playIn = animate && !reduceMotion()
   const total = content.messages.length
   const [delivered, setDelivered] = useState(playIn ? 0 : total)
@@ -39,7 +45,7 @@ export function SmsMockup({ content, animate }: { content: SmsContent; animate: 
   useEffect(() => {
     const thread = threadRef.current
     if (thread) thread.scrollTo({ top: thread.scrollHeight, behavior: reduceMotion() ? 'auto' : 'smooth' })
-  }, [delivered, typing])
+  }, [delivered, typing, extraMessages.length])
 
   // ...and keep it in view if the phone gets shorter, e.g. when Buddy starts talking
   useEffect(() => {
@@ -78,6 +84,16 @@ export function SmsMockup({ content, animate }: { content: SmsContent; animate: 
             className={`bubble bubble-in ${playIn ? 'sms-arrive-pop' : ''} ${i === delivered - 1 ? '' : 'bubble-no-tail'}`}
           >
             <Field name={`message${i + 1}`} text={message} />
+          </div>
+        ))}
+        {/* Added in the recap: each pops in a moment after the one before */}
+        {extraMessages.map((m, i) => (
+          <div
+            key={`extra-${i}`}
+            className={`bubble ${m.from === 'me' ? 'bubble-out' : 'bubble-in'} sms-arrive-pop`}
+            style={{ animationDelay: `${i * 1.4}s` }}
+          >
+            {m.text}
           </div>
         ))}
         {typing && (

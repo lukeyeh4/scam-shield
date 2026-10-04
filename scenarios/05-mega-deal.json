@@ -13,6 +13,7 @@
     "popupText": "Only 3 pairs left! Enter your card details now before they're gone.",
     "popupButton": "BUY NOW"
   },
+  "whatIf": { "do": "bought the sneakers", "ignore": "closed the page", "tell": "told an adult" },
   "outcomes": {
     "do":     { "result": "red",    "text": "You used your parent's card. The money was taken, and the sneakers never arrived." },
     "ignore": { "result": "yellow", "text": "You closed the page and kept your money. But the next 'mega deal' might be harder to spot." },
@@ -20,6 +21,8 @@
   },
   "buddy": {
     "intro": "You're looking for new sneakers online, and this pops up!",
+    "explain": "These sneakers are almost free! The pop-up wants your card number to buy them.",
+    "choices": "You can buy them now, close the page, or tell an adult. What would you do?",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Oh no! Let's see what happened." },
       "ignore": { "mood": "thinking", "text": "You kept your money, but the fake store is still out there." },
@@ -30,9 +33,26 @@
     "stop": { "target": "timer", "text": "This countdown was trying to make you buy before you could think." },
     "check": [
       { "target": "popupTitle", "highlight": "90% OFF", "text": "90% off is too good to be true. Real stores almost never have deals this big." },
-      { "target": "url", "text": "This isn't a store you know. Shop at stores your family trusts." },
-      { "target": "popupText", "highlight": "Enter your card details", "text": "Never type in card details without a grown-up." }
+      { "target": "url", "text": "This isn't a store you know, and the web address looks strange." },
+      { "target": "popupText", "highlight": "Enter your card details", "text": "Never type in a card number without a grown-up." }
     ],
-    "tell": "Show a grown-up and say: 'I found a really cheap deal. Can you check if this store is real?'"
+    "tell": "Show a grown-up and say: 'I found a really cheap deal. Can you check if this store is real?'",
+    "tip": {
+      "label": "Shop safely",
+      "buddy": [
+        "Only shop on stores your family knows and trusts.",
+        "Always ask a grown-up before you buy anything online."
+      ],
+      "target": "url"
+    },
+    "summary": {
+      "solution": "Only shop on stores your family trusts, and ask a grown-up first.",
+      "checks": [
+        "Deals that are too good to be true",
+        "Countdown timers",
+        "Web addresses you don't know",
+        "Pop-ups asking for card numbers"
+      ]
+    }
   }
 }

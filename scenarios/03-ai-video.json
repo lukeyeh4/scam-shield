@@ -1,0 +1,84 @@
+{
+  "id": "ai-video",
+  "title": "Famous Giveaway",
+  "mockup": "shorts",
+  "content": {
+    "channel": "@MrBeast.Gifts",
+    "avatar": "/images/mrbeast-logo.jpg",
+    "video": "/images/mrbeast-video.jpg",
+    "caption": "Get your FREE gift card 🎁👇 Only for the first 100 people.",
+    "link": "mrbeastgiftvoucher.com",
+    "comments": "30",
+    "remixes": "15"
+  },
+  "doIt": {
+    "mockup": "phone-site",
+    "content": {
+      "url": "mrbeastgiftvoucher.com",
+      "brand": "MrBeast Giveaways",
+      "logo": "/images/mrbeast-logo.jpg",
+      "prize": "$500",
+      "heading": "Congratulations! You won a $500 gift card 🎉",
+      "summary": [
+        { "label": "$500 Gift Card", "value": "FREE" },
+        { "label": "Shipping", "value": "$1.99" }
+      ],
+      "total": "$1.99",
+      "paymentLabel": "Payment details",
+      "button": "Claim my gift card",
+      "comments": [
+        { "name": "jake_r", "text": "got mine yesterday!! 🔥" },
+        { "name": "emma.w", "text": "thank you mrbeast!!! it really works" }
+      ]
+    },
+    "buddy": [
+      "You tapped the link, and it opened a website.",
+      "It says you won a gift card. But look at what it wants you to type in…"
+    ]
+  },
+  "whatIf": { "do": "tapped the link", "ignore": "scrolled past", "tell": "told an adult" },
+  "outcomes": {
+    "do":     { "result": "red",    "text": "The website asked for a parent's card number to 'pay for shipping'. The money was taken, and no gift card ever came." },
+    "ignore": { "result": "yellow", "text": "You scrolled past. But the video keeps spreading, and your friend thinks it's real." },
+    "tell":   { "result": "green",  "text": "Mom helped you check the real channel. There was no giveaway! You reported the fake video, and it was taken down." }
+  },
+  "buddy": {
+    "intro": "Ooh, a new video popped up!",
+    "explain": "It looks like a famous YouTuber is giving away free gift cards.",
+    "choices": "You can tap the link, scroll past the video, or tell an adult. What would you do?",
+    "reactions": {
+      "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
+      "ignore": { "mood": "thinking", "text": "Safe for now… but the fake video is still out there." },
+      "tell":   { "mood": "cheering", "text": "Great call! A grown-up helped spot the fake!" }
+    }
+  },
+  "recap": {
+    "stop": { "target": "caption", "highlight": "Only for the first 100 people", "text": "'Only for the first 100 people' was trying to make you rush." },
+    "check": [
+      { "target": "video", "text": "This video could be made with AI. Computers can copy a famous person's face and voice. Seeing it doesn't mean it's real." },
+      { "target": "channel", "text": "Look at the name. This isn't the real channel, and there's no check mark next to it." },
+      { "target": "caption", "highlight": "FREE gift card", "text": "Famous people don't give free gift cards to strangers who tap a link. If it sounds too good to be true, it probably is." },
+      { "target": "link", "text": "This link goes to a strange website, not YouTube. Real prizes don't ask you to fill in a form there." },
+      { "screen": "doIt", "target": "summary", "text": "This is where the link goes. It wants you to pay for 'shipping' with a card. A real prize never costs money." },
+      { "screen": "doIt", "target": "comments", "text": "These happy comments are fake. Scammers write them so you'll trust the site." }
+    ],
+    "tell": "Show a grown-up and say: 'I saw a video of someone famous giving away free gift cards. Is it real?'",
+    "tip": {
+      "label": "Check the real channel",
+      "buddy": [
+        "Go to the famous person's real channel. Look for the check mark next to their name.",
+        "If the giveaway isn't there, it's fake. And a real prize never costs money."
+      ],
+      "target": "channel"
+    },
+    "summary": {
+      "solution": "Before you believe it, check the famous person's real channel for a check mark.",
+      "checks": [
+        "Videos can be made with AI",
+        "Channel names that aren't quite right",
+        "Free prizes from strangers",
+        "Prizes that ask you to pay"
+      ]
+    }
+  }
+}

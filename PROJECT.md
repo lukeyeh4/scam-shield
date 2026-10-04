@@ -7,24 +7,22 @@ What's done, what's next, and what's still undecided. The design itself lives in
 - [x] Design spec, Shield Buddy design and tech stack (`README.md`)
 - [x] Shield Buddy artwork: six moods in `shield_buddy/`
 - [x] React + TypeScript + Vite project set up
-- [x] All 5 scenarios written in `scenarios/`, including Buddy's lines and the red flags to highlight
-- [x] Fake-screen components for text messages, game chat, a messaging app, email and a shopping website (`src/mockups/`)
-- [x] Wireframe: main menu, plus a scenario screen with the text-message screen, three choice buttons and Buddy in the corner
-- [x] iPhone-style text-message screen: texts arrive one by one with typing dots, plus a notification banner
-- [x] Shield Buddy speaks in typed-out chat bubbles; the choices slide up once it has finished
+- [x] All 5 scenarios written in `scenarios/`
+- [x] Main menu, and the full flow for each scenario: the scam, the choice, What happened, and Stop, Check, Tell (wireframe style)
+- [ ] Commit the work on branch `try/result-screens` and merge it into `main`
 
-## 1. Make the game playable
+## 1. The game
 
-Get one scenario working all the way through, using the wireframe style.
-
-- [x] Make the three choice buttons work (screen 2)
-- [x] **What happened** (screen 3, wireframe, on branch `try/result-screens`): Buddy explains the result of the player's choice, then "What if you had…" cards show the other two
-- [x] **Stop, Check, Tell recap** (screen 4, wireframe, on branch `try/result-screens`): a 3-step progress bar; each step highlights a red flag on the scam screen while Buddy explains it, with Back and Next buttons
-- [x] Screen 1 vs. screen 2: the scam plays on its own first, then the choices slide up
-- [x] At the end of a scenario: "Next scenario" (or "Finish" after the last one); "Menu" is always in the header
-- [ ] Decide whether to keep the two result screens (merge `try/result-screens` into `main`, or drop it)
-- [ ] Remember finished scenarios and show ✅ on the menu
-- [ ] Check all 5 scenarios play through correctly
+- [x] The scam plays in on a realistic fake screen, then Shield Buddy explains what's happening and lists the choices in simple words, with no hints
+- [x] The choices slide up once Buddy has finished talking
+- [x] Optional "Do it" step (`doIt`): shows where the scam leads first. Scenario 2 opens a fake Roblox prize site on the iPad; scenario 3 a fake MrBeast gift card site on the phone.
+- [x] **What happened**: Buddy explains the result, then "What if you had…" cards show the other two choices, worded for each scenario (`whatIf`)
+- [x] **Stop, Check, Tell**: a 3-step progress bar; each step highlights a red flag on the fake screen (or the Do it screen) while Buddy explains it; each step only highlights its own clues
+- [x] Every scenario ends Tell with what you can do next time (`tip`, e.g. a family code word), then a summary card: "What you can do" and "Make sure to check for" (`summary`)
+- [x] "Next scenario" (or "Finish" after the last one); "Menu" is always in the header
+- [ ] Remember finished scenarios and show which are done on the menu
+- [ ] Decide which other scenarios get a "Do it" step (e.g. the shopping site in scenario 5, or a fake login page in scenario 4)
+- [ ] Check all 5 scenarios play through correctly (scenarios 4 and 5 haven't been played through, since their fake screens aren't styled yet)
 
 ## Potential simplifications
 
@@ -35,7 +33,10 @@ Ideas to make the game shorter or gentler, to try after kids have played it.
 
 ## 2. Fake screens
 
-- [ ] Add styles for the game chat, messaging app, email and shopping website screens. Only the text-message screen has wireframe styles so far.
+Done: iPhone text messages with a notification banner (scenario 1), Google search results in Safari on an iPad and a fake prize site (scenario 2), YouTube Shorts and a fake gift card site in Safari on a phone (scenario 3).
+
+- [ ] Style the email screen (scenario 4) and the shopping website (scenario 5)
+- [ ] The messaging-app and Discord-style fake screens (`MessengerMockup`, `ChatAppMockup`) are no longer used by any scenario: reuse them or remove them
 - [ ] Make sure none of them contain real links or buttons that do something
 
 ## 3. Visual design
@@ -43,10 +44,9 @@ Ideas to make the game shorter or gentler, to try after kids have played it.
 Replace the grey wireframe with the real look.
 
 - [ ] Bright, friendly style with big buttons and large text (see "Look and feel" in `README.md`)
-- [ ] Make each fake screen look realistic
 - [ ] Colours for the outcomes and the Stop, Check, Tell steps (the wireframe has soft placeholder tints)
 - [ ] In the recap the phone is a little smaller, so the notification's phone number gets cut off on tablets
-- [ ] Shrink Buddy's images. Each is a 1000×1000 PNG of about 360 KB, much bigger than they're shown.
+- [ ] Shrink large images: Buddy's (each a 1000×1000 PNG of about 360 KB) and `public/images/robux-avatar.png` (about 520 KB), all shown much smaller
 
 ## 4. Tests and checks
 
@@ -55,12 +55,12 @@ Vitest is installed, but there's no test script or tests yet.
 - [ ] Add a `test` script to `package.json`
 - [ ] Test that every scenario file is valid: every recap `target` is a real content field, and every `highlight` appears exactly in that field's text
 - [ ] Test the red-flag highlighting helper (`src/highlight.ts`)
-- [ ] Add the dev, build, lint and test commands to `CLAUDE.md` and the "Getting started" section of `README.md`
+- [ ] Add the test command to `CLAUDE.md` and the "Getting started" section of `README.md`
 
 ## 5. Content review
 
-- [ ] Project owner reviews all scenario text: reading level, tone (realistic but not scary), no shaming
-- [ ] Confirm every name, brand and web address is made up
+- [ ] Project owner reviews all scenario text: reading level (simple words), tone (realistic but not scary), no shaming
+- [ ] Check the realistic details against the real thing: Apple's verification text (scenario 1), Google results for "free robux" (scenario 2)
 
 ## 6. Put it online
 
@@ -74,4 +74,6 @@ Vitest is installed, but there's no test script or tests yet.
 
 ## Still to decide
 
+- [ ] Real brands and people: scenarios 1–3 now show Apple, Google, Roblox, Microsoft, YouTube and MrBeast (including his photo and a real scam web address) so they look like what kids actually see. Keep them, or switch to made-up names? Scenarios 4–5 still use made-up names.
+- [ ] `mrbeast.webp` in the project folder isn't used by the game (a cropped copy is): keep it as the source, or remove it?
 - [ ] Should there be an end screen or certificate after all 5 scenarios?

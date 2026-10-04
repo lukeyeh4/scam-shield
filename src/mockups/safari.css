@@ -1,0 +1,118 @@
+/* Safari's toolbar on an iPad (see SafariBar) */
+.safari {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  font-size: 13px;
+}
+
+.safari-bar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 4px 16px 7px;
+  background: #1e1f22;
+  color: #0a84ff;
+}
+
+.safari-buttons {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.safari-disabled {
+  color: #48484a;
+}
+
+/* The address bar: aA on the left, the address in the middle, reload on the right */
+.safari-address {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 5px 12px;
+  border-radius: 10px;
+  background: #3a3a3c;
+  color: #e5e5ea;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.safari-aa {
+  flex: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.safari-aa small {
+  font-size: 9px;
+}
+
+.safari-url-group {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.safari-lock,
+.safari-warning,
+.safari-not-secure {
+  flex: none;
+  color: #98989d;
+}
+
+.safari-reload {
+  flex: none;
+  color: #e5e5ea;
+}
+
+.safari-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The blue loading bar only shows while the page opens */
+.safari-loading {
+  display: none;
+}
+
+.safari-loading-in .safari-loading {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: block;
+  height: 3px;
+  background: #007aff;
+  animation: safari-load 1.2s ease-out forwards;
+}
+
+@keyframes safari-load {
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+
+  80% {
+    width: 100%;
+    opacity: 1;
+  }
+
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .safari-loading-in .safari-loading {
+    display: none;
+  }
+}

@@ -2,39 +2,44 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project status
-
-Pre-implementation. The repo contains only `README.md`, which is the design spec. The stack has been chosen: React + TypeScript + Vite, as a web app that works on tablets and is hosted as static files. The project hasn't been set up yet, so there are no build, lint or test commands. Add the real commands here once they exist.
-
 ## What this is
 
-"Scam Shield: Stop, Check, Tell" is a game that teaches kids aged 8–12 to spot scams. The README is the source of truth for the design. Read it before building anything.
+"Scam Shield: Stop, Check, Tell" is a game that teaches kids aged 8–12 to spot scams. It's a React + TypeScript + Vite web app that works on tablets and is hosted as static files. `README.md` is the design spec and `PROJECT.md` tracks next steps. Read both before building anything.
 
-## Architecture (as designed)
+## Commands
 
-The game is data-driven. Every scenario uses the same four-screen flow, and scenarios differ only in their data:
+- Install: `npm install`
+- Run: `npm run dev`
+- Build (type-checks first): `npm run build`
+- Lint: `npm run lint` (oxlint)
+- Tests: Vitest is installed, but there's no `test` script or tests yet
 
-1. **Scam screen**: a realistic mock-up (`sms`, email, game chat, website) filled with scenario content.
-2. **Choice**: always the same three buttons: `do` / `ignore` / `tell`.
-3. **What happened**: reveals all three outcomes and highlights the player's pick. The results are `do` → red, `ignore` → yellow, `tell` → green, always.
-4. **Recap**: the scam screen comes back with notes added for STOP (what rushed you), CHECK (each red flag), and TELL (who to tell and what to say).
+## Architecture
 
-Planned layout:
-- `scenarios/NN-<slug>.json`: one file per scenario (5 planned, ordered easiest to hardest). The schema is shown in the README's "Example scenario" (`id`, `title`, `mockup`, `content`, `outcomes.{do,ignore,tell}`, `buddy`, `recap.{stop,check[],tell}`).
-- `src/mockups/`: reusable fake screens, one per mock-up type. Adding a scenario should mean adding a JSON file, not building a new screen.
-- `src/buddy/`: Shield Buddy, which shows one image per mood plus a speech bubble.
-- `src/`: the shared game screens (choice, results, recap).
+The game is data-driven. Every scenario uses the same screens, and scenarios differ only in their data in `scenarios/NN-<slug>.json` (loaded in filename order by `src/scenarios.ts`; the format is `Scenario` in `src/types.ts`).
 
-**Recap targets:** each `recap.stop` and `recap.check[]` item is `{ target, highlight?, text }`. `target` names a field in `content`, and `highlight` is an exact piece of text inside that field. Mock-up components must be able to find and highlight the part each target points at. The recap and the "spot the clues" mini-game both rely on this.
+**Flow** (`src/screens/`):
+1. `MainMenu`: Start, or pick a scenario.
+2. `ScenarioScreen`: the scam plays in on a fake screen; Shield Buddy says `buddy.intro`, `buddy.explain` and `buddy.choices`; then the Do it / Ignore it / Tell an adult buttons slide up.
+3. `DoItScreen` (only after Do it, only if the scenario has `doIt`): where the scam leads, e.g. a fake website.
+4. `OutcomeScreen`: Buddy explains the result, then "What if you had…" cards (worded by `whatIf`) show the other two choices. Results are always `do` → red, `ignore` → yellow, `tell` → green.
+5. `RecapScreen`: Stop, Check, Tell with a 3-step progress bar. Each step highlights a red flag on the fake screen while Buddy explains it. Tell ends with `recap.tip` (what you can do, e.g. a family code word), then `SummaryCard` (`recap.summary`: "What you can do" and "Make sure to check for").
 
-**Shield Buddy:** a shield character with a face. The artwork is in `shield_buddy/` (one 1000×1000 transparent PNG per mood). Its lines come from each scenario's `buddy` block (`intro` and `reactions.{do,ignore,tell}`), and it also shows the `outcomes` and `recap` text. The moods are a fixed set: `happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`. Read-aloud is planned for later, so keep Buddy's lines in data and out of the markup.
+**Fake screens** (`src/mockups/`): `Mockup` picks the component for a scenario's `mockup` type. Devices are `PhoneFrame` (iPhone; `dark` for full-screen apps, optional message box) and `TabletFrame` (iPad held sideways, scales to fit with container query units); `SafariBar` is the iPad Safari toolbar. Nothing on a fake screen is a real link, button or form field. Images (logos, photos) live in `public/images/` and are named by path in the scenario files.
+
+**Recap targets:** recap items are `{ target, highlight?, text, screen? }`. `target` names a content field, `highlight` is an exact piece of text inside it, and `screen: "doIt"` points at the Do it screen instead. Mock-ups render text through `<Field name=...>` (`Field.tsx`), and non-text parts (a video, a box of comments) use `useMark` (`marks.ts`); both highlight and scroll into view. A list of texts is targeted as `message1`, `message2`, and so on.
+
+**Shield Buddy** (`src/buddy/`): one image per mood from `shield_buddy/` (`happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`), with typed-out speech bubbles (`useTypewriter`). It shows the two newest bubbles at most. Read-aloud is planned, so keep Buddy's lines in the scenario data, not in markup.
+
+Animations respect `prefers-reduced-motion` (`src/motion.ts`).
 
 ## Content rules (these apply to all scenario text and UI copy)
 
-- Use only made-up names and brands (e.g. "BlockCraft", "ShopZoom", `prize-claim.co`). Never use real brands, and never include working links.
-- Write at about an 8-year-old reading level. Keep one idea per screen, with big buttons and large text.
+- Write at about an 8-year-old reading level, with simple words. Keep one idea per screen, with big buttons and large text. The text on the fake screens can be realistic; everything Buddy and the game say must be simple.
+- Scenarios 1–3 show real apps and brands (iPhone, Safari, Google, Roblox, YouTube) so they match what kids actually see; scenarios 4–5 still use made-up names (PixelPals, ShopZoom). Never include working links. Whether to keep real brands is still being decided (see `PROJECT.md`).
 - Consequences should feel realistic but not frightening or graphic.
 - No shame. Wrong choices get "Here's what to watch for next time," never "You failed."
-- No emojis in the game's own interface (buttons, labels, headings): keep it plain, large, readable text. Emojis are fine inside the fake scam screens and scam messages, where they make them look real.
-- Shield Buddy never hints before the choice (screens 1–2 stay neutral). It isn't a trusted adult: its lines always send kids to a real grown-up. All its lines are scripted, never generated.
+- No emojis in the game's own interface (buttons, labels, headings). Emojis are fine inside the fake scam screens.
+- Shield Buddy never hints before the choice: its intro, explanation and list of choices stay neutral. It isn't a trusted adult: its lines always send kids to a real grown-up. All its lines are scripted, never generated.
 - Keep the key lesson: Ignore keeps *you* safe once, but Tell stops the scam. The yellow outcomes should show why ignoring isn't the full answer.
+- Every scenario ends with what the kid can do next time (`tip` and `summary`), worded gently.
