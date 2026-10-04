@@ -1,5 +1,7 @@
 import { Buddy } from '../buddy/Buddy'
+import { BADGES, useEarnedBadges } from '../badges'
 import { scenarios } from '../scenarios'
+import { BadgeList } from './Badges'
 import './results.css'
 
 const STEPS = [
@@ -13,9 +15,10 @@ type EndScreenProps = {
   onMenu: () => void
 }
 
-// After the last scenario: Stop, Check, Tell one more time, and what you can do
-// next time for each scam.
+// After the last scenario: Stop, Check, Tell one more time, the badges earned,
+// and what you can do next time for each scam.
 export function EndScreen({ onPlayAgain, onMenu }: EndScreenProps) {
+  const earned = useEarnedBadges()
   return (
     <main className="menu end screen-enter">
       <h1 className="menu-title">You did it!</h1>
@@ -36,6 +39,11 @@ export function EndScreen({ onPlayAgain, onMenu }: EndScreenProps) {
           </li>
         ))}
       </ol>
+
+      <h2 className="menu-heading">
+        Your badges: {earned.length} of {BADGES.length}
+      </h2>
+      <BadgeList />
 
       <h2 className="menu-heading">What you can do</h2>
       <ol className="menu-list end-list">

@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent } from 'react'
+import { recordAllCluesFound } from '../badges'
 import { Buddy } from '../buddy/Buddy'
 import type { Mark } from '../mockups/marks'
 import { Mockup } from '../mockups/Mockup'
@@ -76,7 +77,9 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
     const onOther = markIndex >= places.length
     let clue = markIndex >= 0 && !onOther ? places[markIndex].clue : -1
     // ...or else any clue still to be found in the same part of the screen
-    const field = tapped.closest<HTMLElement>('[data-field]')?.dataset.field
+    // (tapping around the text counts too, e.g. a message bubble's padding)
+    const inside = tapped.querySelectorAll<HTMLElement>('[data-field]')
+    const field = (tapped.closest<HTMLElement>('[data-field]') ?? (inside.length === 1 ? inside[0] : null))?.dataset.field
     if (!onOther && (clue < 0 || found.includes(clue))) {
       clue = places.find((p) => p.target === field && !found.includes(p.clue))?.clue ?? -1
     }
@@ -84,8 +87,10 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
     if (clue >= 0) {
       setFound([...found, clue])
       setFresh(clue)
-      if (found.length + 1 === clues.length) say('cheering', ALL_FOUND)
-      else say('happy', FOUND[found.length % FOUND.length])
+      if (found.length + 1 === clues.length) {
+        say('cheering', ALL_FOUND)
+        recordAllCluesFound(scenario.id)
+      } else say('happy', FOUND[found.length % FOUND.length])
     } else if (onOther) {
       say('happy', OTHER_CLUE)
     } else if (places.some((p) => p.target === field && found.includes(p.clue))) {

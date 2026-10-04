@@ -1,6 +1,8 @@
 import { lazy, Suspense, useState } from 'react'
+import { recordFinished } from './badges'
 import type { DevJump } from './dev/DevConsole'
 import { scenarios } from './scenarios'
+import { BadgeToast } from './screens/Badges'
 import { EndScreen } from './screens/EndScreen'
 import { MainMenu } from './screens/MainMenu'
 import { ScenarioScreen, type ScenarioStart } from './screens/ScenarioScreen'
@@ -44,7 +46,11 @@ export default function App() {
         isLast={isLast}
         start={start}
         onBack={menu}
-        onNext={() => (isLast ? setView({ screen: 'end' }) : play(index + 1))}
+        onNext={() => {
+          if (!isLast) return play(index + 1)
+          recordFinished()
+          setView({ screen: 'end' })
+        }}
       />
     )
   }
@@ -52,6 +58,7 @@ export default function App() {
   return (
     <>
       {content}
+      <BadgeToast />
       {DevConsole && (
         <Suspense>
           <DevConsole onJump={jump} />

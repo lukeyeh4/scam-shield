@@ -1,5 +1,6 @@
 // DEV CONSOLE: remove before shipping (see "Dev console" in PROJECT.md).
 import { useEffect, useState } from 'react'
+import { resetBadges } from '../badges'
 import { scenarios } from '../scenarios'
 import type { ScenarioStart } from '../screens/ScenarioScreen'
 import type { Choice } from '../types'
@@ -66,6 +67,9 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
         </button>
         <button type="button" onClick={() => onJump({ to: 'end' })}>
           End screen
+        </button>
+        <button type="button" onClick={resetBadges}>
+          Reset badges
         </button>
       </div>
 

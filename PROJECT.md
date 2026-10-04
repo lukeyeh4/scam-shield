@@ -22,6 +22,7 @@ What's done, what's next, and what's still undecided. The design itself lives in
 - [x] "Next scenario" (or "Finish" after the last one); "Menu" is always in the header
 - [x] **Spot the clues** (`SpotScreen`, between What happened and the recap): the player taps about 3 easy clues from a checklist (recap items with a `spot` name); Buddy answers every tap kindly; "Show me the clues" skips ahead, and the recap still covers every clue
 - [x] Shield Buddy moves to match its mood with each new message (a hop, a wobble, a spin…), bobs while talking and floats when quiet; all bubbles stay, fading out at the top, and can be scrolled back to
+- [x] **Badges** (`src/badges.ts`, saved on the device): Clue Finder, Good Call, Super Spotter and Scam Shield, each with a "New badge!" notification when earned, and all shown on the end screen (grey until earned, with how to earn them)
 - [x] End screen after the last scenario (`EndScreen`): Buddy cheers, Stop, Check, Tell in kid words, "What you can do" from each scenario's summary, then Play again or Menu (wireframe style)
 - [ ] End screen: decide whether it becomes a certificate (e.g. with the player's name), and give it the real look
 - [ ] Remember how far the player got, so Start can pick up where they left off (the menu no longer lists the scenarios)
@@ -97,4 +98,5 @@ It's left out of `npm run build`, but remove it before shipping anyway. Everythi
 - [ ] `src/buddy/Buddy.tsx`: remove `isFast()` from the wait between messages
 - [ ] `src/screens/ScenarioScreen.tsx`: remove `ScenarioStart` and the `start` prop
 - [ ] `src/screens/RecapScreen.tsx`: remove the `startAtSummary` prop
+- [ ] `src/badges.ts`: remove `resetBadges`
 - [ ] Remove this section and the dev console note in `CLAUDE.md`

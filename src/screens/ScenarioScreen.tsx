@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { recordToldAdult } from '../badges'
 import { Buddy } from '../buddy/Buddy'
 import { CHOICES } from '../labels'
 import { arrivalDelay } from '../mockups/arrival'
@@ -86,7 +87,15 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: Scen
         <h2 className="choices-question">What would you do?</h2>
         <div className="choices">
           {CHOICES.map((c) => (
-            <button key={c.id} className="choice" type="button" onClick={() => setChoice(c.id)}>
+            <button
+              key={c.id}
+              className="choice"
+              type="button"
+              onClick={() => {
+                if (c.id === 'tell') recordToldAdult(scenario.id)
+                setChoice(c.id)
+              }}
+            >
               {c.label}
             </button>
           ))}
