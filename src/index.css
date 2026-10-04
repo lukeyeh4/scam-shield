@@ -75,21 +75,17 @@ button:active {
   margin: -16px -12px -20px;
 }
 
-/* The bubbles scroll inside a box (see stackCards in Buddy.tsx); they fade out at the
-   top and, when scrolled up, at the bottom */
+/* The bubbles stack up inside a box. Once the stack is too tall it fades out at the
+   top, and older bubbles can be scrolled back to (with no scroll bar) */
 .buddy-messages {
   position: relative;
   min-width: 0;
-  /* Room for the two newest bubbles, with the third peeking out above */
   max-height: 20em;
-  padding: 1em 6px 1em;
+  padding: 2.5em 6px 1em;
   overflow-y: auto;
   overscroll-behavior: contain;
-  /* Scrolling settles with one card at the front */
-  scroll-snap-type: y mandatory;
-  scroll-padding-bottom: 1em;
   scrollbar-width: none;
-  mask-image: linear-gradient(to bottom, transparent, #000 1em, #000 calc(100% - 1em), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 4em, #000 calc(100% - 1em), transparent);
 }
 
 .buddy-messages::-webkit-scrollbar {
@@ -102,22 +98,14 @@ button:active {
   gap: 10px;
 }
 
-/* A new bubble grows into place, pushing the ones before it up */
+/* A new bubble grows into place, so the older ones glide up to make room */
 .buddy-row {
   display: grid;
   grid-template-rows: 1fr;
-  scroll-snap-align: end;
   animation: bubble-grow 400ms var(--ease) both;
 }
 
-.buddy-card {
-  display: grid;
-  min-height: 0;
-  transform-origin: 50% 100%;
-}
-
 .buddy-bubble {
-  position: relative;
   display: grid;
   min-height: 0;
   max-width: 30ch;
@@ -131,18 +119,6 @@ button:active {
 
 .buddy-row-old .buddy-bubble {
   border-radius: 22px;
-}
-
-/* Older cards fade into the background but stay solid, so the ones behind
-   them don't show through */
-.buddy-bubble::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--bg);
-  opacity: var(--fade, 0);
-  pointer-events: none;
 }
 
 /* Typed text sits on top of the hidden full text, so the bubble doesn't grow as it types */
