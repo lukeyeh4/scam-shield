@@ -130,15 +130,15 @@
     ],
     "tell": "Show a grown-up and say: 'I found a website that gives free Robux. Is it real?'",
     "tip": {
-      "label": "Get Robux safely",
+      "label": "Keep your password safe",
       "buddy": [
-        "Want Robux? Only get it in the real Roblox app or on roblox.com, with a grown-up.",
-        "Roblox will never ask for your password on another website."
+        "Never type your password on a website you got to from an ad or a link.",
+        "Want something for a game? Open the real app yourself, with a grown-up."
       ],
-      "target": "result1"
+      "target": "adUrl"
     },
     "summary": {
-      "solution": "Only get Robux in the real Roblox app or on roblox.com, with a grown-up.",
+      "solution": "Never type your password on a website from an ad or a link. Open the real app yourself, with a grown-up.",
       "checks": [
         "'Sponsored' results at the top",
         "Web addresses that aren't roblox.com",

@@ -56,7 +56,7 @@
     "stop": { "target": "caption", "highlight": "Only for the first 100 people", "text": "'Only for the first 100 people' was trying to make you rush.", "spot": "Someone rushing you" },
     "check": [
       { "target": "video", "text": "This video could be made with AI. Computers can copy a famous person's face and voice. Seeing it doesn't mean it's real." },
-      { "target": "channel", "text": "Look at the name. This isn't the real channel, and there's no check mark next to it.", "spot": "A fake channel name" },
+      { "target": "channel", "text": "Look at the name. This isn't the real channel. Scammers make names that look almost the same.", "spot": "A fake channel name" },
       { "target": "caption", "highlight": "FREE gift card", "text": "Famous people don't give free gift cards to strangers who tap a link. If it sounds too good to be true, it probably is.", "spot": "A free prize", "spotAlso": [{ "target": "video" }] },
       { "target": "link", "text": "This link goes to a strange website, not YouTube. Real prizes don't ask you to fill in a form there." },
       { "screen": "doIt", "target": "summary", "text": "This is where the link goes. It wants you to pay for 'shipping' with a card. A real prize never costs money." },
@@ -64,15 +64,15 @@
     ],
     "tell": "Show a grown-up and say: 'I saw a video of someone famous giving away free gift cards. Is it real?'",
     "tip": {
-      "label": "Check the real channel",
+      "label": "Free prizes are a trick",
       "buddy": [
-        "Go to the famous person's real channel. Look for the check mark next to their name.",
-        "If the giveaway isn't there, it's fake. And a real prize never costs money."
+        "Anyone can make a video or a channel look real. Even check marks can be faked.",
+        "If a stranger online offers you a free prize, don't tap the link. Show a grown-up first."
       ],
-      "target": "channel"
+      "target": "link"
     },
     "summary": {
-      "solution": "Before you believe it, check the famous person's real channel for a check mark.",
+      "solution": "If a stranger online offers you a free prize, don't tap the link. Show a grown-up first.",
       "checks": [
         "Trusting a video just because it looks real",
         "Channel names that aren't quite right",

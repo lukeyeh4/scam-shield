@@ -63,7 +63,7 @@ The scam screen comes back, this time with explanations added to it:
 - 🔍 **CHECK**: circles each red flag one at a time. *"This link doesn't match the real website." "You never entered a contest!"*
 - 🗣️ **TELL**: names who they could tell and what to say. *"Show Mum or Dad and say: 'I got this message and I'm not sure about it.'"*
 
-Every scenario ends TELL with **what you can do** next time (the `tip` in its file), with the matching part of the scam screen highlighted. For example, scenario 1 teaches a **family code word**: Shield Buddy explains it, and the phone shows the player asking *"What's our code word?"* and the scammer failing to answer. Scenario 2 shows the safe way to get Robux, scenario 3 checking the real channel, scenario 4 checking in the real app, and scenario 5 shopping only at stores your family trusts.
+Every scenario ends TELL with **what you can do** next time (the `tip` in its file), with the matching part of the scam screen highlighted. For example, scenario 1 teaches a **family code word**: Shield Buddy explains it, and the phone shows the player asking *"What's our code word?"* and the scammer failing to answer. Scenario 2 teaches never typing your password on a site from an ad or a link, scenario 3 not tapping links for free prizes from strangers (even check marks can be faked), scenario 4 checking in the real app, and scenario 5 shopping only at stores your family trusts.
 
 The recap ends with a **summary card** (the `summary` in each scenario file): **Remember**, then what you can do in one sentence, and a short list under **Make sure to avoid**.
 
