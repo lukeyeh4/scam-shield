@@ -48,8 +48,8 @@ type BuddyProps = {
 // each typing out under the last. Messages added to the end later (e.g. the next
 // step of the recap) type out under the earlier ones, which stay. Give it a new
 // `key` to start over.
-// Buddy moves to match its mood when it starts talking (e.g. a wobble when worried,
-// a jump when cheering), bobs while it talks, and floats gently otherwise.
+// Buddy moves to match its mood as each new message appears (e.g. a wobble when
+// worried, a jump when cheering), bobs while it talks, and floats gently otherwise.
 export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
   const [count, setCount] = useState(delayMs > 0 ? 0 : 1)
   // Messages can also be taken away (e.g. going back a step in the recap)
@@ -118,11 +118,10 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
   return (
     <div className="buddy">
       <span className={shown > 0 && !allDone ? 'buddy-body is-talking' : 'buddy-body'}>
-        {/* The mood's move waits for the first message, e.g. until the scam has arrived */}
+        {/* A new key for each message, so the mood's move plays again */}
         <img
-          key={mood}
-          className={`buddy-image buddy-move-${mood}`}
-          style={{ animationDelay: `${delayMs}ms` }}
+          key={`${mood}-${shown}`}
+          className={shown > 0 ? `buddy-image buddy-move-${mood}` : 'buddy-image'}
           src={IMAGES[mood]}
           alt={`Shield Buddy looking ${mood}`}
         />

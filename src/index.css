@@ -169,7 +169,7 @@ button:active {
   }
 }
 
-/* Each mood has its own move, played once when Buddy starts talking */
+/* Each mood has its own move, played as each new message appears */
 .buddy-move-happy {
   animation: buddy-hop 600ms var(--ease) both;
 }
