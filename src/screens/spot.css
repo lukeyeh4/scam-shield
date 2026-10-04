@@ -83,9 +83,53 @@ mark.flag-hidden {
   }
 }
 
+/* "Show me the clues": a hint, so it looks like the clue highlights rather than
+   a normal button: highlighter yellow with a dashed edge and a magnifying glass */
+.show-clues {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 0 24px 0 18px;
+  border: 3px dashed #f5b700;
+  border-radius: 999px;
+  background: #fff6cf;
+  color: #7a5600;
+  font-size: var(--text-large);
+  font-weight: 700;
+  transition:
+    transform 150ms var(--ease),
+    box-shadow 150ms var(--ease),
+    background-color 150ms var(--ease),
+    border-color 150ms var(--ease);
+}
+
+.show-clues svg {
+  flex: none;
+  transition: transform 300ms var(--ease);
+}
+
+@media (hover: hover) {
+  .show-clues:hover {
+    border-style: solid;
+    background: #ffe066;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+  }
+
+  .show-clues:hover svg {
+    transform: rotate(-15deg) scale(1.15);
+  }
+}
+
 @media (max-width: 560px) {
+  .show-clues {
+    min-height: 56px;
+    font-size: var(--text-body);
+  }
+
   .spot-item {
     min-height: 44px;
-    font-size: 0.9em;
+    font-size: var(--text-small);
   }
 }

@@ -34,8 +34,13 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
   // Clue numbers in the order they were found
   const [found, setFound] = useState<number[]>([])
   const [fresh, setFresh] = useState<number | null>(null)
-  // What happened on the last tap, so Buddy can react
-  const [lastTap, setLastTap] = useState<{ kind: 'found' | 'again' | 'missed' | 'other'; count: number }>()
+  // Everything Buddy has said, so the player can scroll back up; its mood follows the latest
+  const [said, setSaid] = useState<{ mood: Mood; text: string }[]>([
+    { mood: 'curious', text: "Let's look again. Can you find these clues?" },
+    { mood: 'curious', text: 'Tap each one on the screen.' },
+  ])
+  const [misses, setMisses] = useState(0)
+  const say = (mood: Mood, text: string) => setSaid([...said, { mood, text }])
   const allFound = found.length === clues.length
 
   useEffect(() => {
@@ -60,37 +65,20 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
     if (clue < 0 || found.includes(clue)) {
       clue = clues.findIndex((c, i) => c.target === field && !found.includes(i))
     }
-    const count = (lastTap?.count ?? 0) + 1
+    if (allFound) return
     if (clue >= 0) {
       setFound([...found, clue])
       setFresh(clue)
-      setLastTap({ kind: 'found', count })
+      if (found.length + 1 === clues.length) say('cheering', ALL_FOUND)
+      else say('happy', FOUND[found.length % FOUND.length])
     } else if (clues.some((c, i) => c.target === field && found.includes(i))) {
-      setLastTap({ kind: 'again', count })
+      say('happy', AGAIN)
     } else if (allClues.some((c) => c.target === field && !c.spot)) {
-      setLastTap({ kind: 'other', count })
+      say('happy', OTHER_CLUE)
     } else {
-      setLastTap({ kind: 'missed', count })
+      say('thinking', MISSED[misses % MISSED.length])
+      setMisses(misses + 1)
     }
-  }
-
-  let mood: Mood = 'curious'
-  let messages = ["Let's look again. Can you find these clues?", 'Tap each one on the screen.']
-  if (allFound) {
-    mood = 'cheering'
-    messages = [ALL_FOUND]
-  } else if (lastTap?.kind === 'found') {
-    mood = 'happy'
-    messages = [FOUND[(found.length - 1) % FOUND.length]]
-  } else if (lastTap?.kind === 'again') {
-    mood = 'happy'
-    messages = [AGAIN]
-  } else if (lastTap?.kind === 'other') {
-    mood = 'happy'
-    messages = [OTHER_CLUE]
-  } else if (lastTap?.kind === 'missed') {
-    mood = 'thinking'
-    messages = [MISSED[lastTap.count % MISSED.length]]
   }
 
   return (
@@ -108,8 +96,7 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
           <Mockup screen={scenario} marks={marks} animate={false} />
         </div>
         <div className="scenario-buddy">
-          {/* A new key on every tap, so Buddy reacts (and moves) each time */}
-          <Buddy key={lastTap?.count ?? 0} mood={mood} messages={messages} />
+          <Buddy mood={said[said.length - 1].mood} messages={said.map((m) => m.text)} />
         </div>
       </main>
 
@@ -131,12 +118,22 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
             Next: Stop, Check, Tell
           </button>
         ) : (
-          <button className="secondary-button" type="button" onClick={onContinue}>
+          <button className="show-clues" type="button" onClick={onContinue}>
+            <MagnifierIcon />
             Show me the clues
           </button>
         )}
       </footer>
     </div>
+  )
+}
+
+function MagnifierIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="6.5" fill="#fff" stroke="currentColor" strokeWidth="2.6" />
+      <path d="m15.5 15.5 5 5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
   )
 }
 
