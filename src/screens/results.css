@@ -24,7 +24,7 @@
   min-height: 64px;
   padding: 0 28px;
   border-radius: var(--radius);
-  font-size: 1.2em;
+  font-size: var(--text-large);
   font-weight: 700;
 }
 
@@ -56,7 +56,7 @@
   display: inline-block;
   padding: 4px 14px;
   border-radius: 999px;
-  font-size: 0.9em;
+  font-size: var(--text-small);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -97,7 +97,7 @@
 }
 
 .outcome-chosen {
-  font-size: 1.4em;
+  font-size: var(--text-heading);
 }
 
 .outcome-main .buddy {
@@ -124,7 +124,7 @@
 
 .outcome-others-title {
   margin-bottom: 12px;
-  font-size: 1.2em;
+  font-size: var(--text-large);
 }
 
 .outcome-cards {
@@ -153,7 +153,7 @@
 
 .outcome-card p {
   color: var(--muted);
-  font-size: 0.95em;
+  font-size: var(--text-body);
 }
 
 /* Stop, Check, Tell */
@@ -230,12 +230,12 @@
 
 .stepper-label {
   margin-top: 6px;
-  font-size: 1.1em;
+  font-size: var(--text-large);
   font-weight: 700;
 }
 
 .stepper-hint {
-  font-size: 0.8em;
+  font-size: var(--text-small);
 }
 
 .recap-footer {
@@ -295,13 +295,13 @@ mark.flag {
 }
 
 .summary-title {
-  font-size: 1.5em;
+  font-size: var(--text-heading);
   font-weight: 800;
 }
 
 .summary-label {
   color: var(--muted);
-  font-size: 0.8em;
+  font-size: var(--text-small);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -349,7 +349,6 @@ mark.flag {
 @media (max-width: 560px) {
   .summary-card {
     padding: 16px;
-    font-size: 0.95em;
   }
 
   .outcome-cards {
@@ -369,7 +368,7 @@ mark.flag {
   .secondary-button {
     min-height: 56px;
     padding: 0 20px;
-    font-size: 1.05em;
+    font-size: var(--text-body);
   }
 
   .recap-footer .primary-button {
