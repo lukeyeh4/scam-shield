@@ -75,20 +75,20 @@ button:active {
   margin: -16px -12px -20px;
 }
 
-/* The bubbles scroll inside a box (see turnWheel in Buddy.tsx); bubbles fade out at the
-   top and, when scrolled up, at the bottom */
+/* The bubbles scroll inside a box as a stack of cards (see stackCards in Buddy.tsx);
+   cards fade out at the top and, when scrolled up, at the bottom */
 .buddy-messages {
   position: relative;
   min-width: 0;
   max-height: 16em;
-  padding: 1.5em 6px 1em;
+  padding: 1em 6px 1em;
   overflow-y: auto;
   overscroll-behavior: contain;
-  /* Like a wheel picker, scrolling settles with one bubble at the front */
+  /* Scrolling settles with one card at the front */
   scroll-snap-type: y mandatory;
   scroll-padding-bottom: 1em;
   scrollbar-width: none;
-  mask-image: linear-gradient(to bottom, transparent, #000 2em, #000 calc(100% - 1em), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 1em, #000 calc(100% - 1em), transparent);
 }
 
 .buddy-messages::-webkit-scrollbar {
@@ -101,13 +101,18 @@ button:active {
   gap: 10px;
 }
 
-/* A new bubble grows into place, so the older ones roll back to make room */
+/* A new bubble grows into place, sliding up over the ones before it */
 .buddy-row {
   display: grid;
   grid-template-rows: 1fr;
-  transform-origin: 30% 50%;
   scroll-snap-align: end;
   animation: bubble-grow 400ms var(--ease) both;
+}
+
+.buddy-card {
+  display: grid;
+  min-height: 0;
+  transform-origin: 50% 100%;
 }
 
 .buddy-bubble {
@@ -127,8 +132,8 @@ button:active {
   border-radius: 22px;
 }
 
-/* Bubbles further round the wheel fade into the background but stay solid,
-   so the ones behind don't show through */
+/* Cards behind the front fade into the background but stay solid,
+   so the ones behind them don't show through */
 .buddy-bubble::after {
   content: '';
   position: absolute;

@@ -14,36 +14,62 @@ const IMAGES: Record<Mood, string> = { cheering, curious, happy, neutral, thinki
 // Pause between one message finishing and the next one appearing
 const NEXT_MESSAGE_DELAY_MS = 700
 
-// The speech bubbles sit on a wheel seen from the front: the newest is flat at the
-// bottom, and the older ones curve away round the wheel, getting smaller and
-// fainter, tucked behind the one in front. Scrolling turns the wheel, so any
-// bubble can be brought round to the front.
-// The wheel's radius in px: smaller curves away faster
-const WHEEL_RADIUS = 240
-// Bubbles further round than this (in radians) are out of sight
-const WHEEL_LIMIT = 1.5
-// Bubbles tilt more than their place on the wheel, so only the front one looks flat
-const WHEEL_TILT = 1.6
+// The speech bubbles are a stack of cards: the newest is at the front, and each
+// newer card slides up over the one before it. Only two stay in front: the newest,
+// and the one before tucked just under its top edge. Older cards slide behind
+// those and fade away. Scrolling up brings older cards back to the front.
+// How far (px) a card behind tucks under the top of the card in front
+const CARD_TUCK = 20
 
-function turnWheel(scroller: HTMLElement) {
-  // Layout positions (not the bubbles' tilted ones), relative to the scrolling box
+const between = (a: number, b: number, t: number) => a + (b - a) * t
+
+function stackCards(scroller: HTMLElement) {
+  const rows = Array.from(scroller.querySelectorAll<HTMLElement>('.buddy-row'))
+  if (rows.length === 0) return
+  // The front line, in layout positions relative to the scrolling box
   const front = scroller.scrollTop + scroller.clientHeight - parseFloat(getComputedStyle(scroller).paddingBottom)
-  scroller.querySelectorAll<HTMLElement>('.buddy-row').forEach((row) => {
-    // How far the bubble is from the front, along the wheel (negative: below it, when scrolled up)
-    const distance = front - row.offsetTop - row.offsetHeight
-    const angle = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, distance / WHEEL_RADIUS))
-    const depth = 1 - Math.cos(angle) // 0 at the front, 1 at the top of the wheel
-    const tilt = Math.max(-1.4, Math.min(1.4, angle * WHEEL_TILT))
-    // Seen from the front, a bubble that far round the wheel is only
-    // WHEEL_RADIUS * sin(angle) from the front. A tilted bubble also looks shorter,
-    // so it moves in to close the gap, and a little further to tuck under the one in front.
-    const tuck = (row.offsetHeight / 2) * (1 - Math.cos(tilt)) + 14 * Math.min(1, Math.abs(angle) * 4)
-    const shift = distance - WHEEL_RADIUS * Math.sin(angle) + Math.sign(angle) * tuck
-    row.style.transform = `perspective(500px) translateY(${shift}px) rotateX(${tilt}rad) scale(${1 - depth * 0.15})`
-    row.style.setProperty('--fade', String(Math.min(0.85, depth * 1.5)))
-    row.style.opacity = String(Math.max(0, Math.min(1, (WHEEL_LIMIT - Math.abs(angle)) / 0.25)))
-    // The bubble nearest the front is drawn on top
-    row.style.zIndex = String(1000 - Math.round(Math.abs(distance)))
+  const bottoms = rows.map((row) => row.offsetTop + row.offsetHeight)
+
+  // Which card is at the front: a whole number when scrolling has settled,
+  // in between while moving from one card to the next
+  let at = 0
+  if (front >= bottoms[bottoms.length - 1]) at = rows.length - 1
+  else if (front > bottoms[0]) {
+    const i = bottoms.findIndex((b) => b > front) - 1
+    at = i + (front - bottoms[i]) / (bottoms[i + 1] - bottoms[i])
+  }
+  const lower = Math.floor(at)
+  const upper = Math.min(rows.length - 1, lower + 1)
+  const frontTop = front - between(rows[lower].offsetHeight, rows[upper].offsetHeight, at - lower)
+
+  rows.forEach((row, i) => {
+    const behind = at - i // 0 at the front, 1 just behind it, negative: newer cards below
+    const height = row.offsetHeight
+    const tucked = frontTop + CARD_TUCK - height // where a card just behind the front sits
+    let top: number
+    let fade = 0
+    let opacity = 1
+    if (behind < 0) {
+      // Newer cards wait below, sliding up as they come to the front
+      top = front - height + -behind * (height + 10)
+      opacity = Math.max(0, 1 + behind)
+    } else if (behind <= 1) {
+      top = between(front - height, tucked, behind)
+      fade = 0.3 * behind
+    } else {
+      // Further back: stays behind the card just behind the front, and fades away
+      top = tucked
+      fade = 0.3
+      opacity = Math.max(0, 2 - behind)
+    }
+    const scale = 1 - 0.04 * Math.min(2, Math.max(0, behind))
+    // The card inside moves, not the row, so scrolling still snaps to where the rows really are
+    const card = row.firstElementChild as HTMLElement
+    card.style.transform = `translateY(${top - row.offsetTop}px) scale(${scale})`
+    card.style.setProperty('--fade', String(fade))
+    card.style.opacity = String(opacity)
+    // Newer cards are on top of older ones
+    row.style.zIndex = String(i)
   })
 }
 
@@ -114,13 +140,13 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
         scroller.scrollTop = scroller.scrollHeight
         scrolledTo = scroller.scrollTop
       }
-      turnWheel(scroller)
+      stackCards(scroller)
     }
     const onScroll = () => {
       if (Math.abs(scroller.scrollTop - scrolledTo) > 1) {
         atBottom.current = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 8
       }
-      turnWheel(scroller)
+      stackCards(scroller)
     }
     const observer = new ResizeObserver(follow)
     observer.observe(track)
@@ -147,16 +173,18 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
             const isLatest = i === shown - 1
             return (
               <div key={i} className={isLatest ? 'buddy-row' : 'buddy-row buddy-row-old'}>
-                <p className="buddy-bubble">
-                  {/* The hidden full text holds the bubble at its final size while it types */}
-                  <span className="buddy-text-full" aria-hidden="true">
-                    {message}
-                  </span>
-                  <span className="buddy-text-typed" aria-hidden="true">
-                    {isLatest ? typed : message}
-                  </span>
-                  <span className="sr-only">{message}</span>
-                </p>
+                <div className="buddy-card">
+                  <p className="buddy-bubble">
+                    {/* The hidden full text holds the bubble at its final size while it types */}
+                    <span className="buddy-text-full" aria-hidden="true">
+                      {message}
+                    </span>
+                    <span className="buddy-text-typed" aria-hidden="true">
+                      {isLatest ? typed : message}
+                    </span>
+                    <span className="sr-only">{message}</span>
+                  </p>
+                </div>
               </div>
             )
           })}
