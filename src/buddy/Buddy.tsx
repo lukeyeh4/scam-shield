@@ -11,8 +11,9 @@ import { useTypewriter } from './useTypewriter'
 
 const IMAGES: Record<Mood, string> = { cheering, curious, happy, neutral, thinking, worried }
 
-// Pause between one message finishing and the next one appearing
-const NEXT_MESSAGE_DELAY_MS = 700
+// Time to read a message once it has finished typing, before the next one appears:
+// longer messages get longer
+const readingPause = (message: string) => Math.min(3500, 1000 + 80 * message.split(/\s+/).length)
 
 type BuddyProps = {
   mood: Mood
@@ -27,6 +28,8 @@ type BuddyProps = {
 // each typing out under the last. Messages added to the end later (e.g. the next
 // step of the recap) type out under the earlier ones, which stay. Give it a new
 // `key` to start over.
+// Tapping the bubbles hurries Buddy along: the first tap finishes the message being
+// typed, the next skips the pause before the next message.
 // Buddy moves to match its mood as each new message appears (e.g. a wobble when
 // worried, a jump when cheering), bobs while it talks, and floats gently otherwise.
 export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
@@ -34,7 +37,9 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
   // Messages can also be taken away (e.g. going back a step in the recap)
   const shown = Math.min(count, messages.length)
   const latest = messages[shown - 1] ?? ''
-  const typed = useTypewriter(latest)
+  // The message the player tapped to finish typing straight away
+  const [hurried, setHurried] = useState(-1)
+  const typed = useTypewriter(latest, hurried === shown - 1)
   const done = typed === latest
   // When the latest message finished, so a message added much later doesn't wait
   const doneAt = useRef(0)
@@ -45,12 +50,18 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
 
   useEffect(() => {
     if (!done || count >= messages.length) return
-    const pause = Math.max(0, NEXT_MESSAGE_DELAY_MS - (Date.now() - doneAt.current))
+    const pause = Math.max(0, readingPause(latest) - (Date.now() - doneAt.current))
     // DEV CONSOLE: fast mode skips the waits
     const wait = isFast() ? 0 : count === 0 ? delayMs : pause
     const timer = setTimeout(() => setCount((c) => c + 1), wait)
     return () => clearTimeout(timer)
-  }, [done, count, messages.length, delayMs])
+  }, [done, count, messages.length, delayMs, latest])
+
+  const hurry = () => {
+    if (shown === 0) return
+    if (!done) setHurried(shown - 1)
+    else if (shown < messages.length) setCount(shown + 1)
+  }
 
   // Keep the newest bubble in view as bubbles arrive and grow, unless the player
   // has scrolled up to read older ones
@@ -104,7 +115,7 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
           alt={`Shield Buddy looking ${mood}`}
         />
       </span>
-      <div ref={scrollerRef} className="buddy-messages" aria-live="polite">
+      <div ref={scrollerRef} className="buddy-messages" aria-live="polite" onClick={hurry}>
         <div className="buddy-track">
           {messages.slice(0, shown).map((message, i) => {
             const isLatest = i === shown - 1

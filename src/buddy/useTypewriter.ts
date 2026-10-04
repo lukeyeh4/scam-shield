@@ -1,25 +1,27 @@
 import { useEffect, useState } from 'react'
 import { reduceMotion } from '../motion'
 
+// How long each character takes to appear, at a pace a young reader can follow
+const CHAR_MS = 50
+
+// Short breaths after punctuation, like when someone reads aloud
+const pauseAfter = (char: string) => ('.!?…'.includes(char) ? 450 : ',;:'.includes(char) ? 200 : 0)
+
 // Reveals `text` one character at a time, starting over whenever the text changes.
-// Shows it all at once if the player has asked their device for reduced motion.
-export function useTypewriter(text: string, msPerChar = 35) {
+// Shows it all at once when `finished` (e.g. the player tapped to hurry it along),
+// or if the player has asked their device for reduced motion.
+export function useTypewriter(text: string, finished = false) {
   const chars = Array.from(text) // keeps emoji in one piece
   const [progress, setProgress] = useState({ text, shown: 0 })
   const shown = progress.text === text ? progress.shown : 0
+  const instant = finished || reduceMotion()
+  const last = chars[shown - 1] ?? ''
 
   useEffect(() => {
-    if (reduceMotion()) return
-    const timer = setInterval(() => {
-      setProgress((p) => {
-        const next = (p.text === text ? p.shown : 0) + 1
-        if (next >= chars.length) clearInterval(timer)
-        return { text, shown: next }
-      })
-    }, msPerChar)
-    return () => clearInterval(timer)
-  }, [text, chars.length, msPerChar])
+    if (instant || shown >= chars.length) return
+    const timer = setTimeout(() => setProgress({ text, shown: shown + 1 }), CHAR_MS + pauseAfter(last))
+    return () => clearTimeout(timer)
+  }, [text, shown, chars.length, instant, last])
 
-  if (reduceMotion()) return text
-  return chars.slice(0, shown).join('')
+  return instant ? text : chars.slice(0, shown).join('')
 }
