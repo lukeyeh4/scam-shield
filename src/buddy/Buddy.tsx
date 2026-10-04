@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import type { Mood } from '../types'
 import cheering from '../../shield_buddy/cheering.png'
 import curious from '../../shield_buddy/curious.png'
@@ -28,8 +28,8 @@ type BuddyProps = {
 // each typing out under the last. Messages added to the end later (e.g. the next
 // step of the recap) type out under the earlier ones, which stay. Give it a new
 // `key` to start over.
-// Tapping the bubbles hurries Buddy along: the first tap finishes the message being
-// typed, the next skips the pause before the next message.
+// Tapping anywhere on the screen (except a button) hurries Buddy along: the first tap
+// finishes the message being typed, the next skips the pause before the next message.
 // Buddy moves to match its mood as each new message appears (e.g. a wobble when
 // worried, a jump when cheering), bobs while it talks, and floats gently otherwise.
 export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
@@ -57,11 +57,20 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
     return () => clearTimeout(timer)
   }, [done, count, messages.length, delayMs, latest])
 
-  const hurry = () => {
+  const hurry = useEffectEvent(() => {
     if (shown === 0) return
     if (!done) setHurried(shown - 1)
     else if (shown < messages.length) setCount(shown + 1)
-  }
+  })
+  useEffect(() => {
+    const onTap = (e: MouseEvent) => {
+      // Buttons (and the like) do their own thing
+      if ((e.target as Element).closest('button, a, input, select, label, .dev-console')) return
+      hurry()
+    }
+    document.addEventListener('click', onTap)
+    return () => document.removeEventListener('click', onTap)
+  }, [])
 
   // Keep the newest bubble in view as bubbles arrive and grow, unless the player
   // has scrolled up to read older ones
@@ -115,7 +124,7 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
           alt={`Shield Buddy looking ${mood}`}
         />
       </span>
-      <div ref={scrollerRef} className="buddy-messages" aria-live="polite" onClick={hurry}>
+      <div ref={scrollerRef} className="buddy-messages" aria-live="polite">
         <div className="buddy-track">
           {messages.slice(0, shown).map((message, i) => {
             const isLatest = i === shown - 1
