@@ -129,9 +129,117 @@ button:active {
   }
 }
 
+/* Buddy's body floats gently, and bobs while it talks */
+.buddy-body {
+  flex: none;
+  display: flex;
+  animation: buddy-float 3.2s ease-in-out infinite;
+}
+
+.buddy-body.is-talking {
+  animation: buddy-talk 0.5s ease-in-out infinite;
+}
+
+@keyframes buddy-float {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes buddy-talk {
+  50% {
+    transform: translateY(-3px) scale(1.02);
+  }
+}
+
+/* Each mood has its own move, played once when Buddy starts talking */
+.buddy-move-happy {
+  animation: buddy-hop 600ms var(--ease) both;
+}
+
+.buddy-move-curious {
+  animation: buddy-tilt 900ms ease-in-out both;
+}
+
+.buddy-move-thinking {
+  animation: buddy-ponder 1200ms ease-in-out both;
+}
+
+.buddy-move-worried {
+  animation: buddy-wobble 600ms ease-in-out both;
+}
+
+.buddy-move-cheering {
+  animation: buddy-cheer 900ms var(--ease) both;
+}
+
+.buddy-move-neutral {
+  animation: buddy-nod 500ms ease-in-out both;
+}
+
+@keyframes buddy-hop {
+  40% {
+    transform: translateY(-14px);
+  }
+  70% {
+    transform: translateY(0) scaleY(0.94);
+  }
+}
+
+@keyframes buddy-tilt {
+  30% {
+    transform: rotate(-8deg);
+  }
+  65% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes buddy-ponder {
+  40%,
+  70% {
+    transform: rotate(-10deg) translateX(-3px);
+  }
+}
+
+@keyframes buddy-wobble {
+  20% {
+    transform: translateX(-6px) rotate(-5deg);
+  }
+  40% {
+    transform: translateX(5px) rotate(4deg);
+  }
+  60% {
+    transform: translateX(-3px) rotate(-2deg);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes buddy-cheer {
+  35% {
+    transform: translateY(-24px) rotate(-180deg) scale(1.08);
+  }
+  70% {
+    transform: translateY(0) rotate(-360deg) scaleY(0.92);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes buddy-nod {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .buddy-row,
-  .buddy-bubble {
+  .buddy-bubble,
+  .buddy-body,
+  .buddy-image {
     animation: none;
   }
 }

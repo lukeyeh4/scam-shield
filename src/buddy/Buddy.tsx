@@ -25,6 +25,8 @@ type BuddyProps = {
 
 // Shield Buddy with its speech bubbles beside it. Messages appear one at a time,
 // each typing out under the last. Give it a new `key` to start over.
+// Buddy moves to match its mood when it starts talking (e.g. a wobble when worried,
+// a jump when cheering), bobs while it talks, and floats gently otherwise.
 export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
   const [count, setCount] = useState(delayMs > 0 ? 0 : 1)
   const latest = messages[count - 1] ?? ''
@@ -46,7 +48,16 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
 
   return (
     <div className="buddy">
-      <img className="buddy-image" src={IMAGES[mood]} alt={`Shield Buddy looking ${mood}`} />
+      <span className={count > 0 && !allDone ? 'buddy-body is-talking' : 'buddy-body'}>
+        {/* The mood's move waits for the first message, e.g. until the scam has arrived */}
+        <img
+          key={mood}
+          className={`buddy-image buddy-move-${mood}`}
+          style={{ animationDelay: `${delayMs}ms` }}
+          src={IMAGES[mood]}
+          alt={`Shield Buddy looking ${mood}`}
+        />
+      </span>
       <div className="buddy-messages" aria-live="polite">
         {messages.slice(0, count).map((message, i) => {
           const isLatest = i === count - 1
