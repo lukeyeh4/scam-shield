@@ -175,8 +175,11 @@
   overflow: hidden;
 }
 
+/* The channel name is a clue, so it always shows in full: if it doesn't fit
+   next to Subscribe, Subscribe moves under it */
 .shorts-channel {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   max-width: 100%;
@@ -192,11 +195,9 @@
 }
 
 .shorts-handle {
-  overflow: hidden;
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .shorts-subscribe {
@@ -269,15 +270,11 @@
     height: 24px;
   }
 
-  /* The channel name is a clue, so it always shows in full: if it doesn't fit
-     next to Subscribe, Subscribe moves under it */
   .shorts-channel {
-    flex-wrap: wrap;
     gap: 6px;
   }
 
   .shorts-handle {
-    overflow: visible;
     font-size: clamp(11px, 4.6cqw, 12.5px);
   }
 
