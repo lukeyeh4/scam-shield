@@ -48,10 +48,11 @@ export function ShortsMockup({ content }: { content: ShortsContent }) {
               <Field name="link" text={content.link} />
             </span>
             <div className="shorts-channel">
+              {/* The profile picture counts as the channel name in "Spot the clues" */}
               {content.avatar ? (
-                <img className="shorts-avatar" src={content.avatar} alt="" />
+                <img className="shorts-avatar" src={content.avatar} alt="" data-field="channel" />
               ) : (
-                <span className="shorts-avatar" />
+                <span className="shorts-avatar" data-field="channel" />
               )}
               <Field name="channel" text={content.channel} className="shorts-handle" />
               <span className="shorts-subscribe">Subscribe</span>

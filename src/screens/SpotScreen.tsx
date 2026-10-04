@@ -26,7 +26,8 @@ type SpotScreenProps = {
 
 // Before the recap: the scam comes back with a short checklist of clues
 // (the recap items with a `spot` name), and the player taps each one on the
-// fake screen. Tapping anywhere in a clue's text counts.
+// fake screen. Tapping anywhere in a clue's text counts, and so does any other
+// place the clue lists in `spotAlso`.
 export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
   const { recap } = scenario
   const allClues = [recap.stop, ...recap.check].filter((c) => c.screen !== 'doIt')
@@ -49,21 +50,27 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
     return () => clearTimeout(timer)
   }, [fresh])
 
-  const marks: Mark[] = clues.map((c, i) => ({
-    target: c.target,
-    highlight: c.highlight,
-    state: !found.includes(i) ? 'hidden' : i === fresh ? 'active' : 'seen',
+  // Every place on the screen that counts, and which clue it finds
+  const places = clues.flatMap((c, clue) => [
+    { target: c.target, highlight: c.highlight, clue },
+    ...(c.spotAlso ?? []).map((also) => ({ ...also, clue })),
+  ])
+  // Once a clue is found, all its places light up
+  const marks: Mark[] = places.map((p) => ({
+    target: p.target,
+    highlight: p.highlight,
+    state: !found.includes(p.clue) ? 'hidden' : p.clue === fresh ? 'active' : 'seen',
   }))
 
   const onTap = (e: MouseEvent) => {
     const tapped = e.target as HTMLElement
     // The exact clue text, if that was tapped and is still to be found...
     const mark = tapped.closest<HTMLElement>('[data-mark]')
-    let clue = mark ? Number(mark.dataset.mark) : -1
+    let clue = mark ? places[Number(mark.dataset.mark)].clue : -1
     // ...or else any clue still to be found in the same part of the screen
     const field = tapped.closest<HTMLElement>('[data-field]')?.dataset.field
     if (clue < 0 || found.includes(clue)) {
-      clue = clues.findIndex((c, i) => c.target === field && !found.includes(i))
+      clue = places.find((p) => p.target === field && !found.includes(p.clue))?.clue ?? -1
     }
     if (allFound) return
     if (clue >= 0) {
@@ -71,7 +78,7 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
       setFresh(clue)
       if (found.length + 1 === clues.length) say('cheering', ALL_FOUND)
       else say('happy', FOUND[found.length % FOUND.length])
-    } else if (clues.some((c, i) => c.target === field && found.includes(i))) {
+    } else if (places.some((p) => p.target === field && found.includes(p.clue))) {
       say('happy', AGAIN)
     } else if (allClues.some((c) => c.target === field && !c.spot)) {
       say('happy', OTHER_CLUE)

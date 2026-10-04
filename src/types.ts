@@ -135,6 +135,9 @@ export type RecapItem = {
   // A short name for the clue on the "Spot the clues" checklist, e.g. "Someone rushing you".
   // Only clues with one are on the list (about 3 per scenario, the easiest to see).
   spot?: string
+  // Other places on the scam screen that also count as finding this clue in
+  // "Spot the clues" (e.g. both the caption and the video for "A free prize")
+  spotAlso?: { target: string; highlight?: string }[]
 }
 
 // A text added to the phone during the recap, from the player ('me') or the scammer ('them')

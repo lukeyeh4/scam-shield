@@ -110,7 +110,8 @@
         "target": "adTitle",
         "highlight": "10,000 Free Robux",
         "text": "Free stuff that sounds too good to be true usually isn't real.",
-        "spot": "Free stuff"
+        "spot": "Free stuff",
+        "spotAlso": [{ "target": "adText", "highlight": "claim your free Robux" }]
       },
       {
         "target": "result3",
