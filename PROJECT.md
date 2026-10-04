@@ -69,7 +69,7 @@ Vitest is installed, but there's no test script or tests yet.
 ## 6. Put it online
 
 - [ ] **Remove the dev console** (see below) before shipping
-- [ ] Host it on GitHub Pages (or similar). This needs Vite's `base` setting to match the repo name.
+- [x] Hosted on GitHub Pages at https://lukeyeh4.github.io/scam-shield/ (the repo is public). Every push to `main` redeploys it (`.github/workflows/deploy.yml`). Vite's `base` is `/scam-shield/`, and scenario image paths get it added in `src/scenarios.ts`.
 
 ## Later
 

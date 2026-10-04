@@ -1,5 +1,7 @@
 # Scam Shield: Stop, Check, Tell
 
+**Play it: [lukeyeh4.github.io/scam-shield](https://lukeyeh4.github.io/scam-shield/)**
+
 A game that teaches kids aged 8–12 to spot scams. Each scam looks like the real thing: a text from "Mom", a Google search, a YouTube Short. The kid picks what to do, sees what happens, then learns the clues with **Stop, Check, Tell**.
 
 ![A scam text on an iPhone, with Shield Buddy and the three choices](docs/screenshots/scam-texts.png)
@@ -86,7 +88,7 @@ While running `npm run dev`, a **Dev** button in the corner jumps to any screen 
 
 ## How it's built
 
-React + TypeScript + Vite, as a web app for tablets that can be hosted as static files.
+React + TypeScript + Vite, as a web app for tablets. Every push to `main` rebuilds the game and puts it on GitHub Pages (`.github/workflows/deploy.yml`).
 
 The game is **data-driven**: every scam uses the same screens, and each one is just a JSON file in `scenarios/` (format: `Scenario` in `src/types.ts`). A scenario picks a fake screen (`sms`, `search`, `shorts`, …), fills in its content, and lists Buddy's lines, the outcomes, and the red flags for the recap and Spot the clues.
 
