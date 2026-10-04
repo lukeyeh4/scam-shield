@@ -22,6 +22,8 @@ const NEXT_MESSAGE_DELAY_MS = 700
 const WHEEL_RADIUS = 240
 // Bubbles further round than this (in radians) are out of sight
 const WHEEL_LIMIT = 1.5
+// Bubbles tilt more than their place on the wheel, so only the front one looks flat
+const WHEEL_TILT = 1.6
 
 function turnWheel(scroller: HTMLElement) {
   // Layout positions (not the bubbles' tilted ones), relative to the scrolling box
@@ -30,10 +32,14 @@ function turnWheel(scroller: HTMLElement) {
     // How far the bubble is from the front, along the wheel (negative: below it, when scrolled up)
     const distance = front - row.offsetTop - row.offsetHeight
     const angle = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, distance / WHEEL_RADIUS))
-    // Seen from the front, a bubble that far round the wheel is only this far from the front
-    const shift = distance - WHEEL_RADIUS * Math.sin(angle)
     const depth = 1 - Math.cos(angle) // 0 at the front, 1 at the top of the wheel
-    row.style.transform = `perspective(600px) translateY(${shift}px) rotateX(${angle}rad) scale(${1 - depth * 0.15})`
+    const tilt = Math.max(-1.4, Math.min(1.4, angle * WHEEL_TILT))
+    // Seen from the front, a bubble that far round the wheel is only
+    // WHEEL_RADIUS * sin(angle) from the front. A tilted bubble also looks shorter,
+    // so it moves in to close the gap, and a little further to tuck under the one in front.
+    const tuck = (row.offsetHeight / 2) * (1 - Math.cos(tilt)) + 14 * Math.min(1, Math.abs(angle) * 4)
+    const shift = distance - WHEEL_RADIUS * Math.sin(angle) + Math.sign(angle) * tuck
+    row.style.transform = `perspective(500px) translateY(${shift}px) rotateX(${tilt}rad) scale(${1 - depth * 0.15})`
     row.style.setProperty('--fade', String(Math.min(0.85, depth * 1.5)))
     row.style.opacity = String(Math.max(0, Math.min(1, (WHEEL_LIMIT - Math.abs(angle)) / 0.25)))
     // The bubble nearest the front is drawn on top
