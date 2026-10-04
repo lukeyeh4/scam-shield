@@ -14,11 +14,10 @@ const IMAGES: Record<Mood, string> = { cheering, curious, happy, neutral, thinki
 // Pause between one message finishing and the next one appearing
 const NEXT_MESSAGE_DELAY_MS = 700
 
-// The speech bubbles are a stack of cards: the newest is at the front, and each
-// newer card slides up over the one before it. Only two stay in front: the newest,
-// and the one before tucked just under its top edge. Older cards slide behind
-// those and fade away. Scrolling up brings older cards back to the front.
-// How far (px) a card behind tucks under the top of the card in front
+// The speech bubbles: the two newest sit stacked one above the other, both fully
+// visible. Older cards slide behind the upper one and fade, with just the third
+// peeking out. Scrolling up brings older cards back down into the front two.
+// How far (px) a faded card tucks under the top of the card in front of it
 const CARD_TUCK = 20
 
 const between = (a: number, b: number, t: number) => a + (b - a) * t
@@ -30,39 +29,33 @@ function stackCards(scroller: HTMLElement) {
   const front = scroller.scrollTop + scroller.clientHeight - parseFloat(getComputedStyle(scroller).paddingBottom)
   const bottoms = rows.map((row) => row.offsetTop + row.offsetHeight)
 
-  // Which card is at the front: a whole number when scrolling has settled,
-  // in between while moving from one card to the next
+  // Which card is at the front (the bottom one): a whole number when scrolling has
+  // settled, in between while moving from one card to the next
   let at = 0
   if (front >= bottoms[bottoms.length - 1]) at = rows.length - 1
   else if (front > bottoms[0]) {
     const i = bottoms.findIndex((b) => b > front) - 1
     at = i + (front - bottoms[i]) / (bottoms[i + 1] - bottoms[i])
   }
-  const lower = Math.floor(at)
-  const upper = Math.min(rows.length - 1, lower + 1)
-  const frontTop = front - between(rows[lower].offsetHeight, rows[upper].offsetHeight, at - lower)
 
-  rows.forEach((row, i) => {
-    const behind = at - i // 0 at the front, 1 just behind it, negative: newer cards below
-    const height = row.offsetHeight
-    const tucked = frontTop + CARD_TUCK - height // where a card just behind the front sits
-    let top: number
+  // Newest first, so each card can tuck behind where the next one ended up
+  const tops: number[] = []
+  for (let i = rows.length - 1; i >= 0; i--) {
+    const row = rows[i]
+    const behind = at - i // 0 at the front, 1 just above it; negative: newer, below the front
+    let top = row.offsetTop
     let fade = 0
     let opacity = 1
-    if (behind < 0) {
-      // Newer cards wait below, sliding up as they come to the front
-      top = front - height + -behind * (height + 10)
-      opacity = Math.max(0, 1 + behind)
-    } else if (behind <= 1) {
-      top = between(front - height, tucked, behind)
-      fade = 0.3 * behind
-    } else {
-      // Further back: stays behind the card just behind the front, and fades away
-      top = tucked
-      fade = 0.3
-      opacity = Math.max(0, 2 - behind)
+    if (behind > 1) {
+      // From the third card on: slide behind the card after it and fade
+      const tucked = tops[i + 1] + CARD_TUCK - row.offsetHeight
+      const t = Math.min(1, behind - 1)
+      top = between(row.offsetTop, tucked, t)
+      fade = 0.5 * t
+      opacity = Math.max(0, Math.min(1, 3 - behind))
     }
-    const scale = 1 - 0.04 * Math.min(2, Math.max(0, behind))
+    tops[i] = top
+    const scale = 1 - 0.04 * Math.max(0, Math.min(1, behind - 1))
     // The card inside moves, not the row, so scrolling still snaps to where the rows really are
     const card = row.firstElementChild as HTMLElement
     card.style.transform = `translateY(${top - row.offsetTop}px) scale(${scale})`
@@ -70,7 +63,7 @@ function stackCards(scroller: HTMLElement) {
     card.style.opacity = String(opacity)
     // Newer cards are on top of older ones
     row.style.zIndex = String(i)
-  })
+  }
 }
 
 // Leaves room above the first bubble so it too can be scrolled round to the front,

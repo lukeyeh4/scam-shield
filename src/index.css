@@ -75,12 +75,13 @@ button:active {
   margin: -16px -12px -20px;
 }
 
-/* The bubbles scroll inside a box as a stack of cards (see stackCards in Buddy.tsx);
-   cards fade out at the top and, when scrolled up, at the bottom */
+/* The bubbles scroll inside a box (see stackCards in Buddy.tsx); they fade out at the
+   top and, when scrolled up, at the bottom */
 .buddy-messages {
   position: relative;
   min-width: 0;
-  max-height: 16em;
+  /* Room for the two newest bubbles, with the third peeking out above */
+  max-height: 20em;
   padding: 1em 6px 1em;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -101,7 +102,7 @@ button:active {
   gap: 10px;
 }
 
-/* A new bubble grows into place, sliding up over the ones before it */
+/* A new bubble grows into place, pushing the ones before it up */
 .buddy-row {
   display: grid;
   grid-template-rows: 1fr;
@@ -132,8 +133,8 @@ button:active {
   border-radius: 22px;
 }
 
-/* Cards behind the front fade into the background but stay solid,
-   so the ones behind them don't show through */
+/* Older cards fade into the background but stay solid, so the ones behind
+   them don't show through */
 .buddy-bubble::after {
   content: '';
   position: absolute;
