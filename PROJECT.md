@@ -80,7 +80,7 @@ Vitest is installed, but there's no test script or tests yet.
 ## Still to decide
 
 - [ ] Real brands and people: scenarios 1–3 now show Apple, Google, Roblox, Microsoft, YouTube and MrBeast (including his photo and a real scam web address) so they look like what kids actually see. Keep them, or switch to made-up names? Scenarios 4–5 still use made-up names.
-- [ ] `mrbeast.webp` in the project folder isn't used by the game (a cropped copy is): keep it as the source, or remove it?
+- [x] `mrbeast.webp`: kept as the original in `source-images/` (the game uses the cropped `public/images/mrbeast-video.jpg`)
 - [ ] Should the end screen become a certificate?
 
 ## Dev console (remove before shipping)
