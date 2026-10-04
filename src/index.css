@@ -75,16 +75,17 @@ button:active {
   margin: -16px -12px -20px;
 }
 
-/* The bubbles scroll inside a box; older ones fade out at the top (see turnWheel in Buddy.tsx) */
+/* The bubbles scroll inside a box (see turnWheel in Buddy.tsx); bubbles fade out at the
+   top and, when scrolled up, at the bottom */
 .buddy-messages {
   position: relative;
   min-width: 0;
   max-height: 16em;
-  padding: 1.5em 6px 6px;
+  padding: 1.5em 6px 1em;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: none;
-  mask-image: linear-gradient(to bottom, transparent, #000 2em);
+  mask-image: linear-gradient(to bottom, transparent, #000 2em, #000 calc(100% - 1em), transparent);
 }
 
 .buddy-messages::-webkit-scrollbar {
@@ -106,6 +107,7 @@ button:active {
 }
 
 .buddy-bubble {
+  position: relative;
   display: grid;
   min-height: 0;
   max-width: 30ch;
@@ -119,8 +121,18 @@ button:active {
 
 .buddy-row-old .buddy-bubble {
   border-radius: 22px;
-  color: var(--muted);
-  transition: color 300ms var(--ease);
+}
+
+/* Bubbles further round the wheel fade into the background but stay solid,
+   so the ones behind don't show through */
+.buddy-bubble::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--bg);
+  opacity: var(--fade, 0);
+  pointer-events: none;
 }
 
 /* Typed text sits on top of the hidden full text, so the bubble doesn't grow as it types */
@@ -546,7 +558,7 @@ button:active {
 
   /* Room for the newest bubble, with the one before peeking out behind it */
   .scenario-buddy .buddy-messages {
-    max-height: 8em;
+    max-height: 9.5em;
   }
 }
 
