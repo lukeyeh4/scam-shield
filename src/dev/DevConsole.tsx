@@ -106,6 +106,9 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
         <button type="button" onClick={() => go({ choice, stage: 'outcome' })}>
           Outcome
         </button>
+        <button type="button" onClick={() => go({ choice, stage: 'spot' })}>
+          Spot clues
+        </button>
         <button type="button" onClick={() => go({ choice, stage: 'recap' })}>
           Recap
         </button>

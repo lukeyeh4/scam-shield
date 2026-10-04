@@ -21,12 +21,12 @@ export function Field({ name, text, className = '' }: FieldProps) {
   const segments = splitByHighlights(text, parts.map(({ m, index }) => ({ index, text: m.highlight! })))
 
   return (
-    <span ref={ref} className={`field ${whole ? `flag flag-${whole.state}` : ''} ${className}`}>
+    <span ref={ref} data-field={name} className={`field ${whole ? `flag flag-${whole.state}` : ''} ${className}`}>
       {segments.map((s, i) =>
         s.mark === undefined ? (
           s.text
         ) : (
-          <mark key={i} className={`flag flag-${marks[s.mark].state}`}>
+          <mark key={i} data-mark={s.mark} className={`flag flag-${marks[s.mark].state}`}>
             {s.text}
           </mark>
         ),

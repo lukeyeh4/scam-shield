@@ -22,11 +22,11 @@ export function SmsMockup({ content, animate, extraMessages }: SmsMockupProps) {
   const threadRef = useRef<HTMLDivElement>(null)
   const marks = useContext(MarksContext)
 
-  // Without the animation (the recap), the banner only shows while it's being pointed at,
-  // so it doesn't cover the texts the other clues point at
+  // Without the animation (the recap), the banner only shows while it's being pointed at
+  // (or is still to be found), so it doesn't cover the texts the other clues point at
   const showBanner = animate
     ? notified
-    : marks.some((m) => m.target.startsWith('notification') && m.state === 'active')
+    : marks.some((m) => m.target.startsWith('notification') && m.state !== 'seen')
 
   useEffect(() => {
     if (!playIn) return

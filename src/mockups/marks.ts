@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useRef } from 'react'
 
-export type Mark = { target: string; highlight?: string; state: 'active' | 'seen' }
+// `hidden` marks a clue that's still to be found in "Spot the clues": it looks like
+// plain text, but a tap on it can be told apart
+export type Mark = { target: string; highlight?: string; state: 'active' | 'seen' | 'hidden' }
 
 // The recap passes the red flags to highlight; mock-ups render content through <Field>.
 export const MarksContext = createContext<Mark[]>([])
@@ -25,6 +27,11 @@ export function useMark<T extends HTMLElement>(name: string) {
   useEffect(() => {
     if (isActive) return scrollMarkIntoView(ref.current)
   }, [isActive])
+
+  // Lets "Spot the clues" tell which part was tapped
+  useEffect(() => {
+    ref.current?.setAttribute('data-field', name)
+  }, [name])
 
   return [mark ? `flag flag-${mark.state}` : '', ref] as const
 }

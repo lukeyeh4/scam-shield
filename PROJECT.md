@@ -70,7 +70,7 @@ Vitest is installed, but there's no test script or tests yet.
 
 ## Later
 
-- [ ] "Spot the clues" mini-game: tap the red flags before the recap. It can reuse the recap targets.
+- [ ] "Spot the clues" mini-game: tap the red flags before the recap (being tried on branch `try/spot-clues`: `SpotScreen`, between What happened and the recap)
 - [ ] Read-aloud audio for Shield Buddy's lines
 - [ ] More scenarios
 

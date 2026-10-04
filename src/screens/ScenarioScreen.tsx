@@ -7,13 +7,14 @@ import type { Choice, Scenario } from '../types'
 import { DoItScreen } from './DoItScreen'
 import { OutcomeScreen } from './OutcomeScreen'
 import { RecapScreen } from './RecapScreen'
+import { SpotScreen } from './SpotScreen'
 
 // Said after a scenario's intro if it doesn't spell out its own choices.
 // Stays neutral: no hints before the choice.
 const CHOOSE_PROMPT = 'Read it carefully. Then pick what you would do.'
 
 // DEV CONSOLE: open a scenario part-way through, as if `choice` had been picked
-export type ScenarioStart = { choice: Choice; stage: 'doIt' | 'outcome' | 'recap' | 'summary' }
+export type ScenarioStart = { choice: Choice; stage: 'doIt' | 'outcome' | 'spot' | 'recap' | 'summary' }
 
 type ScenarioScreenProps = {
   scenario: Scenario
@@ -30,6 +31,7 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: Scen
   const [showChoices, setShowChoices] = useState(false)
   const revealChoices = useCallback(() => setShowChoices(true), [])
   const [choice, setChoice] = useState<Choice | null>(start?.choice ?? null)
+  const [showSpot, setShowSpot] = useState(start?.stage === 'spot')
   const [showRecap, setShowRecap] = useState(start?.stage === 'recap' || start?.stage === 'summary')
   // Some scenarios show where "Do it" takes you (e.g. a fake website) before the outcome
   const [doItSeen, setDoItSeen] = useState(start !== undefined && start.stage !== 'doIt')
@@ -45,11 +47,12 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: Scen
       />
     )
   }
+  if (showSpot) return <SpotScreen scenario={scenario} onBack={onBack} onContinue={() => setShowRecap(true)} />
   if (choice === 'do' && scenario.doIt && !doItSeen) {
     return <DoItScreen scenario={scenario} doIt={scenario.doIt} onBack={onBack} onContinue={() => setDoItSeen(true)} />
   }
   if (choice) {
-    return <OutcomeScreen scenario={scenario} choice={choice} onBack={onBack} onContinue={() => setShowRecap(true)} />
+    return <OutcomeScreen scenario={scenario} choice={choice} onBack={onBack} onContinue={() => setShowSpot(true)} />
   }
 
   return (

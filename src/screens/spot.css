@@ -1,0 +1,41 @@
+/* Spot the clues */
+
+/* Doesn't change the layout: the fake screen sits in the grid as usual */
+.spot-screen {
+  display: contents;
+}
+
+/* A clue still to be found looks like plain text */
+mark.flag-hidden {
+  padding: 0;
+  background: none;
+}
+
+/* A clue pops when it's found */
+.spot .flag-active {
+  animation: clue-pop 450ms var(--ease);
+}
+
+@keyframes clue-pop {
+  40% {
+    box-shadow: 0 0 0 8px #f5b700;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spot .flag-active {
+    animation: none;
+  }
+}
+
+.spot-footer {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 24px;
+}
+
+.spot-count {
+  font-size: 1.2em;
+}

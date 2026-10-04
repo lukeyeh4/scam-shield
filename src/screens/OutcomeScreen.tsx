@@ -62,7 +62,7 @@ export function OutcomeScreen({ scenario, choice, onBack, onContinue }: OutcomeS
 
       <footer className={revealed ? 'scenario-footer' : 'scenario-footer scenario-footer-hidden'} inert={!revealed}>
         <button className="primary-button" type="button" onClick={onContinue}>
-          Next: Stop, Check, Tell
+          Next: Spot the clues
         </button>
       </footer>
     </div>
