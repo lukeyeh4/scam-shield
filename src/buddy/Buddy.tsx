@@ -15,24 +15,42 @@ const IMAGES: Record<Mood, string> = { cheering, curious, happy, neutral, thinki
 const NEXT_MESSAGE_DELAY_MS = 700
 
 // The speech bubbles sit on a wheel seen from the front: the newest is flat at the
-// bottom, and each older one tilts back, shrinks, fades and tucks under the one
-// after it. Scrolling up turns the wheel, so older bubbles come back to the front.
-// How far (in px) from the bottom a bubble counts as one step around the wheel
-const WHEEL_STEP_PX = 80
+// bottom, and the older ones curve away round the wheel, getting smaller and
+// fainter, tucked behind the one in front. Scrolling turns the wheel, so any
+// bubble can be brought round to the front.
+// The wheel's radius in px: smaller curves away faster
+const WHEEL_RADIUS = 240
+// Bubbles further round than this (in radians) are out of sight
+const WHEEL_LIMIT = 1.5
 
 function turnWheel(scroller: HTMLElement) {
   // Layout positions (not the bubbles' tilted ones), relative to the scrolling box
   const front = scroller.scrollTop + scroller.clientHeight - parseFloat(getComputedStyle(scroller).paddingBottom)
-  const rows = Array.from(scroller.querySelectorAll<HTMLElement>('.buddy-row'))
-  rows.forEach((row, i) => {
-    // 0 at the front; 1, 2... further back (negative: below the front, when scrolled up)
-    const steps = Math.max(-2.5, Math.min(2.5, (front - row.offsetTop - row.offsetHeight) / WHEEL_STEP_PX))
-    const away = Math.abs(steps)
-    row.style.transform =
-      `perspective(600px) translateY(${steps * 22}px) rotateX(${steps * 18}deg) scale(${1 - away * 0.07})`
-    row.style.opacity = String(Math.max(0.15, 1 - away * 0.35))
-    row.style.zIndex = String(i)
+  scroller.querySelectorAll<HTMLElement>('.buddy-row').forEach((row) => {
+    // How far the bubble is from the front, along the wheel (negative: below it, when scrolled up)
+    const distance = front - row.offsetTop - row.offsetHeight
+    const angle = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, distance / WHEEL_RADIUS))
+    // Seen from the front, a bubble that far round the wheel is only this far from the front
+    const shift = distance - WHEEL_RADIUS * Math.sin(angle)
+    const depth = 1 - Math.cos(angle) // 0 at the front, 1 at the top of the wheel
+    row.style.transform = `perspective(600px) translateY(${shift}px) rotateX(${angle}rad) scale(${1 - depth * 0.15})`
+    row.style.setProperty('--fade', String(Math.min(0.85, depth * 1.5)))
+    row.style.opacity = String(Math.max(0, Math.min(1, (WHEEL_LIMIT - Math.abs(angle)) / 0.25)))
+    // The bubble nearest the front is drawn on top
+    row.style.zIndex = String(1000 - Math.round(Math.abs(distance)))
   })
+}
+
+// Leaves room above the first bubble so it too can be scrolled round to the front,
+// once there are more bubbles than fit
+function makeRoomAtTop(scroller: HTMLElement, track: HTMLElement) {
+  const first = track.firstElementChild as HTMLElement | null
+  const style = getComputedStyle(scroller)
+  const space = scroller.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
+  const room = parseFloat(track.style.paddingTop) || 0
+  const overflows = track.offsetHeight - room > space
+  const wanted = first && overflows ? Math.max(0, space - first.offsetHeight) : 0
+  if (Math.abs(wanted - room) > 1) track.style.paddingTop = `${wanted}px`
 }
 
 type BuddyProps = {
@@ -80,11 +98,12 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
   }, [shown])
   useEffect(() => {
     const scroller = scrollerRef.current
-    const track = scroller?.firstElementChild
+    const track = scroller?.firstElementChild as HTMLElement | null
     if (!scroller || !track) return
     // Where this code last scrolled to, so its own scrolling isn't mistaken for the player's
     let scrolledTo = -1
     const follow = () => {
+      makeRoomAtTop(scroller, track)
       if (atBottom.current) {
         scroller.scrollTop = scroller.scrollHeight
         scrolledTo = scroller.scrollTop
