@@ -84,6 +84,9 @@ button:active {
   padding: 1.5em 6px 1em;
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* Like a wheel picker, scrolling settles with one bubble at the front */
+  scroll-snap-type: y mandatory;
+  scroll-padding-bottom: 1em;
   scrollbar-width: none;
   mask-image: linear-gradient(to bottom, transparent, #000 2em, #000 calc(100% - 1em), transparent);
 }
@@ -102,7 +105,8 @@ button:active {
 .buddy-row {
   display: grid;
   grid-template-rows: 1fr;
-  transform-origin: 30% bottom;
+  transform-origin: 30% 50%;
+  scroll-snap-align: end;
   animation: bubble-grow 400ms var(--ease) both;
 }
 
