@@ -139,6 +139,13 @@
   font-weight: 700;
 }
 
+.msite-note {
+  margin-bottom: 2px;
+  color: rgb(255 255 255 / 0.8);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
 .msite-input {
   flex: 1;
   padding: 6px 10px;

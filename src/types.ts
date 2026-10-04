@@ -95,6 +95,8 @@ export type PhoneSiteContent = {
   summary: { label: string; value: string }[]
   total: string
   paymentLabel: string
+  // A line under the payment heading, e.g. why the site "needs" a card
+  note?: string
   button: string
   comments: { name: string; text: string }[]
 }

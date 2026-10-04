@@ -21,11 +21,12 @@
       "heading": "Congratulations! You won a $500 gift card 🎉",
       "summary": [
         { "label": "$500 Gift Card", "value": "FREE" },
-        { "label": "Shipping", "value": "$1.99" }
+        { "label": "Verification", "value": "$0.00" }
       ],
-      "total": "$1.99",
-      "paymentLabel": "Payment details",
-      "button": "Claim my gift card",
+      "total": "$0.00",
+      "paymentLabel": "Verify you're a real person",
+      "note": "To stop robots, we need a parent's card number. You won't be charged!",
+      "button": "Verify & claim my gift card",
       "comments": [
         { "name": "jake_r", "text": "got mine yesterday!! 🔥" },
         { "name": "emma.w", "text": "thank you mrbeast!!! it really works" }
@@ -38,7 +39,7 @@
   },
   "whatIf": { "do": "tapped the link", "ignore": "scrolled past", "tell": "told an adult" },
   "outcomes": {
-    "do":     { "result": "red",    "text": "The website asked for a parent's card number to 'pay for shipping'. The money was taken, and no gift card ever came." },
+    "do":     { "result": "red",    "text": "The website asked for a parent's card to 'check you're real'. It said you wouldn't be charged. But the scammers took money from the card, and no gift card came." },
     "ignore": { "result": "yellow", "text": "You scrolled past. But the video keeps spreading, and your friend thinks it's real." },
     "tell":   { "result": "green",  "text": "Mom helped you check the real channel. There was no giveaway! You reported the fake video, and it was taken down." }
   },
@@ -59,7 +60,7 @@
       { "target": "channel", "text": "Look at the name. This isn't the real channel. Scammers make names that look almost the same.", "spot": "A fake channel name", "spotHint": "Look at the name of the channel. Is it really theirs?" },
       { "target": "caption", "highlight": "FREE gift card", "text": "Famous people don't give free gift cards to strangers who tap a link. If it sounds too good to be true, it probably is.", "spot": "A free prize", "spotHint": "What is the video giving away?", "spotAlso": [{ "target": "video" }] },
       { "target": "link", "text": "This link goes to a strange website, not YouTube. Real prizes don't ask you to fill in a form there." },
-      { "screen": "doIt", "target": "summary", "text": "This is where the link goes. It wants you to pay for 'shipping' with a card. A real prize never costs money." },
+      { "screen": "doIt", "target": "note", "highlight": "we need a parent's card number", "text": "This is where the link goes. It asks for a parent's card to 'check you're real'. A real prize never needs a card." },
       { "screen": "doIt", "target": "comments", "text": "These happy comments are fake. Scammers write them so you'll trust the site." }
     ],
     "tell": "Show a grown-up and say: 'I saw a video of someone famous giving away free gift cards. Is it real?'",
@@ -77,7 +78,7 @@
         "Trusting a video just because it looks real",
         "Channel names that aren't quite right",
         "Free prizes from strangers",
-        "Prizes that ask you to pay"
+        "Prizes that ask for a parent's card"
       ]
     }
   }

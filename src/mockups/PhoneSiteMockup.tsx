@@ -46,6 +46,7 @@ export function PhoneSiteMockup({ content, animate }: { content: PhoneSiteConten
           </div>
 
           <span className="msite-section">{content.paymentLabel}</span>
+          {content.note && <Field name="note" text={content.note} className="msite-note" />}
           <span className="msite-input">Card number</span>
           <div className="msite-row">
             <span className="msite-input">MM / YY</span>
