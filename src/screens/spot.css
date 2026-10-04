@@ -11,6 +11,24 @@ mark.flag-hidden {
   background: none;
 }
 
+/* A hint: where to look glows softly, on and off */
+.flag-hint {
+  border-radius: 8px;
+  animation: hint-glow 1.6s ease-in-out infinite;
+}
+
+mark.flag-hint {
+  padding: 0 2px;
+  background: none;
+}
+
+@keyframes hint-glow {
+  50% {
+    background-color: rgb(255 224 102 / 0.45);
+    box-shadow: 0 0 0 6px rgb(255 224 102 / 0.45);
+  }
+}
+
 /* A clue pops when it's found */
 .spot .flag-active {
   animation: clue-pop 450ms var(--ease);
@@ -24,6 +42,14 @@ mark.flag-hidden {
 
 @media (prefers-reduced-motion: reduce) {
   .spot .flag-active {
+    animation: none;
+  }
+
+  /* No glowing on and off: a steady soft highlight instead */
+  .flag-hint,
+  mark.flag-hint {
+    background-color: rgb(255 224 102 / 0.45);
+    box-shadow: 0 0 0 6px rgb(255 224 102 / 0.45);
     animation: none;
   }
 }
@@ -83,9 +109,9 @@ mark.flag-hidden {
   }
 }
 
-/* "Show me the clues": a hint, so it looks like the clue highlights rather than
-   a normal button: highlighter yellow with a dashed edge and a magnifying glass */
-.show-clues {
+/* The hint button looks like the clue highlights rather than a normal button:
+   highlighter yellow with a dashed edge and a light bulb */
+.hint-button {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -104,26 +130,26 @@ mark.flag-hidden {
     border-color 150ms var(--ease);
 }
 
-.show-clues svg {
+.hint-button svg {
   flex: none;
   transition: transform 300ms var(--ease);
 }
 
 @media (hover: hover) {
-  .show-clues:hover {
+  .hint-button:hover {
     border-style: solid;
     background: #ffe066;
     box-shadow: var(--shadow-md);
     transform: translateY(-3px);
   }
 
-  .show-clues:hover svg {
+  .hint-button:hover svg {
     transform: rotate(-15deg) scale(1.15);
   }
 }
 
 @media (max-width: 560px) {
-  .show-clues {
+  .hint-button {
     min-height: 56px;
     font-size: var(--text-body);
   }

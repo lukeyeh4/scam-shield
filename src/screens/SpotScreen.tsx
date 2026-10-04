@@ -11,9 +11,11 @@ import './spot.css'
 // Misses stay kind: no "wrong", just a nudge to keep looking.
 const FOUND = ['You found one!', 'Good eyes!', 'Nice spotting!']
 const ALL_FOUND = "You found them all! Now let's see what each clue means."
-const MISSED = ['Not that one. Keep looking!', 'Hmm, try somewhere else.', 'Look at the list for help.']
+const MISSED = ['Not that one. Keep looking!', 'Hmm, try somewhere else.', 'Stuck? Tap the hint button.']
 const OTHER_CLUE = "Good eye! That's a clue too. Can you find the ones on the list?"
 const AGAIN = 'You found that one already! Look for the others.'
+// A second hint for the same clue: its exact words glow
+const HINT_AGAIN = "Look closely at the part that's glowing."
 
 // How long a clue stays brightly lit after it's found, before it fades to a
 // lighter highlight
@@ -28,7 +30,8 @@ type SpotScreenProps = {
 // Before the recap: the scam comes back with a short checklist of clues
 // (the recap items with a `spot` name), and the player taps each one on the
 // fake screen. Tapping anywhere in a clue's text counts, and so does any other
-// place the clue lists in `spotAlso`.
+// place the clue lists in `spotAlso`. The hint button nudges towards the next
+// clue: first Buddy's `spotHint` and a soft glow where to look, then its exact words.
 export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
   const { recap } = scenario
   const allClues = [recap.stop, ...recap.check].filter((c) => c.screen !== 'doIt')
@@ -39,8 +42,11 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
   // Everything Buddy has said, so the player can scroll back up; its mood follows the latest
   const [said, setSaid] = useState<{ mood: Mood; text: string }[]>([
     { mood: 'curious', text: "Let's look again. Can you find these clues?" },
-    { mood: 'curious', text: 'Tap each one on the screen.' },
+    { mood: 'curious', text: 'Tap each one on the screen. If you need help, tap the hint button.' },
   ])
+  // The clue being hinted at, and whether it's the first hint (where to look) or
+  // the second (its exact words)
+  const [hint, setHint] = useState<{ clue: number; exact: boolean } | null>(null)
   const [misses, setMisses] = useState(0)
   const say = (mood: Mood, text: string) => setSaid([...said, { mood, text }])
   const allFound = found.length === clues.length
@@ -68,6 +74,23 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
     })),
     ...others.map((c): Mark => ({ target: c.target, highlight: c.highlight, state: 'hidden' })),
   ]
+  if (hint) {
+    const place = places.findIndex((p) => p.clue === hint.clue)
+    // The second hint lights up the clue's own words; the first, softly, the part of the screen it's in
+    if (hint.exact) marks[place] = { ...marks[place], state: 'hint' }
+    else marks.push({ target: places[place].target, state: 'hint' })
+  }
+
+  const askForHint = () => {
+    const next = clues.findIndex((_, i) => !found.includes(i))
+    if (hint?.clue === next) {
+      setHint({ clue: next, exact: true })
+      say('thinking', HINT_AGAIN)
+    } else {
+      setHint({ clue: next, exact: false })
+      say('thinking', clues[next].spotHint ?? HINT_AGAIN)
+    }
+  }
 
   const onTap = (e: MouseEvent) => {
     const tapped = e.target as HTMLElement
@@ -81,12 +104,15 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
     const inside = tapped.querySelectorAll<HTMLElement>('[data-field]')
     const field = (tapped.closest<HTMLElement>('[data-field]') ?? (inside.length === 1 ? inside[0] : null))?.dataset.field
     if (!onOther && (clue < 0 || found.includes(clue))) {
-      clue = places.find((p) => p.target === field && !found.includes(p.clue))?.clue ?? -1
+      // (the clue being hinted at first, if it's in that part)
+      const inField = places.filter((p) => p.target === field && !found.includes(p.clue))
+      clue = (inField.find((p) => p.clue === hint?.clue) ?? inField[0])?.clue ?? -1
     }
     if (allFound) return
     if (clue >= 0) {
       setFound([...found, clue])
       setFresh(clue)
+      if (hint?.clue === clue) setHint(null)
       if (found.length + 1 === clues.length) {
         say('cheering', ALL_FOUND)
         recordAllCluesFound(scenario.id)
@@ -140,9 +166,9 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
             Next: Stop, Check, Tell
           </button>
         ) : (
-          <button className="show-clues" type="button" onClick={onContinue}>
-            <MagnifierIcon />
-            Show me the clues
+          <button className="hint-button" type="button" onClick={askForHint}>
+            <LightBulbIcon />
+            Hint
           </button>
         )}
       </footer>
@@ -150,11 +176,17 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
   )
 }
 
-function MagnifierIcon() {
+function LightBulbIcon() {
   return (
     <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-      <circle cx="10.5" cy="10.5" r="6.5" fill="#fff" stroke="currentColor" strokeWidth="2.6" />
-      <path d="m15.5 15.5 5 5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      <path
+        d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z"
+        fill="#fff"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinejoin="round"
+      />
+      <path d="M9.5 20.5h5" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
     </svg>
   )
 }

@@ -138,6 +138,9 @@ export type RecapItem = {
   // Other places on the scam screen that also count as finding this clue in
   // "Spot the clues" (e.g. both the caption and the video for "A free prize")
   spotAlso?: { target: string; highlight?: string }[]
+  // What Shield Buddy says when the player asks for a hint about this clue: a gentle
+  // nudge towards where to look, without giving the answer away
+  spotHint?: string
 }
 
 // A text added to the phone during the recap, from the player ('me') or the scammer ('them')

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef } from 'react'
 import { splitByHighlights } from '../highlight'
-import { MarksContext, scrollMarkIntoView } from './marks'
+import { findWhole, MarksContext, scrollMarkIntoView } from './marks'
 
 type FieldProps = { name: string; text: string; className?: string }
 
@@ -8,7 +8,7 @@ export function Field({ name, text, className = '' }: FieldProps) {
   const marks = useContext(MarksContext)
   const ref = useRef<HTMLSpanElement>(null)
 
-  const whole = marks.find((m) => m.target === name && !m.highlight)
+  const whole = findWhole(marks, name)
   const parts = marks
     .map((m, index) => ({ m, index }))
     .filter(({ m }) => m.target === name && m.highlight)

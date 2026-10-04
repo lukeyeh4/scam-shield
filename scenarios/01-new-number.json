@@ -32,11 +32,11 @@
     }
   },
   "recap": {
-    "stop": { "target": "message2", "highlight": "really quick", "text": "'Really quick' was trying to rush you, so you wouldn't stop and think.", "spot": "Someone rushing you" },
+    "stop": { "target": "message2", "highlight": "really quick", "text": "'Really quick' was trying to rush you, so you wouldn't stop and think.", "spot": "Someone rushing you", "spotHint": "Read the messages again. Is someone trying to make you hurry?" },
     "check": [
       { "target": "sender", "text": "This number isn't saved as Mom in your phone." },
-      { "target": "message1", "highlight": "I had to get a new number", "text": "'I got a new number' is a trick scammers use a lot. Anyone can say they're your mom.", "spot": "A new number", "spotAlso": [{ "target": "sender" }] },
-      { "target": "message3", "highlight": "send me the code", "text": "Never share a code sent to your phone. Codes are like keys to your accounts.", "spot": "Asking for a code" },
+      { "target": "message1", "highlight": "I had to get a new number", "text": "'I got a new number' is a trick scammers use a lot. Anyone can say they're your mom.", "spot": "A new number", "spotHint": "Look at who sent these texts. Is it Mom's usual number?", "spotAlso": [{ "target": "sender" }] },
+      { "target": "message3", "highlight": "send me the code", "text": "Never share a code sent to your phone. Codes are like keys to your accounts.", "spot": "Asking for a code", "spotHint": "What do they want you to send them?" },
       { "target": "notificationText", "highlight": "Don't share it with anyone", "text": "The code itself says not to share it. Someone is trying to get into your account." }
     ],
     "tell": "Show a grown-up and say: 'Someone says they're Mom and wants my code. Can we call her old number?'",

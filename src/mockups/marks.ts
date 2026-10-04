@@ -1,8 +1,14 @@
 import { createContext, useContext, useEffect, useRef } from 'react'
 
-// `hidden` marks a clue that's still to be found in "Spot the clues": it looks like
-// plain text, but a tap on it can be told apart
-export type Mark = { target: string; highlight?: string; state: 'active' | 'seen' | 'hidden' }
+// In "Spot the clues", `hidden` marks a clue that's still to be found (it looks like
+// plain text, but a tap on it can be told apart), and `hint` glows softly as a hint
+export type Mark = { target: string; highlight?: string; state: 'active' | 'seen' | 'hidden' | 'hint' }
+
+// A mark for a whole part of the screen; if there are several, one that shows wins
+export const findWhole = (marks: Mark[], name: string) => {
+  const wholes = marks.filter((m) => m.target === name && !m.highlight)
+  return wholes.find((m) => m.state !== 'hidden') ?? wholes[0]
+}
 
 // The recap passes the red flags to highlight; mock-ups render content through <Field>.
 export const MarksContext = createContext<Mark[]>([])
@@ -20,7 +26,7 @@ export function scrollMarkIntoView(element: HTMLElement | null) {
 // the highlight classes to add when the recap points at `name`, and a ref so the
 // part scrolls into view while it's being pointed at
 export function useMark<T extends HTMLElement>(name: string) {
-  const mark = useContext(MarksContext).find((m) => m.target === name && !m.highlight)
+  const mark = findWhole(useContext(MarksContext), name)
   const ref = useRef<T>(null)
   const isActive = mark?.state === 'active'
 
