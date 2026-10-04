@@ -93,8 +93,7 @@
     "stop": {
       "target": "adText",
       "highlight": "Limited time!",
-      "text": "'Limited time' was trying to make you rush.",
-      "spot": "Someone rushing you"
+      "text": "'Limited time' was trying to make you rush."
     },
     "check": [
       {
@@ -104,7 +103,8 @@
       },
       {
         "target": "adUrl",
-        "text": "The real Roblox website is roblox.com. This one is roblox-giveaway-official.net, a different website."
+        "text": "The real Roblox website is roblox.com. This one is roblox-giveaway-official.net, a different website.",
+        "spot": "A website that isn't roblox.com"
       },
       {
         "target": "adTitle",

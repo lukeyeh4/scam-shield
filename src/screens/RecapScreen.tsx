@@ -55,7 +55,7 @@ export function RecapScreen({ scenario, isLast, onBack, onNext, startAtSummary }
           } satisfies Step,
         ]
       : []),
-    // Finally, a summary card: what you can do, and what to check for
+    // Finally, a summary card: what you can do, and what to avoid
     ...(recap.summary
       ? [{ phase: 'tell', messages: ["Great job! Here's what to remember."], summary: recap.summary } satisfies Step]
       : []),

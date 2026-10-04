@@ -308,21 +308,11 @@ mark.flag {
 }
 
 .summary-solution {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
   margin-bottom: 6px;
   padding: 14px 16px;
   border-radius: 16px;
   background: #dcf5e3;
   color: #14532d;
-}
-
-.summary-solution .summary-label {
-  color: #1c6b38;
-}
-
-.summary-solution p {
   font-weight: 700;
 }
 

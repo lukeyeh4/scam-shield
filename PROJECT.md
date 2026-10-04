@@ -18,7 +18,7 @@ What's done, what's next, and what's still undecided. The design itself lives in
 - [x] Optional "Do it" step (`doIt`): shows where the scam leads first. Scenario 2 opens a fake Roblox prize site on the iPad; scenario 3 a fake MrBeast gift card site on the phone.
 - [x] **What happened**: Buddy explains the result, then "What if you had…" cards show the other two choices, worded for each scenario (`whatIf`)
 - [x] **Stop, Check, Tell**: a 3-step progress bar; each step highlights a red flag on the fake screen (or the Do it screen) while Buddy explains it; each step only highlights its own clues
-- [x] Every scenario ends Tell with what you can do next time (`tip`, e.g. a family code word), then a summary card: "What you can do" and "Make sure to check for" (`summary`)
+- [x] Every scenario ends Tell with what you can do next time (`tip`, e.g. a family code word), then a summary card: what you can do, and "Make sure to avoid" (`summary`)
 - [x] "Next scenario" (or "Finish" after the last one); "Menu" is always in the header
 - [x] **Spot the clues** (`SpotScreen`, between What happened and the recap): the player taps about 3 easy clues from a checklist (recap items with a `spot` name); Buddy answers every tap kindly; "Show me the clues" skips ahead, and the recap still covers every clue
 - [x] Shield Buddy moves to match its mood with each new message (a hop, a wobble, a spin…), bobs while talking and floats when quiet; all bubbles stay, fading out at the top, and can be scrolled back to

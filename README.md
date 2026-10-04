@@ -65,7 +65,7 @@ The scam screen comes back, this time with explanations added to it:
 
 Every scenario ends TELL with **what you can do** next time (the `tip` in its file), with the matching part of the scam screen highlighted. For example, scenario 1 teaches a **family code word**: Shield Buddy explains it, and the phone shows the player asking *"What's our code word?"* and the scammer failing to answer. Scenario 2 shows the safe way to get Robux, scenario 3 checking the real channel, scenario 4 checking in the real app, and scenario 5 shopping only at stores your family trusts.
 
-The recap ends with a **summary card** (the `summary` in each scenario file): **Remember**, then **What you can do** in one sentence, and a short list under **Make sure to check for**.
+The recap ends with a **summary card** (the `summary` in each scenario file): **Remember**, then what you can do in one sentence, and a short list under **Make sure to avoid**.
 
 Optional: before the recap, the player taps the red flags themselves as a mini "spot the clues" game.
 

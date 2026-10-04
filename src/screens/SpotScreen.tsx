@@ -55,21 +55,29 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
     { target: c.target, highlight: c.highlight, clue },
     ...(c.spotAlso ?? []).map((also) => ({ ...also, clue })),
   ])
+  // Clues that aren't on the list but share text with one that is (e.g. "Limited time!"
+  // next to "claim your free Robux"), so a tap on them isn't taken for the listed one
+  const others = allClues.filter((c) => !c.spot && c.highlight && places.some((p) => p.target === c.target))
   // Once a clue is found, all its places light up
-  const marks: Mark[] = places.map((p) => ({
-    target: p.target,
-    highlight: p.highlight,
-    state: !found.includes(p.clue) ? 'hidden' : p.clue === fresh ? 'active' : 'seen',
-  }))
+  const marks: Mark[] = [
+    ...places.map((p): Mark => ({
+      target: p.target,
+      highlight: p.highlight,
+      state: !found.includes(p.clue) ? 'hidden' : p.clue === fresh ? 'active' : 'seen',
+    })),
+    ...others.map((c): Mark => ({ target: c.target, highlight: c.highlight, state: 'hidden' })),
+  ]
 
   const onTap = (e: MouseEvent) => {
     const tapped = e.target as HTMLElement
     // The exact clue text, if that was tapped and is still to be found...
     const mark = tapped.closest<HTMLElement>('[data-mark]')
-    let clue = mark ? places[Number(mark.dataset.mark)].clue : -1
+    const markIndex = mark ? Number(mark.dataset.mark) : -1
+    const onOther = markIndex >= places.length
+    let clue = markIndex >= 0 && !onOther ? places[markIndex].clue : -1
     // ...or else any clue still to be found in the same part of the screen
     const field = tapped.closest<HTMLElement>('[data-field]')?.dataset.field
-    if (clue < 0 || found.includes(clue)) {
+    if (!onOther && (clue < 0 || found.includes(clue))) {
       clue = places.find((p) => p.target === field && !found.includes(p.clue))?.clue ?? -1
     }
     if (allFound) return
@@ -78,6 +86,8 @@ export function SpotScreen({ scenario, onBack, onContinue }: SpotScreenProps) {
       setFresh(clue)
       if (found.length + 1 === clues.length) say('cheering', ALL_FOUND)
       else say('happy', FOUND[found.length % FOUND.length])
+    } else if (onOther) {
+      say('happy', OTHER_CLUE)
     } else if (places.some((p) => p.target === field && found.includes(p.clue))) {
       say('happy', AGAIN)
     } else if (allClues.some((c) => c.target === field && !c.spot)) {

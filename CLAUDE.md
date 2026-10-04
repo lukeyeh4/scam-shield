@@ -24,7 +24,7 @@ The game is data-driven. Every scenario uses the same screens, and scenarios dif
 3. `DoItScreen` (only after Do it, only if the scenario has `doIt`): where the scam leads, e.g. a fake website.
 4. `OutcomeScreen`: Buddy explains the result, then "What if you had…" cards (worded by `whatIf`) show the other two choices. Results are always `do` → red, `ignore` → yellow, `tell` → green.
    Then `SpotScreen`: the scam comes back and the player taps the clues on a short checklist.
-5. `RecapScreen`: Stop, Check, Tell with a 3-step progress bar. Each step highlights a red flag on the fake screen while Buddy explains it. Tell ends with `recap.tip` (what you can do, e.g. a family code word), then `SummaryCard` (`recap.summary`: "What you can do" and "Make sure to check for").
+5. `RecapScreen`: Stop, Check, Tell with a 3-step progress bar. Each step highlights a red flag on the fake screen while Buddy explains it. Tell ends with `recap.tip` (what you can do, e.g. a family code word), then `SummaryCard` (`recap.summary`: what you can do, and "Make sure to avoid").
 6. `EndScreen`: after "Finish" on the last scenario.
 
 **Fake screens** (`src/mockups/`): `Mockup` picks the component for a scenario's `mockup` type. Devices are `PhoneFrame` (iPhone; `dark` for full-screen apps, optional message box) and `TabletFrame` (iPad held sideways, scales to fit with container query units); `SafariBar` is the iPad Safari toolbar. Nothing on a fake screen is a real link, button or form field. Images (logos, photos) live in `public/images/` and are named by path in the scenario files.

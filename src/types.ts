@@ -144,7 +144,7 @@ export type RecapItem = {
 export type ExtraMessage = { from: 'me' | 'them'; text: string }
 
 // What to remember from a scenario, shown on a card at the very end of the recap:
-// "What you can do" (`solution`) and "Make sure to check for" (`checks`)
+// what you can do (`solution`) and "Make sure to avoid" (`checks`)
 export type RecapSummary = {
   solution: string
   // Short warning signs to look out for next time
