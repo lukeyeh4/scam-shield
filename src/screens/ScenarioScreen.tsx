@@ -12,25 +12,39 @@ import { RecapScreen } from './RecapScreen'
 // Stays neutral: no hints before the choice.
 const CHOOSE_PROMPT = 'Read it carefully. Then pick what you would do.'
 
+// DEV CONSOLE: open a scenario part-way through, as if `choice` had been picked
+export type ScenarioStart = { choice: Choice; stage: 'doIt' | 'outcome' | 'recap' | 'summary' }
+
 type ScenarioScreenProps = {
   scenario: Scenario
   isLast: boolean
   onBack: () => void
   onNext: () => void
+  start?: ScenarioStart
 }
 
 // Wireframe: the scam screen with Shield Buddy beside it. Once Buddy has finished
 // talking, the three choices slide up from the bottom. Picking one leads to
 // "What happened", then "Stop, Check, Tell".
-export function ScenarioScreen({ scenario, isLast, onBack, onNext }: ScenarioScreenProps) {
+export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: ScenarioScreenProps) {
   const [showChoices, setShowChoices] = useState(false)
   const revealChoices = useCallback(() => setShowChoices(true), [])
-  const [choice, setChoice] = useState<Choice | null>(null)
-  const [showRecap, setShowRecap] = useState(false)
+  const [choice, setChoice] = useState<Choice | null>(start?.choice ?? null)
+  const [showRecap, setShowRecap] = useState(start?.stage === 'recap' || start?.stage === 'summary')
   // Some scenarios show where "Do it" takes you (e.g. a fake website) before the outcome
-  const [doItSeen, setDoItSeen] = useState(false)
+  const [doItSeen, setDoItSeen] = useState(start !== undefined && start.stage !== 'doIt')
 
-  if (showRecap) return <RecapScreen scenario={scenario} isLast={isLast} onBack={onBack} onNext={onNext} />
+  if (showRecap) {
+    return (
+      <RecapScreen
+        scenario={scenario}
+        isLast={isLast}
+        onBack={onBack}
+        onNext={onNext}
+        startAtSummary={start?.stage === 'summary'}
+      />
+    )
+  }
   if (choice === 'do' && scenario.doIt && !doItSeen) {
     return <DoItScreen scenario={scenario} doIt={scenario.doIt} onBack={onBack} onContinue={() => setDoItSeen(true)} />
   }

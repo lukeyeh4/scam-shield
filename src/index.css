@@ -234,25 +234,6 @@ button:active {
   list-style: none;
 }
 
-.menu-scenario {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  min-height: 64px;
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-  font-weight: 600;
-  text-align: left;
-}
-
-.menu-scenario:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
 .menu-scenario-number {
   display: grid;
   flex: none;
@@ -262,6 +243,28 @@ button:active {
   border-radius: 50%;
   background: var(--surface-soft);
   font-weight: 700;
+}
+
+/* End screen: reuses the menu layout */
+.end-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.end-solution {
+  color: var(--muted);
+}
+
+.end-buttons {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  width: 100%;
 }
 
 /* Scenario: header, the scam screen with Buddy beside it, then the choices.

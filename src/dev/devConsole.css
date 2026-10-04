@@ -1,0 +1,68 @@
+/* DEV CONSOLE: remove before shipping (see "Dev console" in PROJECT.md). */
+.dev-toggle,
+.dev-console {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 1000;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.dev-toggle {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #1d2433;
+  color: #fff;
+  opacity: 0.5;
+}
+
+.dev-toggle:hover {
+  opacity: 1;
+}
+
+.dev-console {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(300px, calc(100vw - 24px));
+  padding: 12px;
+  border-radius: 12px;
+  background: #1d2433;
+  color: #fff;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
+}
+
+.dev-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.dev-head {
+  justify-content: space-between;
+}
+
+.dev-console select {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+}
+
+.dev-console button {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #3a4459;
+  color: #fff;
+}
+
+.dev-console button:hover:not(:disabled) {
+  background: #4d5a75;
+}
+
+.dev-console button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

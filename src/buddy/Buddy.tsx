@@ -6,6 +6,7 @@ import happy from '../../shield_buddy/happy.png'
 import neutral from '../../shield_buddy/neutral.png'
 import thinking from '../../shield_buddy/thinking.png'
 import worried from '../../shield_buddy/worried.png'
+import { isFast } from '../dev/devSettings'
 import { useTypewriter } from './useTypewriter'
 
 const IMAGES: Record<Mood, string> = { cheering, curious, happy, neutral, thinking, worried }
@@ -32,7 +33,8 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
 
   useEffect(() => {
     if (!done || count >= messages.length) return
-    const wait = count === 0 ? delayMs : NEXT_MESSAGE_DELAY_MS
+    // DEV CONSOLE: fast mode skips the waits
+    const wait = isFast() ? 0 : count === 0 ? delayMs : NEXT_MESSAGE_DELAY_MS
     const timer = setTimeout(() => setCount((c) => c + 1), wait)
     return () => clearTimeout(timer)
   }, [done, count, messages.length, delayMs])

@@ -1,5 +1,4 @@
 import { Buddy } from '../buddy/Buddy'
-import { scenarios } from '../scenarios'
 
 const STEPS = [
   { label: 'Stop', hint: 'Slow down' },
@@ -7,7 +6,7 @@ const STEPS = [
   { label: 'Tell', hint: 'Tell a grown-up' },
 ]
 
-export function MainMenu({ onPlay }: { onPlay: (index: number) => void }) {
+export function MainMenu({ onStart }: { onStart: () => void }) {
   return (
     <main className="menu">
       <h1 className="menu-title">Scam Shield</h1>
@@ -23,21 +22,9 @@ export function MainMenu({ onPlay }: { onPlay: (index: number) => void }) {
         ))}
       </ol>
 
-      <button className="menu-start" type="button" onClick={() => onPlay(0)}>
+      <button className="menu-start" type="button" onClick={onStart}>
         Start
       </button>
-
-      <h2 className="menu-heading">Pick a scam</h2>
-      <ol className="menu-list">
-        {scenarios.map((s, i) => (
-          <li key={s.id}>
-            <button className="menu-scenario" type="button" onClick={() => onPlay(i)}>
-              <span className="menu-scenario-number">{i + 1}</span>
-              {s.title}
-            </button>
-          </li>
-        ))}
-      </ol>
     </main>
   )
 }

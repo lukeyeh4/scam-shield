@@ -16,14 +16,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture
 
-The game is data-driven. Every scenario uses the same screens, and scenarios differ only in their data in `scenarios/NN-<slug>.json` (loaded in filename order by `src/scenarios.ts`; the format is `Scenario` in `src/types.ts`).
+The game is data-driven. Every scenario uses the same screens, and scenarios differ only in their data in `scenarios/NN-<slug>.json` (loaded in filename order by `src/scenarios.ts`; the format is `Scenario` in `src/types.ts`). Scenarios 4–5 are set aside in `scenarios/later/`, which isn't loaded.
 
 **Flow** (`src/screens/`):
-1. `MainMenu`: Start, or pick a scenario.
+1. `MainMenu`: Start plays the scenarios in order (the dev console can jump to any one).
 2. `ScenarioScreen`: the scam plays in on a fake screen; Shield Buddy says `buddy.intro`, `buddy.explain` and `buddy.choices`; then the Do it / Ignore it / Tell an adult buttons slide up.
 3. `DoItScreen` (only after Do it, only if the scenario has `doIt`): where the scam leads, e.g. a fake website.
 4. `OutcomeScreen`: Buddy explains the result, then "What if you had…" cards (worded by `whatIf`) show the other two choices. Results are always `do` → red, `ignore` → yellow, `tell` → green.
 5. `RecapScreen`: Stop, Check, Tell with a 3-step progress bar. Each step highlights a red flag on the fake screen while Buddy explains it. Tell ends with `recap.tip` (what you can do, e.g. a family code word), then `SummaryCard` (`recap.summary`: "What you can do" and "Make sure to check for").
+6. `EndScreen`: after "Finish" on the last scenario.
 
 **Fake screens** (`src/mockups/`): `Mockup` picks the component for a scenario's `mockup` type. Devices are `PhoneFrame` (iPhone; `dark` for full-screen apps, optional message box) and `TabletFrame` (iPad held sideways, scales to fit with container query units); `SafariBar` is the iPad Safari toolbar. Nothing on a fake screen is a real link, button or form field. Images (logos, photos) live in `public/images/` and are named by path in the scenario files.
 
@@ -33,10 +34,12 @@ The game is data-driven. Every scenario uses the same screens, and scenarios dif
 
 Animations respect `prefers-reduced-motion` (`src/motion.ts`).
 
+**Dev console** (`src/dev/`, dev server only): fast mode plus jumps to any screen, for testing. It must be removed before shipping; the steps are in `PROJECT.md`, and every touchpoint is marked `DEV CONSOLE`. Keep that list up to date if you add to it.
+
 ## Content rules (these apply to all scenario text and UI copy)
 
 - Write at about an 8-year-old reading level, with simple words. Keep one idea per screen, with big buttons and large text. The text on the fake screens can be realistic; everything Buddy and the game say must be simple.
-- Scenarios 1–3 show real apps and brands (iPhone, Safari, Google, Roblox, YouTube) so they match what kids actually see; scenarios 4–5 still use made-up names (PixelPals, ShopZoom). Never include working links. Whether to keep real brands is still being decided (see `PROJECT.md`).
+- Scenarios 1–3 show real apps and brands (iPhone, Safari, Google, Roblox, YouTube) so they match what kids actually see; scenarios 4–5 (set aside for now) use made-up names (PixelPals, ShopZoom). Never include working links. Whether to keep real brands is still being decided (see `PROJECT.md`).
 - Consequences should feel realistic but not frightening or graphic.
 - No shame. Wrong choices get "Here's what to watch for next time," never "You failed."
 - No emojis in the game's own interface (buttons, labels, headings). Emojis are fine inside the fake scam screens.

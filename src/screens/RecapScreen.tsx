@@ -31,11 +31,13 @@ type RecapScreenProps = {
   isLast: boolean
   onBack: () => void
   onNext: () => void
+  // DEV CONSOLE: open on the last step
+  startAtSummary?: boolean
 }
 
 // Screen 4: Stop, Check, Tell. The scam comes back, and each step highlights
 // a red flag on it while Shield Buddy explains.
-export function RecapScreen({ scenario, isLast, onBack, onNext }: RecapScreenProps) {
+export function RecapScreen({ scenario, isLast, onBack, onNext, startAtSummary }: RecapScreenProps) {
   const { recap } = scenario
   const steps: Step[] = [
     { phase: 'stop', messages: [recap.stop.text], item: recap.stop },
@@ -58,7 +60,7 @@ export function RecapScreen({ scenario, isLast, onBack, onNext }: RecapScreenPro
       ? [{ phase: 'tell', messages: ["Great job! Here's what to remember."], summary: recap.summary } satisfies Step]
       : []),
   ]
-  const [index, setIndex] = useState(0)
+  const [index, setIndex] = useState(startAtSummary ? steps.length - 1 : 0)
   const step = steps[index]
   // On the summary all three steps are done
   const phaseIndex = step.summary ? PHASES.length : PHASES.findIndex((p) => p.id === step.phase)

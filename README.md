@@ -27,7 +27,7 @@ Every scenario follows the same four screens, so kids always know what to expect
 
 This is a realistic mock-up of wherever the scam would actually appear: a phone's text messages, Safari on an iPad, YouTube Shorts, an email inbox, or a web page. It should look and feel real, with a few rules:
 
-- **Real apps where it helps.** Scenarios 1–3 show real apps and brands (iPhone, Safari, Google, Roblox, YouTube) so they look like what kids actually see. Scenarios 4–5 use made-up names ("PixelPals", "ShopZoom"). Whether to keep real brands is still being decided.
+- **Real apps where it helps.** Scenarios 1–3 show real apps and brands (iPhone, Safari, Google, Roblox, YouTube) so they look like what kids actually see. Scenarios 4–5 (set aside for now) use made-up names ("PixelPals", "ShopZoom"). Whether to keep real brands is still being decided.
 - **Red flags planted in it**: a countdown timer, an odd link, a spelling mistake, an unknown sender, a request for a password or code
 - **No real working links**, buttons or form fields
 
@@ -90,7 +90,7 @@ Rules for Shield Buddy:
 
 ## The 5 scenarios
 
-Ordered from easiest to hardest:
+Ordered from easiest to hardest. Only scenarios 1–3 are in the game for now; 4 and 5 wait in `scenarios/later/` until their fake screens are built.
 
 | # | Scenario | Looks like | The scam | 👆 Do it → | 🙈 Ignore it → |
 |---|----------|------------|----------|-----------|---------------|
@@ -126,8 +126,7 @@ scam-shield/
 │   ├── 01-new-number.json
 │   ├── 02-free-robux.json
 │   ├── 03-ai-video.json
-│   ├── 04-account-locked.json
-│   └── 05-mega-deal.json
+│   └── later/            # Scenarios 4 and 5, set aside for now
 ├── shield_buddy/         # Shield Buddy artwork, one image per mood
 ├── public/images/        # Logos and photos used on the fake screens
 └── src/
@@ -213,7 +212,7 @@ Shield Buddy shows the existing `outcomes` and `recap` text in its speech bubble
 - [x] Platform: a web app that works on tablets
 - [x] Tech stack: React + TypeScript + Vite
 - [x] Mascot: Shield Buddy (artwork in `shield_buddy/`)
-- [ ] Should there be an end screen or certificate after all 5 scenarios?
+- [x] End screen after the last scenario (could become a certificate later)
 - [ ] Read-aloud audio for younger readers? (Planned for later. Shield Buddy's lines would be read aloud.)
 
 ## Getting started

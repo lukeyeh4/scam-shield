@@ -7,9 +7,9 @@ What's done, what's next, and what's still undecided. The design itself lives in
 - [x] Design spec, Shield Buddy design and tech stack (`README.md`)
 - [x] Shield Buddy artwork: six moods in `shield_buddy/`
 - [x] React + TypeScript + Vite project set up
-- [x] All 5 scenarios written in `scenarios/`
+- [x] All 5 scenarios written. Only scenarios 1–3 are in the game for now; 4 and 5 are set aside in `scenarios/later/` until their fake screens are built.
 - [x] Main menu, and the full flow for each scenario: the scam, the choice, What happened, and Stop, Check, Tell (wireframe style)
-- [ ] Commit the work on branch `try/result-screens` and merge it into `main`
+- [x] Commit the work on branch `try/result-screens` and merge it into `main`
 
 ## 1. The game
 
@@ -20,9 +20,10 @@ What's done, what's next, and what's still undecided. The design itself lives in
 - [x] **Stop, Check, Tell**: a 3-step progress bar; each step highlights a red flag on the fake screen (or the Do it screen) while Buddy explains it; each step only highlights its own clues
 - [x] Every scenario ends Tell with what you can do next time (`tip`, e.g. a family code word), then a summary card: "What you can do" and "Make sure to check for" (`summary`)
 - [x] "Next scenario" (or "Finish" after the last one); "Menu" is always in the header
-- [ ] Remember finished scenarios and show which are done on the menu
-- [ ] Decide which other scenarios get a "Do it" step (e.g. the shopping site in scenario 5, or a fake login page in scenario 4)
-- [ ] Check all 5 scenarios play through correctly (scenarios 4 and 5 haven't been played through, since their fake screens aren't styled yet)
+- [x] End screen after the last scenario (`EndScreen`): Buddy cheers, Stop, Check, Tell in kid words, "What you can do" from each scenario's summary, then Play again or Menu (wireframe style)
+- [ ] End screen: decide whether it becomes a certificate (e.g. with the player's name), and give it the real look
+- [ ] Remember how far the player got, so Start can pick up where they left off (the menu no longer lists the scenarios)
+- [ ] Bring back scenarios 4 and 5: style their fake screens, move their files from `scenarios/later/` back into `scenarios/`, decide whether they get a "Do it" step (e.g. the shopping site in scenario 5, or a fake login page in scenario 4), and play them through
 
 ## Potential simplifications
 
@@ -64,6 +65,7 @@ Vitest is installed, but there's no test script or tests yet.
 
 ## 6. Put it online
 
+- [ ] **Remove the dev console** (see below) before shipping
 - [ ] Host it on GitHub Pages (or similar). This needs Vite's `base` setting to match the repo name.
 
 ## Later
@@ -76,4 +78,21 @@ Vitest is installed, but there's no test script or tests yet.
 
 - [ ] Real brands and people: scenarios 1–3 now show Apple, Google, Roblox, Microsoft, YouTube and MrBeast (including his photo and a real scam web address) so they look like what kids actually see. Keep them, or switch to made-up names? Scenarios 4–5 still use made-up names.
 - [ ] `mrbeast.webp` in the project folder isn't used by the game (a cropped copy is): keep it as the source, or remove it?
-- [ ] Should there be an end screen or certificate after all 5 scenarios?
+- [ ] Should the end screen become a certificate?
+
+## Dev console (remove before shipping)
+
+A testing panel that only appears with `npm run dev`. Click "Dev" in the bottom-right corner, or press the `` ` `` key. It can:
+
+- Turn on **fast mode**: Buddy's text appears at once and nothing waits, so you don't have to sit through each conversation. It stays on after a reload.
+- Jump to the menu, the end screen, or any scenario at any stage (the scam, the Do it page, the outcome for a chosen answer, the recap, or the summary card).
+
+It's left out of `npm run build`, but remove it before shipping anyway. Everything is marked `DEV CONSOLE`:
+
+- [ ] Delete the `src/dev/` folder
+- [ ] `src/App.tsx`: remove the `DevConsole` import, `DevJump`, `run` and `jump`, and the `key={run}` parts
+- [ ] `src/motion.ts`: remove `isFast()`
+- [ ] `src/buddy/Buddy.tsx`: remove `isFast()` from the wait between messages
+- [ ] `src/screens/ScenarioScreen.tsx`: remove `ScenarioStart` and the `start` prop
+- [ ] `src/screens/RecapScreen.tsx`: remove the `startAtSummary` prop
+- [ ] Remove this section and the dev console note in `CLAUDE.md`
