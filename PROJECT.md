@@ -85,7 +85,12 @@ One chat with Shield Buddy, where kids tap options or (later) type a question. I
 **Still to decide**
 
 - [ ] Build Check a picture first, or the link checker first as a smaller warm-up (it was the first tool before Check a picture became the flagship)
-- [ ] Which AI model (it must read pictures well) and where the server runs; cost per check, and limits so it can't be overused
+- [ ] Which AI model (it must read pictures well) and where the server runs. Options:
+  - Models: Anthropic Claude (Haiku 4.5, Sonnet 5.5, Opus 5.5), OpenAI or Google Gemini, directly or through Amazon Bedrock, Google Vertex AI or Microsoft Foundry. Start mid-range (e.g. Sonnet 5.5) and only move to a cheaper model if it catches scams just as well on the same test pictures
+  - Server (holds the AI key, sets limits and spending caps): Cloudflare Workers, Vercel or Netlify functions, or Firebase / Supabase (which could also hold parent accounts)
+  - Rough cost: about a cent per picture check on a mid-range model (an estimate, to measure)
+  - Not everything needs AI: the browser can read QR codes itself, and Google Safe Browsing / Web Risk checks links against lists of known bad sites
+  - Check each provider's terms for apps used by children, and pick one that doesn't keep or train on the pictures; cost per check, and limits so it can't be overused
 - [ ] Privacy: kids will scan real messages and screenshots with names, numbers and faces. What's sent, whether anything is stored, and parent consent (children's privacy laws such as COPPA)
 - [ ] How Check and Tell fit together in the tutorial and in every tool result
 - [ ] What Shield Buddy says in the tools: today every Buddy line is scripted. Stage 3 of Ask Shield Buddy means changing that rule (and "Buddy isn't a trusted adult" must still hold)
