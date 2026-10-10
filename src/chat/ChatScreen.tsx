@@ -5,7 +5,7 @@ import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
 import { LinkIcon, MessageIcon, MicIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
 import type { Mood } from '../types'
-import { type ChatIcon, type ChatOption, replyTo, STEPS, type StepId } from './script'
+import { type ChatIcon, type ChatOption, findLink, replyTo, STEPS, type StepId } from './script'
 import './chat.css'
 
 // How Buddy's messages appear in the chat: 'dots' shows moving "typing" dots,
@@ -42,7 +42,8 @@ function groupEntries(entries: Entry[]) {
 
 type ChatScreenProps = {
   onBack: () => void
-  onLeave: (to: NonNullable<ChatOption['leave']>) => void
+  // `link` is a link the player typed, to check straight away
+  onLeave: (to: NonNullable<ChatOption['leave']>, link?: string) => void
 }
 
 // Ask Shield Buddy: a chat where Buddy helps check something that feels weird.
@@ -56,8 +57,9 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   // How many entries are showing; the last one may still be typing
   const [shown, setShown] = useState(1)
   const [hurried, setHurried] = useState(-1)
-  // What the player is typing in the box
+  // What the player is typing in the box, and the last link they typed
   const [draft, setDraft] = useState('')
+  const [typedLink, setTypedLink] = useState<string>()
 
   const latest = entries[shown - 1]
   const latestText = latest.from === 'buddy' ? latest.text : ''
@@ -131,7 +133,7 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   }
 
   const choose = (option: ChatOption) => {
-    if (option.leave) return onLeave(option.leave)
+    if (option.leave) return onLeave(option.leave, option.leave === 'link' && step === 'typedLink' ? typedLink : undefined)
     if (option.next) say(option.label, option.next)
   }
 
@@ -139,6 +141,7 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
     e.preventDefault()
     const text = draft.trim()
     if (!text) return
+    setTypedLink(findLink(text))
     say(text, replyTo(text))
     setDraft('')
   }

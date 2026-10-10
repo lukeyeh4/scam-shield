@@ -89,6 +89,16 @@ export const STEPS: Record<StepId, ChatStep> = {
 // Steps reached by typing instead of tapping an answer
 export const TYPED_STEPS: StepId[] = ['typed', 'typedLink']
 
+const LINKISH = /https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|io|gg|ly|co|xyz|info)\b/i
+
+// The link in a typed question, if there is one (without punctuation around it):
+// "is roblox-giveaway-official.net real?" → "roblox-giveaway-official.net"
+export const findLink = (text: string) =>
+  text
+    .split(/\s+/)
+    .find((word) => LINKISH.test(word))
+    ?.replace(/^[([{<"']+/, '')
+    .replace(/[)\]}>"'.,!?;:]+$/, '')
+
 // Which reply a typed question gets (see `typed` and `typedLink`)
-export const replyTo = (text: string): StepId =>
-  /https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|io|gg|ly|co|xyz|info)\b/i.test(text) ? 'typedLink' : 'typed'
+export const replyTo = (text: string): StepId => (findLink(text) ? 'typedLink' : 'typed')

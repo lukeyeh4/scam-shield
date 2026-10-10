@@ -50,6 +50,9 @@ export default function App() {
 
   // DEV CONSOLE: leaving the scenarios forgets the jump, so it isn't replayed later
   if (jumped && route.name !== 'learn') setJumped(undefined)
+  // A link typed in the chat, filled in when the link checker opens
+  const [linkToCheck, setLinkToCheck] = useState<string>()
+  if (linkToCheck && !(route.name === 'ask' || (route.name === 'check' && route.tool === 'link'))) setLinkToCheck(undefined)
 
   const title = route.name === 'check' ? TOOL_TITLES[route.tool] : TITLES[route.name]
   useEffect(() => {
@@ -89,13 +92,21 @@ export default function App() {
   } else if (route.name === 'learnDone') {
     content = <EndScreen key={run} onPlayAgain={() => learn(1, true)} onMenu={home} />
   } else if (route.name === 'ask') {
-    content = <ChatScreen onBack={home} onLeave={check} />
+    content = (
+      <ChatScreen
+        onBack={home}
+        onLeave={(tool, link) => {
+          setLinkToCheck(link)
+          check(tool)
+        }}
+      />
+    )
   } else if (route.name === 'check') {
     content =
       route.tool === 'picture' ? (
         <PictureCheck {...toolNav} />
       ) : (
-        <TextCheck key={route.tool} kind={route.tool} {...toolNav} />
+        <TextCheck key={route.tool} kind={route.tool} initial={linkToCheck} {...toolNav} />
       )
   } else if (route.name === 'grownUps') {
     content = <GrownUpsScreen onBack={home} />

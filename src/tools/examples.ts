@@ -2,8 +2,8 @@ import { scenarios } from '../scenarios'
 
 // What every check returns, whichever tool made it: how risky it looks, and the
 // clues, each with a short name, a reason in kid words, and (for text) the exact
-// words to highlight. The AI will fill this in later; for now the tools show the
-// made-up examples below.
+// words to highlight. Links are really checked (linkCheck.ts); pictures and
+// messages still show the made-up examples below.
 export type Risk = 'high' | 'medium' | 'none'
 
 export type Clue = { label: string; reason: string; highlight?: string }
@@ -21,24 +21,6 @@ export const pictureResult: CheckResult = {
 }
 // Which parts of the picture to mark (they match `pictureResult.clues`, in order)
 export const pictureMarks = pictureClues.map((c) => ({ target: c.target, highlight: c.highlight }))
-
-// Check a link
-export const exampleLink = 'roblox-giveaway-official.net/claim'
-export const linkResult: CheckResult = {
-  risk: 'high',
-  clues: [
-    {
-      label: 'Not the real Roblox website',
-      reason: "The real one is roblox.com. This one just has 'roblox' in its name.",
-      highlight: 'roblox-giveaway-official.net',
-    },
-    {
-      label: 'Claim a prize',
-      reason: "Websites that say you won something and need to 'claim' it are often scams.",
-      highlight: '/claim',
-    },
-  ],
-}
 
 // Check a message
 export const exampleMessage = 'omg is this you in this video?? 😂 bit.ly/3xVid'

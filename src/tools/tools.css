@@ -164,6 +164,39 @@
   outline-offset: 2px;
 }
 
+/* The link box with a Paste button beside it */
+.tool-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.tool-input-row .tool-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.tool-input[aria-invalid='true'] {
+  box-shadow: inset 0 0 0 2px #c2410c;
+}
+
+.tool-paste {
+  flex: none;
+  padding: 0 20px;
+  border-radius: 16px;
+  background: var(--surface-soft);
+  font-weight: 700;
+}
+
+.tool-problem {
+  color: #9a3412;
+  font-weight: 700;
+}
+
+.tool-button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 /* The fake screen beside its words, stacked on narrower screens */
 .tool-split {
   display: grid;

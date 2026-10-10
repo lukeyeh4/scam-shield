@@ -51,12 +51,12 @@ export function ToolScreen({ title, steps, step = 0, onBack, note = 'Preview: no
 }
 
 // While a check runs: Buddy looks for clues, then the result appears by itself
-export function Checking({ onDone }: { onDone: () => void }) {
+export function Checking({ onDone, ms = 3000 }: { onDone: () => void; ms?: number }) {
   const done = useEffectEvent(onDone)
   useEffect(() => {
-    const timer = setTimeout(done, 3000)
+    const timer = setTimeout(done, ms)
     return () => clearTimeout(timer)
-  }, [])
+  }, [ms])
 
   return (
     <div className="tool-checking" role="status">

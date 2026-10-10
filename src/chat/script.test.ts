@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { replyTo, STEPS, type StepId, TYPED_STEPS } from './script'
+import { findLink, replyTo, STEPS, type StepId, TYPED_STEPS } from './script'
 
 const ids = Object.keys(STEPS) as StepId[]
 
@@ -47,6 +47,15 @@ describe('chat script', () => {
       return STEPS[id].options.some((o) => o.leave || o.next === 'again' || (o.next && canFinish(o.next, seen)))
     }
     for (const id of ids) expect(canFinish(id), id).toBe(true)
+  })
+
+  it.each([
+    ['is roblox-giveaway-official.net real?', 'roblox-giveaway-official.net'],
+    ['someone sent me https://bit.ly/3xVid!', 'https://bit.ly/3xVid'],
+    ['my friend said (www.free-robux.com) works', 'www.free-robux.com'],
+    ['no link here', undefined],
+  ])('finds the link in "%s"', (text, link) => {
+    expect(findLink(text)).toBe(link)
   })
 
   it('sends a kid who is not sure to a grown-up', () => {
