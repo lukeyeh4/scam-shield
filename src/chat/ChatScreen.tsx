@@ -8,10 +8,9 @@ import type { Mood } from '../types'
 import { type ChatIcon, type ChatOption, replyTo, STEPS, type StepId } from './script'
 import './chat.css'
 
-// EXPERIMENT: how Buddy's messages appear in the chat. 'dots' shows moving
-// "typing" dots, then the whole message at once; 'typewriter' types each message
-// out letter by letter, like the rest of the game. To undo, set it back to
-// 'typewriter' (or delete this, useDots.ts and the .ask-dots styles).
+// How Buddy's messages appear in the chat: 'dots' shows moving "typing" dots,
+// then the whole message at once (chosen for the chat); 'typewriter' types each
+// message out letter by letter, like the rest of the game.
 const REVEAL = 'dots' as 'dots' | 'typewriter'
 const useReveal = REVEAL === 'dots' ? useDots : useTypewriter
 
@@ -47,7 +46,7 @@ type ChatScreenProps = {
 }
 
 // Ask Shield Buddy: a chat where Buddy helps check something that feels weird.
-// Buddy's messages type out one at a time, like everywhere else in the game; once
+// Buddy's messages appear one at a time (typing dots, then the whole message); once
 // it has finished, the answers slide up and the player taps one, or types a
 // question in the box (Buddy's replies are placeholders until the AI answers them).
 // Everything Buddy says is in script.ts. Asking out loud is shown but not built yet.
@@ -186,7 +185,7 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
                 <div className="ask-bubbles">
                   {group.entries.map((entry, i) => {
                     const isTyping = group.start + i === shown - 1 && !done
-                    // EXPERIMENT (REVEAL): the moving dots, until the whole message appears
+                    // The moving dots, until the whole message appears (see REVEAL)
                     if (REVEAL === 'dots' && isTyping) {
                       return (
                         <p key={`${i}-dots`} className="ask-bubble ask-bubble-buddy ask-dots" aria-hidden="true">

@@ -287,8 +287,7 @@
   opacity: 0.5;
 }
 
-/* EXPERIMENT (REVEAL in ChatScreen): Buddy's "typing" dots, before a message
-   appears all at once */
+/* Buddy's "typing" dots, before a message appears all at once (REVEAL in ChatScreen) */
 .ask-dots {
   display: flex;
   gap: 6px;
