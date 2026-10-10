@@ -228,7 +228,7 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
                   onClick={() => choose(option)}
                 >
                   {Icon && (
-                    <span className="ask-option-icon">
+                    <span className={`ask-option-icon icon-${option.icon}`}>
                       <Icon />
                     </span>
                   )}

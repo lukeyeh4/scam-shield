@@ -1,20 +1,24 @@
-/* Wireframe styles: neutral greys for layout and sizing, not the final colours. */
+/* Cream colours (see "Look and feel" in PROJECT.md): warm paper, soft white cards,
+   brown text, orange buttons, with yellow and teal touches */
 :root {
-  --bg: #f4f5f7;
-  --surface: #ffffff;
-  --surface-soft: #eef0f3;
-  --surface-hover: #e4e7ec;
-  --ink: #1d2433;
-  --muted: #5b6475;
-  --hairline: #e6e8ec;
+  --bg: #fbf1e1;
+  --surface: #fffaf2;
+  --surface-soft: #f6e9d5;
+  --surface-hover: #efdcc2;
+  --ink: #3b2a1e;
+  --muted: #7a6656;
+  --hairline: #efe2cd;
   /* The main colour: big buttons, the player's chat bubbles, progress */
-  --accent: #1d2433;
-  --accent-2: #34405a;
+  --accent: #d9622b;
+  --accent-2: #ef8a4f;
   --accent-gradient: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
   --on-accent: #ffffff;
-  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05), 0 2px 8px rgb(16 24 40 / 0.05);
-  --shadow-md: 0 2px 4px rgb(16 24 40 / 0.05), 0 10px 28px rgb(16 24 40 / 0.08);
-  --radius: 20px;
+  /* Friendly extra colours for icon tiles */
+  --sun: #f4c04f;
+  --teal: #3aa79a;
+  --shadow-sm: 0 1px 2px rgb(90 55 20 / 0.06), 0 2px 8px rgb(90 55 20 / 0.06);
+  --shadow-md: 0 2px 4px rgb(90 55 20 / 0.06), 0 10px 28px rgb(90 55 20 / 0.1);
+  --radius: 22px;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   /* The game's only text sizes (fake screens keep their own realistic sizes) */
   --text-small: 0.9em;
@@ -36,6 +40,11 @@
 body {
   margin: 0;
   background: var(--bg);
+  /* Soft warm glows in the corners */
+  background-image:
+    radial-gradient(circle at 10% 0%, rgb(253 214 170 / 0.55) 0, transparent 38%),
+    radial-gradient(circle at 100% 100%, rgb(250 222 150 / 0.45) 0, transparent 34%);
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -334,9 +343,36 @@ button:active {
   color: var(--muted);
 }
 
-/* Home: one big button to check something, and two small links */
+/* Home: the logo, one big button to check something, and two small links */
 .home {
   gap: 28px;
+}
+
+.home-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.home-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--text-title);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.home-logo {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.home-tagline {
+  color: var(--muted);
+  font-size: var(--text-large);
 }
 
 .home-check {
@@ -351,7 +387,7 @@ button:active {
   color: var(--on-accent);
   font-size: var(--text-heading);
   font-weight: 800;
-  box-shadow: 0 4px 8px rgb(16 24 40 / 0.08), 0 18px 40px rgb(29 36 51 / 0.28);
+  box-shadow: 0 4px 8px rgb(90 55 20 / 0.08), 0 18px 40px rgb(217 98 43 / 0.3);
   transition:
     transform 200ms var(--ease),
     box-shadow 200ms var(--ease);
@@ -365,7 +401,7 @@ button:active {
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .home-check:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgb(16 24 40 / 0.1), 0 24px 48px rgb(29 36 51 / 0.32);
+    box-shadow: 0 6px 12px rgb(90 55 20 / 0.1), 0 24px 48px rgb(217 98 43 / 0.36);
   }
 }
 

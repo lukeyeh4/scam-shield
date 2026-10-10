@@ -84,3 +84,17 @@ export const LockIcon = (p: IconProps) => (
     <path d="M8 10V7a4 4 0 0 1 8 0v3" />
   </Icon>
 )
+
+// Scam Shield's logo: a yellow shield with a star (filled, unlike the line icons)
+export const ShieldLogo = (p: IconProps) => (
+  <svg className={p.className} viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      d="M12 2.5 4 5.5v6c0 4.9 3.4 8.6 8 10 4.6-1.4 8-5.1 8-10v-6z"
+      fill="var(--sun)"
+      stroke="var(--ink)"
+      strokeWidth="1.6"
+      strokeLinejoin="round"
+    />
+    <path d="m12 7.6 1.3 2.7 3 .4-2.2 2 .6 2.9-2.7-1.4-2.7 1.4.6-2.9-2.2-2 3-.4z" fill="var(--ink)" />
+  </svg>
+)

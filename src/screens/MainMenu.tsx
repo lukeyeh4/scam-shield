@@ -1,5 +1,5 @@
 import { Buddy } from '../buddy/Buddy'
-import { ScanIcon } from '../icons'
+import { ScanIcon, ShieldLogo } from '../icons'
 
 type MainMenuProps = {
   onCheck: () => void
@@ -13,7 +13,13 @@ type MainMenuProps = {
 export function MainMenu({ onCheck, onLearn, onGrownUps }: MainMenuProps) {
   return (
     <main className="menu home">
-      <h1 className="menu-title">Scam Shield</h1>
+      <header className="home-header">
+        <h1 className="home-title">
+          <ShieldLogo className="home-logo" />
+          Scam Shield
+        </h1>
+        <p className="home-tagline">Spot scams. Stay safe.</p>
+      </header>
 
       <Buddy mood="happy" messages={["Hi! I'm Shield Buddy. Got something that feels weird? Let's check it."]} />
 

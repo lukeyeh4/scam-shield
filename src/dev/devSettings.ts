@@ -3,22 +3,22 @@
 const FAST_KEY = 'scam-shield-dev-fast'
 const PALETTE_KEY = 'scam-shield-dev-palette'
 
-// Colour palettes to try (in dev/palettes.css); 'cloud' is the one in index.css
-export const PALETTES = ['cloud', 'cream', 'night', 'sky', 'mint', 'lavender', 'sunset'] as const
+// Colour palettes to try (in dev/palettes.css); 'cream' is the one in index.css
+export const PALETTES = ['cream', 'cloud', 'night', 'sky', 'mint', 'lavender', 'sunset'] as const
 export type Palette = (typeof PALETTES)[number]
 
 export function getPalette(): Palette {
   try {
     const saved = localStorage.getItem(PALETTE_KEY)
-    return PALETTES.find((p) => p === saved) ?? 'cloud'
+    return PALETTES.find((p) => p === saved) ?? 'cream'
   } catch {
-    return 'cloud'
+    return 'cream'
   }
 }
 
 // Shows the palette straight away, and remembers it after a reload
 export function setPalette(palette: Palette) {
-  if (palette === 'cloud') delete document.documentElement.dataset.palette
+  if (palette === 'cream') delete document.documentElement.dataset.palette
   else document.documentElement.dataset.palette = palette
   try {
     localStorage.setItem(PALETTE_KEY, palette)

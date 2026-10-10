@@ -144,8 +144,30 @@ Done: iPhone text messages with a notification banner (scenario 1), Google searc
 
 ## 3. Visual design
 
-Replace the grey wireframe with the real look.
+### Look and feel: cream
 
+Chosen 2026-10-10: the **Cream** colours, inspired by a mock-up of the home screen (save it as `docs/inspiration/home-cream.png`). What it looks like:
+
+- A warm cream background with soft peach and yellow glows, soft off-white cards with big rounded corners and gentle shadows, and dark brown text
+- At the top: a yellow shield logo with a star, "ScamShield" in bold, a short tagline ("Spot scams. Stay safe. Be smart."), and a settings gear on the right
+- The tools as three big cards, each with a coloured rounded icon tile, a bold name, one short line and an orange arrow: **Scan a Screenshot** (orange camera, "Find red flags in images"), **Check a Message** (orange speech bubble, "See if it might be a scam"), **Inspect a Link** (yellow link, "Check a website before opening")
+- The mascot at the bottom with a speech bubble: "You're in control! Let's make the internet a safer, kinder place together." (the mock-up shows a puppy holding a teal shield; ours is Shield Buddy)
+- A tab bar at the bottom: Home, Learn, History, More (the current tab in orange)
+- A rounded, friendly font
+
+Done so far:
+
+- [x] Cream colours as the default (`:root` in `src/index.css`): cream background with corner glows, off-white cards, brown text, orange buttons (`--accent`), yellow (`--sun`) and teal (`--teal`) for icon tiles. The old greys and other palettes are still in the dev console's Colours picker to compare
+- [x] Home: the yellow shield logo and a tagline; the chat's answer buttons have coloured icon tiles
+
+To do (mostly when it becomes an app):
+
+- [ ] Decide whether the home screen becomes the three tool cards from the mock-up, or stays one big Check something button
+- [ ] Tab bar (Home, Learn, History, More) and a settings gear for grown-ups (behind the parent gate)
+- [ ] History: past checks. Decide what's kept, where (on the device only?), and for how long, since it's kids' data
+- [ ] A rounded, friendly font (e.g. Nunito), bundled with the app so it works offline
+- [ ] Night colours for later (a dark mode), with darker result banners
+- [ ] Once settled, copy the final colours into `:root` and remove the dev palettes
 - [ ] Bright, friendly style with big buttons and large text (see "Look and feel" in `README.md`)
 - [ ] Colours for the outcomes and the Stop, Check, Tell steps (the wireframe has soft placeholder tints)
 - [ ] In the recap the phone is a little smaller, so the notification's phone number gets cut off on tablets

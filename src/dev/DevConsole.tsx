@@ -78,7 +78,7 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
           {PALETTES.map((p) => (
             <option key={p} value={p}>
               {p.charAt(0).toUpperCase() + p.slice(1)}
-              {p === 'cloud' ? ' (now)' : ''}
+              {p === 'cream' ? ' (now)' : ''}
             </option>
           ))}
         </select>

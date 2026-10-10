@@ -2,19 +2,24 @@
    the same colours as :root in index.css; the fake scam screens keep their own
    realistic colours. Once one is chosen, copy it into :root and delete this file. */
 
-/* Cream: warm paper, brown text, terracotta buttons */
-:root[data-palette='cream'] {
-  --bg: #f5ecdc;
-  --surface: #fffaf1;
-  --surface-soft: #efe3cf;
-  --surface-hover: #e6d6bd;
-  --ink: #3a2c20;
-  --muted: #7b6853;
-  --hairline: #e8dbc6;
-  --accent: #a8532f;
-  --accent-2: #c9743f;
-  --shadow-sm: 0 1px 2px rgb(80 50 20 / 0.06), 0 2px 8px rgb(80 50 20 / 0.06);
-  --shadow-md: 0 2px 4px rgb(80 50 20 / 0.06), 0 10px 28px rgb(80 50 20 / 0.1);
+/* Cloud: the old cool greys and navy */
+:root[data-palette='cloud'] {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-soft: #eef0f3;
+  --surface-hover: #e4e7ec;
+  --ink: #1d2433;
+  --muted: #5b6475;
+  --hairline: #e6e8ec;
+  --accent: #1d2433;
+  --accent-2: #34405a;
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05), 0 2px 8px rgb(16 24 40 / 0.05);
+  --shadow-md: 0 2px 4px rgb(16 24 40 / 0.05), 0 10px 28px rgb(16 24 40 / 0.08);
+}
+
+/* The other palettes keep the corner glows off */
+:root[data-palette] body {
+  background-image: none;
 }
 
 /* Night: deep navy, soft white text, blue-violet buttons */

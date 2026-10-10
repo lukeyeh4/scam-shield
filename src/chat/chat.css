@@ -147,8 +147,19 @@
   place-items: center;
   width: 42px;
   height: 42px;
-  border-radius: 50%;
-  background: var(--surface-soft);
+  border-radius: 14px;
+  background: var(--accent-2);
+  color: #fff;
+}
+
+/* Each kind of thing has its own tile colour */
+.ask-option-icon.icon-link {
+  background: var(--sun);
+  color: var(--ink);
+}
+
+.ask-option-icon.icon-question {
+  background: var(--teal);
 }
 
 .ask-option-icon svg {
