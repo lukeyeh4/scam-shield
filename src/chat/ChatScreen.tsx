@@ -4,8 +4,23 @@ import { useDots } from '../buddy/useDots'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
 import { CameraIcon, LinkIcon, MessageIcon, MicIcon, QuestionIcon, SendIcon } from '../icons'
+import { canReadAloud } from '../readAloud'
 import { OptionCard, type Tone } from '../screens/OptionCard'
-import { BACK_AFTER, buddySays, type ChatIcon, type ChatOption, findLink, replyTo, STEPS, type StepId } from './script'
+import { useSetUp } from '../setup'
+import { canTalk, listen, type ListenProblem, useTalkingAllowed } from '../voiceInput'
+import { askBuddy, canAsk, useQuestionsAllowed } from './askBuddy'
+import {
+  ANSWERED,
+  BACK_AFTER,
+  buddySays,
+  type ChatIcon,
+  type ChatOption,
+  findLink,
+  replyTo,
+  STEPS,
+  type StepId,
+  TOPIC_STEPS,
+} from './script'
 import { checkSinceChat, type Entry, forgetCheck, saveChat, savedChat } from './session'
 import './chat.css'
 
@@ -60,6 +75,14 @@ function groupEntries(entries: Entry[]) {
   return groups
 }
 
+// What the box says when empty: normally, or after asking out loud didn't work
+const PLACEHOLDERS: Record<ListenProblem | 'none', string> = {
+  none: 'Type a question',
+  unheard: "I didn't hear that. Try again, or type.",
+  blocked: 'Ask a grown-up to let me use the mic.',
+  failed: "I can't listen right now. Please type.",
+}
+
 type ChatScreenProps = {
   onBack: () => void
   // `link` is a link the player typed, to check straight away
@@ -70,8 +93,11 @@ type ChatScreenProps = {
 // conversation carries on after leaving to check something (session.ts).
 // Buddy's messages appear one at a time (typing dots, then the whole message); once
 // it has finished, the answers slide up and the player taps one, or types a
-// question in the box (Buddy's replies are placeholders until the AI answers them).
-// Everything Buddy says is in script.ts. Asking out loud is shown but not built yet.
+// question in the box. With a grown-up's OK, the AI answers questions (askBuddy.ts),
+// followed by a scripted line; otherwise Buddy's replies are scripted placeholders.
+// Everything else Buddy says is in script.ts. With a grown-up's OK, the player can also
+// tap the microphone and ask out loud: the words fill the box as they're heard,
+// to check before sending (voiceInput.ts).
 export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const [start] = useState(resume)
   const [step, setStep] = useState<StepId>(start.step)
@@ -82,6 +108,17 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   // What the player is typing in the box, and the last link they typed
   const [draft, setDraft] = useState('')
   const [typedLink, setTypedLink] = useState(start.typedLink)
+  // Nothing is sent anywhere (to the AI, or to the browser's speech service) until a
+  // grown-up has finished setup (setup.ts)
+  const setUp = useSetUp()
+  // Asking out loud: whether a grown-up allows it, whether it's listening now (and how
+  // to stop), and what went wrong last time, to say in the box
+  const talkingAllowed = useTalkingAllowed() && setUp
+  const [stopListening, setStopListening] = useState<(() => void) | null>(null)
+  const [listenProblem, setListenProblem] = useState<ListenProblem>()
+  // Asking the AI: whether a grown-up allows it, and whether Buddy is working on an answer
+  const questionsAllowed = useQuestionsAllowed()
+  const [waiting, setWaiting] = useState(false)
 
   // Keep the conversation for coming back, and Buddy has now talked about the last check
   useEffect(() => forgetCheck(), [])
@@ -91,7 +128,7 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const latestText = latest.from === 'buddy' ? latest.text : ''
   const typed = useReveal(latestText, hurried === shown - 1)
   const done = latest.from === 'kid' || typed === latestText
-  const ready = done && shown === entries.length
+  const ready = done && shown === entries.length && !waiting
 
   // Shows the next entry once the last has finished, after a pause to read it
   useEffect(() => {
@@ -163,13 +200,55 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
     if (option.next) say(option.label, option.next)
   }
 
-  const send = (e: FormEvent) => {
+  // Stop listening when leaving the chat
+  const stopOnLeave = useEffectEvent(() => stopListening?.())
+  useEffect(() => () => stopOnLeave(), [])
+
+  const toggleListening = () => {
+    if (stopListening) return stopListening()
+    if (!talkingAllowed) return
+    if (canReadAloud) speechSynthesis.cancel() // so the microphone doesn't hear Buddy
+    setListenProblem(undefined)
+    const before = draft.trim()
+    const stop = listen(
+      (words) => setDraft(before ? `${before} ${words}` : words),
+      (problem) => {
+        setStopListening(null)
+        setListenProblem(problem)
+      },
+    )
+    setStopListening(() => stop)
+  }
+
+  // A typed (or said) question. A link goes to the link checker, and personal
+  // details or something upsetting get Buddy's scripted lines (never sent);
+  // anything else is answered by the AI when allowed, with Buddy's typing dots
+  // while it works. The AI's own words are only shown for questions about scams
+  // and staying safe; other kinds get scripted lines too (TOPIC_STEPS).
+  const send = async (e: FormEvent) => {
     e.preventDefault()
+    stopListening?.()
     const text = draft.trim()
-    if (!text) return
+    if (!text || waiting) return
     setTypedLink(findLink(text))
-    say(text, replyTo(text))
     setDraft('')
+    const scripted = replyTo(text)
+    if (scripted !== 'typed' || !canAsk(setUp, questionsAllowed)) return say(text, scripted)
+
+    const asked: Entry[] = [...entries, { from: 'kid', text }]
+    setEntries(asked)
+    setShown(asked.length)
+    following.current = true
+    setWaiting(true)
+    const answer = await askBuddy(asked)
+    setWaiting(false)
+    const safety = answer?.topic === 'safety'
+    const next = !answer ? 'askFailed' : safety ? ANSWERED[answer.offer] : TOPIC_STEPS[answer.topic as keyof typeof TOPIC_STEPS]
+    // Which time the player has asked, so the line after the answer varies
+    const turn = asked.filter((entry) => entry.from === 'kid').length - 1
+    const said: Entry[] = safety ? answer.lines.map((line) => ({ from: 'buddy', text: line, mood: answer.mood })) : []
+    setStep(next)
+    setEntries([...asked, ...said, ...buddyLines(next, turn)])
   }
 
   const groups = groupEntries(entries.slice(0, shown))
@@ -241,6 +320,22 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
               </div>
             )
           })}
+          {/* Buddy working on an answer to a question */}
+          {waiting && shown === entries.length && (
+            <div className="ask-group ask-group-buddy">
+              <span className="buddy-body is-talking">
+                <img className="ask-avatar buddy-move-thinking" src={IMAGES.thinking} alt="" />
+              </span>
+              <div className="ask-bubbles">
+                <span className="sr-only">Shield Buddy is thinking</span>
+                <p className="ask-bubble ask-bubble-buddy ask-dots" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -270,17 +365,30 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
           <input
             id="ask-question"
             type="text"
-            placeholder="Type a question"
+            placeholder={stopListening ? 'Listening…' : PLACEHOLDERS[listenProblem ?? 'none']}
             autoComplete="off"
             maxLength={300}
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(e) => {
+              setDraft(e.target.value)
+              setListenProblem(undefined)
+            }}
           />
-          {/* Voice input: ask out loud instead of typing (not built yet, see PROJECT.md) */}
-          <button className="ask-mic" type="button" disabled aria-label="Talk to Shield Buddy">
-            <MicIcon />
-          </button>
-          <button className="ask-send" type="submit" disabled={!draft.trim()} aria-label="Send">
+          {/* Ask out loud instead of typing; turned off until a grown-up allows it,
+              and not shown in browsers that can't listen */}
+          {canTalk && (
+            <button
+              className={stopListening ? 'ask-mic is-listening' : 'ask-mic'}
+              type="button"
+              disabled={!talkingAllowed}
+              aria-pressed={!!stopListening}
+              aria-label={stopListening ? 'Stop listening' : 'Talk to Shield Buddy'}
+              onClick={toggleListening}
+            >
+              <MicIcon />
+            </button>
+          )}
+          <button className="ask-send" type="submit" disabled={!draft.trim() || waiting} aria-label="Send">
             <SendIcon />
           </button>
         </form>

@@ -14,7 +14,14 @@ namespace_id = "1001"
   limit = 20
   period = 60
 
+# Shield Buddy's voice (src/speak.ts): the audio of each line, made once, and how
+# many characters Google has turned into speech this month (stops at 500,000)
+[[kv_namespaces]]
+binding = "SPEECH"
+id = "fe65a0fb3691434ab59587a01188f6d2"
+
 # The keys are secrets, never in this file:
 #   npx wrangler secret put SAFE_BROWSING_KEY
 #   npx wrangler secret put ANTHROPIC_API_KEY
+#   npx wrangler secret put GOOGLE_TTS_KEY
 # For `npm run dev`, put it in worker/.dev.vars (ignored by git).

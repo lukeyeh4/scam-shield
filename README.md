@@ -140,5 +140,5 @@ worker/           the link checker's server: lookups, and Claude reading pages
 ## Open questions
 
 - Keep real brands and people (Apple, Google, Roblox, YouTube, MrBeast) in scams 1–3, or switch to made-up names?
-- Read-aloud: Buddy's lines are read by the device's own voice for now, which varies by device. Switch to recorded or AI-made audio for one Buddy voice? Where should the switch go (it covers the home screen's gear on phones)?
+- Read-aloud: Buddy now has one voice everywhere (Google Cloud Text-to-Speech, with the device's voice as a backup). Which voice suits Buddy best? Where should the switch go (it covers the home screen's gear on phones)?
 - Add VirusTotal (about 90 security companies' verdicts) to catch sites like vmsvedaweb.com that web filters block but Google doesn't list?

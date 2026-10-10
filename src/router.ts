@@ -12,8 +12,9 @@ export type Route =
   | { name: 'ask' }
   // The tools: Check a picture (the main one), a link or a message
   | { name: 'check'; tool: Tool }
-  // The grown-ups' area: setup and settings (not built yet)
-  | { name: 'grownUps' }
+  // The grown-ups' area: setup and settings. `then`: the tool to go back to
+  // afterwards, when a kid was sent here to get setup finished
+  | { name: 'grownUps'; then?: Tool }
 
 export type Tool = 'picture' | 'link' | 'message'
 const TOOLS: Tool[] = ['picture', 'link', 'message']
@@ -31,7 +32,7 @@ export function toHash(route: Route): string {
     case 'check':
       return `#/check/${route.tool}`
     case 'grownUps':
-      return '#/grown-ups'
+      return route.then ? `#/grown-ups/${route.then}` : '#/grown-ups'
   }
 }
 
@@ -47,6 +48,8 @@ export function parseHash(hash: string): Route {
   const tool = TOOLS.find((t) => t === parts[1])
   if (parts[0] === 'check' && tool && parts.length === 2) return { name: 'check', tool }
   if (parts[0] === 'grown-ups' && parts.length === 1) return { name: 'grownUps' }
+  const then = TOOLS.find((t) => t === parts[1])
+  if (parts[0] === 'grown-ups' && then && parts.length === 2) return { name: 'grownUps', then }
   return { name: 'home' }
 }
 

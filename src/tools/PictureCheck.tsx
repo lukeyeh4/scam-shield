@@ -3,16 +3,20 @@ import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
 import { Mockup } from '../mockups/Mockup'
 import { examplePicture, pictureMarks, pictureResult } from './examples'
 import { ResultView } from './Result'
-import { Checking, ToolScreen, type ToolNav } from './ToolScreen'
+import { useSetUp } from '../setup'
+import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 
 type Stage = 'choose' | 'check' | 'checking' | 'result'
 const STEP: Record<Stage, number> = { choose: 0, check: 1, checking: 1, result: 2 }
 
 // Check a picture, the main tool (a wireframe: any choice uses the example picture).
 // Choose a photo or screenshot, make sure it's the right one, then see the result.
-export function PictureCheck({ onHome, onAsk }: ToolNav) {
+// Pictures will be sent to be checked, so a grown-up has to finish setup first.
+export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
+  const setUp = useSetUp()
   const [stage, setStage] = useState<Stage>('choose')
   const back = () => (stage === 'choose' ? onHome() : setStage(stage === 'result' ? 'check' : 'choose'))
+  if (!setUp) return <SetupFirst title="Check a picture" what="pictures" onHome={onHome} onSetUp={onSetUp} />
 
   return (
     <ToolScreen title="Check a picture" steps={3} step={STEP[stage]} onBack={back}>

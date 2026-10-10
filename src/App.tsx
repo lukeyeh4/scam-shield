@@ -39,7 +39,7 @@ const home = () => navigate({ name: 'home' })
 const check = (tool: Tool) => navigate({ name: 'check', tool })
 const ask = () => navigate({ name: 'ask' })
 // Where every tool can lead next
-const toolNav = { onHome: home, onAsk: ask }
+const toolNav = (tool: Tool) => ({ onHome: home, onAsk: ask, onSetUp: () => navigate({ name: 'grownUps', then: tool }) })
 const learn = (scenario: number, replace = false) => navigate({ name: 'learn', scenario }, { replace })
 
 export default function App() {
@@ -105,12 +105,13 @@ export default function App() {
   } else if (route.name === 'check') {
     content =
       route.tool === 'picture' ? (
-        <PictureCheck {...toolNav} />
+        <PictureCheck {...toolNav('picture')} />
       ) : (
-        <TextCheck key={route.tool} kind={route.tool} initial={linkToCheck} {...toolNav} />
+        <TextCheck key={route.tool} kind={route.tool} initial={linkToCheck} {...toolNav(route.tool)} />
       )
   } else if (route.name === 'grownUps') {
-    content = <GrownUpsScreen onBack={home} />
+    // Sent here from a tool to finish setup: back (or Done) returns to that tool
+    content = <GrownUpsScreen onBack={route.then ? () => history.back() : home} />
   } else {
     content = (
       <MainMenu

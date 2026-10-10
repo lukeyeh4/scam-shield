@@ -12,6 +12,7 @@ describe('router', () => {
     { name: 'check', tool: 'link' },
     { name: 'check', tool: 'message' },
     { name: 'grownUps' },
+    { name: 'grownUps', then: 'picture' },
   ]
 
   it.each(routes)('reads back the address it makes for %o', (route) => {
@@ -27,7 +28,7 @@ describe('router', () => {
     expect(parseHash('#/learn')).toEqual({ name: 'learn', scenario: 1 })
   })
 
-  it.each(['#/nowhere', '#/learn/0', '#/learn/abc', '#/learn/1.5', '#/ask/extra', '#/check', '#/check/qr', '#/tell'])('goes home for %s', (hash) => {
+  it.each(['#/nowhere', '#/learn/0', '#/learn/abc', '#/learn/1.5', '#/ask/extra', '#/check', '#/check/qr', '#/tell', '#/grown-ups/qr'])('goes home for %s', (hash) => {
     expect(parseHash(hash)).toEqual({ name: 'home' })
   })
 })

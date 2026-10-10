@@ -276,6 +276,20 @@
   opacity: 0.5;
 }
 
+/* Listening: the microphone turns orange and pulses until the player stops talking */
+.ask-compose .ask-mic.is-listening {
+  background: var(--accent);
+  box-shadow: none;
+  color: var(--on-accent);
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-compose .ask-mic.is-listening {
+    animation: none;
+  }
+}
+
 /* Buddy's "typing" dots, before a message appears all at once (REVEAL in ChatScreen) */
 .ask-dots {
   display: flex;

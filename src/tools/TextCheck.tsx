@@ -5,7 +5,8 @@ import { exampleMessage, messageResult } from './examples'
 import { checkLink } from './linkCheck'
 import { lookUpLink, withFacts } from './linkLookup'
 import { MarkedText, ResultView } from './Result'
-import { Checking, ToolScreen, type ToolNav } from './ToolScreen'
+import { useSetUp } from '../setup'
+import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 
 // Check a link and Check a message work the same way: paste it in, then see the
 // result with the clues marked in the text. Links are really checked (linkCheck.ts,
@@ -36,8 +37,9 @@ type TextCheckProps = ToolNav & {
   initial?: string
 }
 
-export function TextCheck({ kind, initial = '', onHome, onAsk }: TextCheckProps) {
+export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCheckProps) {
   const k = KINDS[kind]
+  const setUp = useSetUp()
   const [stage, setStage] = useState<Stage>('paste')
   const [text, setText] = useState(kind === 'link' ? initial : exampleMessage)
   const [result, setResult] = useState<CheckResult>()
@@ -70,6 +72,10 @@ export function TextCheck({ kind, initial = '', onHome, onAsk }: TextCheckProps)
     })
   }
   const showResult = stage === 'checking' && waited && lookedUp
+  // Messages will be sent to be checked, so a grown-up has to finish setup first.
+  // Links are checked on the device until then, with a note saying so.
+  if (kind === 'message' && !setUp) return <SetupFirst title={k.title} what="messages" onHome={onHome} onSetUp={onSetUp} />
+  const note = kind === 'link' && !setUp ? 'Quick check only. Ask a grown-up to set up full checks.' : k.note
 
   // The Paste button: reads what the player copied (the browser may ask first)
   const paste = async () => {
@@ -85,7 +91,7 @@ export function TextCheck({ kind, initial = '', onHome, onAsk }: TextCheckProps)
   }
 
   return (
-    <ToolScreen title={k.title} steps={2} step={stage === 'paste' ? 0 : 1} onBack={back} note={k.note}>
+    <ToolScreen title={k.title} steps={2} step={stage === 'paste' ? 0 : 1} onBack={back} note={note}>
       {stage === 'paste' && (
         <form className="tool-column" onSubmit={check}>
           <h2 className="tool-heading" id="paste-heading">
