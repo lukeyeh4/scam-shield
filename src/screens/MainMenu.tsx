@@ -1,42 +1,65 @@
-import { Buddy } from '../buddy/Buddy'
-import { ScanIcon, ShieldLogo } from '../icons'
+import { IMAGES } from '../buddy/moods'
+import { BookIcon, CameraIcon, GearIcon, LinkIcon, MessageIcon, ShieldLogo } from '../icons'
+import type { Tool } from '../router'
+import { OptionCard } from './OptionCard'
 
 type MainMenuProps = {
-  onCheck: () => void
+  onTool: (tool: Tool) => void
   onLearn: () => void
+  onAsk: () => void
   onGrownUps: () => void
 }
 
-// The home screen: one big button to check something (it opens the chat with
-// Buddy, which leads to the right checker), with the game and the grown-ups'
-// area as small links underneath
-export function MainMenu({ onCheck, onLearn, onGrownUps }: MainMenuProps) {
+// The home screen: the logo with a gear for grown-ups, a big warm card for each tool
+// and the game, then Shield Buddy, who opens the chat when tapped
+export function MainMenu({ onTool, onLearn, onAsk, onGrownUps }: MainMenuProps) {
   return (
-    <main className="menu home">
+    <main className="home">
       <header className="home-header">
-        <h1 className="home-title">
-          <ShieldLogo className="home-logo" />
-          Scam Shield
-        </h1>
-        <p className="home-tagline">Spot scams. Stay safe.</p>
+        <ShieldLogo className="home-logo" />
+        <div className="home-name">
+          <h1 className="home-title">Scam Shield</h1>
+          <p className="home-tagline">Spot scams. Stay safe.</p>
+        </div>
+        <button className="home-gear" type="button" onClick={onGrownUps} aria-label="For grown-ups">
+          <GearIcon />
+        </button>
       </header>
 
-      <Buddy mood="happy" messages={["Hi! I'm Shield Buddy. Got something that feels weird? Let's check it."]} />
-
-      <button className="home-check" type="button" onClick={onCheck}>
-        <ScanIcon />
-        Check something
-      </button>
-
-      <nav className="home-links" aria-label="More">
-        <button type="button" onClick={onLearn}>
-          Learn about scams
-        </button>
-        <span aria-hidden="true">·</span>
-        <button type="button" onClick={onGrownUps}>
-          For grown-ups
-        </button>
+      <nav className="home-cards" aria-label="What do you want to do?">
+        <OptionCard
+          icon={<CameraIcon />}
+          tone="orange"
+          title="Check a picture"
+          hint="Find red flags in a screenshot"
+          onClick={() => onTool('picture')}
+        />
+        <OptionCard
+          icon={<MessageIcon />}
+          tone="peach"
+          title="Check a message"
+          hint="See if it might be a scam"
+          onClick={() => onTool('message')}
+        />
+        <OptionCard
+          icon={<LinkIcon />}
+          tone="gold"
+          title="Check a link"
+          hint="Check a website before you open it"
+          onClick={() => onTool('link')}
+        />
+        <OptionCard icon={<BookIcon />} tone="amber" title="Learn about scams" hint="Play the scam game" onClick={onLearn} />
       </nav>
+
+      <button className="home-buddy" type="button" onClick={onAsk}>
+        <span className="buddy-body">
+          <img className="home-buddy-image" src={IMAGES.happy} alt="" />
+        </span>
+        <span className="home-buddy-bubble">
+          <strong>Not sure about something?</strong>
+          <span>Tap me, and we can check it together.</span>
+        </span>
+      </button>
     </main>
   )
 }

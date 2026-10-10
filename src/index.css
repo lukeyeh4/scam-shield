@@ -26,9 +26,9 @@
   --text-large: 1.2em;
   --text-heading: 1.4em;
   --text-title: 2.4em;
-  /* Fonts: a bouncy one for headings and buttons, a rounded, very readable one
-     for everything else (the fake screens keep the real phone font) */
-  --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  /* Fonts: one rounded, very readable font everywhere (headings and buttons use
+     --font-display, so it can differ; the fake screens keep the real phone font) */
+  --font-display: 'Nunito', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* Large, easy-to-read text that grows a little on bigger screens */
   font-family: var(--font-body);
@@ -355,83 +355,194 @@ button:active {
   color: var(--muted);
 }
 
-/* Home: the logo, one big button to check something, and two small links */
+/* Home: a header card with the logo, big warm cards, then Shield Buddy */
 .home {
-  gap: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 20px 16px 32px;
 }
 
 .home-header {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
-}
-
-.home-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: var(--text-title);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  gap: 14px;
+  padding: 16px 16px 16px 20px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .home-logo {
-  width: 1.1em;
-  height: 1.1em;
+  flex: none;
+  width: 52px;
+  height: 52px;
+}
+
+.home-name {
+  flex: 1;
+}
+
+.home-title {
+  font-size: var(--text-heading);
+  font-weight: 800;
+  line-height: 1.15;
 }
 
 .home-tagline {
   color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.home-gear {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--surface-soft);
+}
+
+.home-gear svg {
+  width: 26px;
+  height: 26px;
+}
+
+.home-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Shield Buddy at the bottom, with a speech bubble: tap to open the chat */
+.home-buddy {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 0;
+  background: none;
+  text-align: left;
+}
+
+.home-buddy-image {
+  display: block;
+  width: 120px;
+  height: 120px;
+}
+
+.home-buddy-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 24px;
+  padding: 14px 18px;
+  border-radius: 22px 22px 22px 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-buddy-bubble strong {
   font-size: var(--text-large);
 }
 
-.home-check {
+.home-buddy-bubble span {
+  color: var(--muted);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .home-buddy:hover .home-buddy-bubble {
+    box-shadow: var(--shadow-md), inset 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+}
+
+/* A big, warm card to tap (OptionCard): on the home screen and in the chat */
+.option-card {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
+  gap: 16px;
   width: 100%;
   min-height: 88px;
-  border-radius: 28px;
-  background: var(--accent-gradient);
-  color: var(--on-accent);
-  font-size: var(--text-heading);
-  font-weight: 800;
-  box-shadow: 0 4px 8px rgb(90 55 20 / 0.08), 0 18px 40px rgb(217 98 43 / 0.3);
+  padding: 14px 16px;
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  text-align: left;
   transition:
     transform 200ms var(--ease),
     box-shadow 200ms var(--ease);
 }
 
-.home-check svg {
-  width: 36px;
-  height: 36px;
+.option-card-plain {
+  min-height: 64px;
+  padding-left: 24px;
+}
+
+.option-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 18px;
+  color: #fff;
+}
+
+.option-tile svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* Warm tile colours, close together so they never clash */
+.tone-orange {
+  background: linear-gradient(135deg, #ea8350 0%, #f2a070 100%);
+}
+
+.tone-peach {
+  background: linear-gradient(135deg, #ee9478 0%, #f4b29a 100%);
+}
+
+.tone-gold {
+  background: linear-gradient(135deg, #eeae4a 0%, #f4c76e 100%);
+}
+
+.tone-amber {
+  background: linear-gradient(135deg, #e5975a 0%, #efb47e 100%);
+}
+
+.option-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.option-title {
+  font-size: var(--text-large);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.option-hint {
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.option-arrow {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  color: var(--accent);
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .home-check:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgb(90 55 20 / 0.1), 0 24px 48px rgb(217 98 43 / 0.36);
+  .option-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), inset 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
   }
-}
-
-.home-links {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--muted);
-}
-
-.home-links button {
-  min-height: 48px;
-  padding: 0 12px;
-  background: none;
-  color: var(--ink);
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 4px;
 }
 
 .menu-heading {

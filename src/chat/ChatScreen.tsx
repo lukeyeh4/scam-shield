@@ -3,7 +3,8 @@ import { IMAGES } from '../buddy/moods'
 import { useDots } from '../buddy/useDots'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
-import { LinkIcon, MessageIcon, MicIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
+import { CameraIcon, LinkIcon, MessageIcon, MicIcon, QuestionIcon, SendIcon } from '../icons'
+import { OptionCard, type Tone } from '../screens/OptionCard'
 import type { Mood } from '../types'
 import { type ChatIcon, type ChatOption, findLink, replyTo, STEPS, type StepId } from './script'
 import './chat.css'
@@ -16,11 +17,12 @@ const useReveal = REVEAL === 'dots' ? useDots : useTypewriter
 
 type Entry = { from: 'buddy'; text: string; mood: Mood } | { from: 'kid'; text: string }
 
-const ICONS: Record<ChatIcon, typeof ScanIcon> = {
-  picture: ScanIcon,
-  link: LinkIcon,
-  message: MessageIcon,
-  question: QuestionIcon,
+// The same icons and warm colours as the cards on the home screen
+const ICONS: Record<ChatIcon, { Icon: typeof CameraIcon; tone: Tone }> = {
+  picture: { Icon: CameraIcon, tone: 'orange' },
+  message: { Icon: MessageIcon, tone: 'peach' },
+  link: { Icon: LinkIcon, tone: 'gold' },
+  question: { Icon: QuestionIcon, tone: 'amber' },
 }
 
 // What Buddy says on arriving at a step
@@ -222,21 +224,15 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
         {ready && (
           <div key={shown} className="ask-options" role="group" aria-label="Your answer">
             {STEPS[step].options.map((option) => {
-              const Icon = option.icon && ICONS[option.icon]
+              const look = option.icon && ICONS[option.icon]
               return (
-                <button
+                <OptionCard
                   key={option.label}
-                  className={Icon ? 'ask-option' : 'ask-option ask-option-plain'}
-                  type="button"
+                  title={option.label}
+                  icon={look && <look.Icon />}
+                  tone={look ? look.tone : undefined}
                   onClick={() => choose(option)}
-                >
-                  {Icon && (
-                    <span className="ask-option-icon">
-                      <Icon />
-                    </span>
-                  )}
-                  {option.label}
-                </button>
+                />
               )
             })}
           </div>

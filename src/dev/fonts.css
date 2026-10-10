@@ -3,9 +3,9 @@
    --font-body (everything else). Once one is chosen, copy it into :root, trim the
    Google Fonts link in index.html to the fonts used, and delete this file. */
 
-/* Nunito for everything: rounded and calm */
-:root[data-font='nunito'] {
-  --font-display: 'Nunito', system-ui, sans-serif;
+/* Fredoka headings and buttons: bouncier, with Nunito text */
+:root[data-font='fredoka'] {
+  --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
 }
 
 /* Baloo 2 headings and buttons: chunkier and bouncier */

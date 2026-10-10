@@ -113,8 +113,9 @@ export default function App() {
   } else {
     content = (
       <MainMenu
+        onTool={check}
         onLearn={() => learn(1)}
-        onCheck={ask}
+        onAsk={ask}
         onGrownUps={() => navigate({ name: 'grownUps' })}
       />
     )
