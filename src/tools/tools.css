@@ -1,6 +1,6 @@
-/* The tools (Check a picture, a link, a message), Tell a grown-up and the
-   grown-ups' area share one look: a note that it's a preview, a step bar, then
-   one step at a time in a centred column, with big buttons */
+/* The tools (Check a picture, a link, a message) and the grown-ups' area share
+   one calm look: a slim progress bar, one step at a time in a centred column
+   with a clear heading and big buttons, and a quiet preview note at the bottom */
 .tool {
   min-height: 100dvh;
 }
@@ -9,71 +9,47 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 28px;
   max-width: 960px;
   margin: 0 auto;
-  padding: 0 16px 48px;
+  padding: 8px 16px 32px;
 }
 
 .preview-note {
-  padding: 4px 14px;
-  border-radius: 999px;
-  background: var(--surface-soft);
   color: var(--muted);
   font-size: var(--text-small);
-  font-weight: 600;
 }
 
-/* Step bar: numbered steps, done ones filled in, the current one dark */
-.tool-steps {
+/* Progress: "Step 1 of 3" over a bar in as many pieces as there are steps */
+.tool-progress {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   width: 100%;
   max-width: 560px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-.tool-steps li {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: var(--surface-soft);
+.tool-progress-text {
   color: var(--muted);
   font-size: var(--text-small);
   font-weight: 700;
 }
 
-.tool-step-number {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--surface);
+.tool-progress-bar {
+  display: flex;
+  gap: 6px;
 }
 
-.tool-steps .is-done {
-  color: var(--ink);
+.tool-progress-bar span {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-hover);
+  transition: background-color 300ms var(--ease);
 }
 
-.tool-steps .is-done .tool-step-number {
+.tool-progress-bar .is-on {
   background: var(--ink);
-  color: #fff;
-}
-
-.tool-steps .is-current {
-  background: var(--ink);
-  color: #fff;
-}
-
-.tool-steps .is-current .tool-step-number {
-  background: rgb(255 255 255 / 0.18);
 }
 
 .tool-step {
@@ -86,13 +62,9 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 18px;
+  gap: 20px;
   width: 100%;
   max-width: 560px;
-}
-
-.tool-column .buddy {
-  justify-content: center;
 }
 
 .tool-heading {
@@ -103,150 +75,6 @@
 
 .tool-text {
   color: var(--muted);
-}
-
-.tool-small {
-  font-size: var(--text-small);
-  text-align: center;
-}
-
-/* Big side-by-side choices, e.g. Choose a screenshot / Take a photo */
-.tool-choices {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.tool-choices-list {
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-.tool-choice {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 24px 16px;
-  border-radius: 24px;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--hairline);
-  text-align: center;
-}
-
-.tool-choice-icon {
-  display: grid;
-  place-items: center;
-  width: 72px;
-  height: 72px;
-  margin-bottom: 8px;
-  border-radius: 22px;
-  background: linear-gradient(135deg, #1d2433 0%, #34405a 100%);
-  color: #fff;
-}
-
-.tool-choice-icon svg {
-  width: 38px;
-  height: 38px;
-}
-
-.tool-choice-label {
-  font-size: var(--text-large);
-  font-weight: 700;
-}
-
-.tool-choice-hint {
-  color: var(--muted);
-  font-size: var(--text-small);
-}
-
-.tool-choice,
-.tool-person,
-.tool-button {
-  transition:
-    transform 200ms var(--ease),
-    box-shadow 200ms var(--ease);
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .tool-choice:hover,
-  .tool-person:hover,
-  .tool-button:not(:disabled):hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md), inset 0 0 0 2px var(--ink);
-  }
-
-  .tool-button-main:not(:disabled):hover {
-    box-shadow: var(--shadow-md);
-  }
-}
-
-/* A trusted grown-up to tell: their first letter, name and who they are */
-.tool-person {
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 14px;
-  align-items: center;
-  width: 100%;
-  padding: 14px 18px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--hairline);
-  text-align: left;
-}
-
-.tool-person-initial {
-  display: grid;
-  grid-row: span 2;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: var(--surface-soft);
-  font-size: var(--text-large);
-  font-weight: 800;
-}
-
-.tool-person-initial svg {
-  width: 28px;
-  height: 28px;
-}
-
-.tool-tip {
-  padding: 14px 18px;
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--hairline);
-}
-
-.tool-tip summary {
-  min-height: 32px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.tool-tip p {
-  margin-top: 8px;
-  color: var(--muted);
-}
-
-/* The fake screen beside its words, stacked on narrow screens */
-.tool-split {
-  display: grid;
-  grid-template-columns: minmax(0, 340px) minmax(0, 420px);
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-  width: 100%;
-}
-
-.tool-picture .mockup {
-  height: 600px;
-  margin: 0 auto;
 }
 
 .tool-actions {
@@ -261,18 +89,21 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 64px;
+  min-height: 68px;
   padding: 8px 24px;
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--hairline);
   font-size: var(--text-large);
   font-weight: 700;
+  transition:
+    transform 200ms var(--ease),
+    box-shadow 200ms var(--ease);
 }
 
 .tool-button svg {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
 }
 
 .tool-button-main {
@@ -281,41 +112,40 @@
   box-shadow: var(--shadow-md);
 }
 
-.tool-button:disabled {
-  cursor: default;
-  opacity: 0.45;
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .tool-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md), inset 0 0 0 2px var(--ink);
+  }
+
+  .tool-button-main:not(:disabled):hover {
+    box-shadow: var(--shadow-md);
+  }
 }
 
 .tool-text-button {
-  min-height: 44px;
+  min-height: 48px;
   background: none;
-  color: var(--muted);
+  color: var(--ink);
   font-weight: 600;
   text-decoration: underline;
+  text-underline-offset: 4px;
 }
 
-.tool-text-button:disabled {
-  cursor: default;
-  opacity: 0.5;
+/* "How do I take a screenshot?": a plain line that opens, not a box */
+.tool-tip summary {
+  min-height: 44px;
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tool-tip p {
+  color: var(--muted);
 }
 
 /* Where a link or message is pasted in */
-.tool-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.tool-field-label {
-  color: var(--muted);
-  font-size: var(--text-small);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.tool-field input,
-.tool-field textarea,
+.tool-input,
 .settings-input {
   width: 100%;
   padding: 16px 18px;
@@ -328,43 +158,25 @@
   resize: none;
 }
 
-.tool-field input:focus-visible,
-.tool-field textarea:focus-visible,
+.tool-input:focus-visible,
 .settings-input:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 2px;
 }
 
-.tool-card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px;
-  border-radius: 24px;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--hairline);
+/* The fake screen beside its words, stacked on narrower screens */
+.tool-split {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 420px);
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
 }
 
-/* What the player says to a grown-up: as a message, or big enough to show */
-.say-bubble {
-  align-self: flex-end;
-  max-width: 34ch;
-  padding: 12px 18px;
-  border-radius: 22px 22px 8px 22px;
-  background: linear-gradient(135deg, #1d2433 0%, #34405a 100%);
-  color: #fff;
-  font-weight: 600;
-}
-
-.say-card {
-  padding: 28px 24px;
-  border-radius: 28px;
-  background: var(--surface);
-  box-shadow: var(--shadow-md);
-  font-size: var(--text-heading);
-  font-weight: 800;
-  line-height: 1.3;
-  text-align: center;
+.tool-picture .mockup {
+  height: 600px;
+  margin: 0 auto;
 }
 
 /* While a check runs: Buddy, and a bar that sweeps across */
@@ -378,13 +190,17 @@
   padding-top: 32px;
 }
 
+.tool-checking .buddy {
+  justify-content: center;
+}
+
 .checking-bar {
   position: relative;
   width: 100%;
-  height: 10px;
+  height: 8px;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--surface-soft);
+  background: var(--surface-hover);
 }
 
 .checking-bar::after {
@@ -417,14 +233,11 @@
 /* The result: what was checked beside how risky it looks and the numbered clues */
 .result {
   display: grid;
-  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
-  gap: 32px;
+  grid-template-columns: minmax(0, 340px) minmax(0, 440px);
+  justify-content: center;
+  gap: 40px;
   align-items: center;
   width: 100%;
-  padding: 24px;
-  border-radius: 28px;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--hairline);
 }
 
 .result .flag-seen {
@@ -436,21 +249,16 @@
 .result-panel {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
+  gap: 20px;
 }
 
+/* How risky it looks, as one coloured heading */
 .result-title {
+  padding: 14px 20px;
+  border-radius: var(--radius);
   font-size: var(--text-heading);
   font-weight: 800;
-  line-height: 1.15;
-}
-
-.risk-badge {
-  padding: 4px 14px;
-  border-radius: 999px;
-  font-size: var(--text-small);
-  font-weight: 700;
+  line-height: 1.2;
 }
 
 .risk-high {
@@ -471,9 +279,8 @@
 .result-clues {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  margin: 4px 0 0;
+  gap: 16px;
+  margin: 0;
   padding: 0;
   list-style: none;
   counter-reset: clue;
@@ -482,10 +289,7 @@
 .result-clue {
   display: grid;
   grid-template-columns: 32px 1fr;
-  column-gap: 12px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: var(--surface-soft);
+  column-gap: 14px;
   counter-increment: clue;
 }
 
@@ -512,26 +316,21 @@
 }
 
 /* A checked link or message, with each clue's words marked and numbered */
-.checked-text {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .marked-text {
   line-height: 2;
   overflow-wrap: anywhere;
 }
 
-.checked-link .marked-text {
+.marked-text.checked-link {
   padding: 16px 18px;
   border-radius: 16px;
-  background: var(--surface-soft);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--hairline);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-.checked-message .marked-text {
-  align-self: flex-start;
+.marked-text.checked-message {
+  justify-self: start;
   padding: 12px 18px;
   border-radius: 22px 22px 22px 8px;
   background: #e9e9eb;
@@ -640,30 +439,6 @@
   accent-color: var(--ink);
 }
 
-.settings-list {
-  display: flex;
-  flex-direction: column;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.settings-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 52px;
-  border-bottom: 1px solid var(--hairline);
-}
-
-.settings-list li span {
-  color: var(--muted);
-}
-
-.settings-list strong {
-  color: var(--ink);
-}
-
 .settings-toggle {
   display: flex;
   align-items: center;
@@ -707,27 +482,15 @@
 
 /* Below tablet-landscape width the picture goes above its words */
 @media (max-width: 860px) {
-  .tool-split {
-    grid-template-columns: minmax(0, 420px);
+  .tool-split,
+  .result {
+    grid-template-columns: minmax(0, 440px);
+    gap: 28px;
   }
 }
 
-@media (max-width: 760px) {
-  .tool-split,
-  .result {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .result {
-    padding: 16px;
-  }
-
+@media (max-width: 560px) {
   .tool-picture .mockup {
     height: 540px;
-  }
-
-  .tool-steps li {
-    justify-content: center;
-    padding: 8px;
   }
 }

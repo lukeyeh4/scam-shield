@@ -4,20 +4,20 @@ import './tools.css'
 
 type ToolScreenProps = {
   title: string
-  // The steps, named in a word or two (e.g. Choose, Check, Result), and which one this is.
-  // Leave out for a screen with only one step.
-  steps?: string[]
+  // How many steps the tool has, and which one this is (from 0). Leave out for a
+  // screen with only one step.
+  steps?: number
   step?: number
   // The first step goes back to the menu; later steps go back a step
   onBack: () => void
-  // These screens are wireframes: a note says nothing really happens yet
+  // These screens are wireframes: a quiet note at the bottom says nothing really happens yet
   note?: string
   children: ReactNode
 }
 
-// The frame every tool shares: the header with a back button, a note that it's a
-// preview, the step bar, then the step itself
-export function ToolScreen({ title, steps, step = 0, onBack, note = 'Preview: nothing is checked yet', children }: ToolScreenProps) {
+// The frame every tool shares: the header with a back button, a slim progress bar,
+// the step itself, then the preview note
+export function ToolScreen({ title, steps, step = 0, onBack, note = 'Preview: nothing is really checked yet', children }: ToolScreenProps) {
   return (
     <div className="tool">
       <header className="scenario-header">
@@ -28,32 +28,23 @@ export function ToolScreen({ title, steps, step = 0, onBack, note = 'Preview: no
       </header>
 
       <main className="tool-main">
-        <p className="preview-note">{note}</p>
         {steps && (
-          <ol className="tool-steps">
-            {steps.map((name, i) => (
-              <li
-                key={name}
-                className={i < step ? 'is-done' : i === step ? 'is-current' : undefined}
-                aria-current={i === step ? 'step' : undefined}
-              >
-                <span className="tool-step-number" aria-hidden="true">
-                  {i + 1}
-                </span>
-                <span>
-                  <span className="sr-only">
-                    Step {i + 1} of {steps.length}:{' '}
-                  </span>
-                  {name}
-                </span>
-              </li>
-            ))}
-          </ol>
+          <div className="tool-progress">
+            <span className="tool-progress-text">
+              Step {step + 1} of {steps}
+            </span>
+            <span className="tool-progress-bar" aria-hidden="true">
+              {Array.from({ length: steps }, (_, i) => (
+                <span key={i} className={i <= step ? 'is-on' : undefined} />
+              ))}
+            </span>
+          </div>
         )}
         {/* A new key for each step, so it slides in */}
         <div key={step} className="tool-step screen-enter">
           {children}
         </div>
+        <p className="preview-note">{note}</p>
       </main>
     </div>
   )
@@ -78,6 +69,5 @@ export function Checking({ onDone }: { onDone: () => void }) {
 // Where every tool can lead next
 export type ToolNav = {
   onHome: () => void
-  onTell: () => void
   onAsk: () => void
 }

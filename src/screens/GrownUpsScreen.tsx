@@ -1,10 +1,9 @@
 import { type ReactNode, useState } from 'react'
 import { LockIcon } from '../icons'
-import { exampleGrownUps } from '../tools/examples'
 import { ToolScreen } from '../tools/ToolScreen'
 
 // The grown-ups' area (a wireframe: nothing is saved). A parent gate first, then
-// the settings: how checks work, trusted grown-ups, a family code word, and
+// the settings: how checks work, a family code word, and
 // whether the child can type or talk to Shield Buddy.
 // Written for adults, so the kids' reading-level rules don't apply here.
 
@@ -74,25 +73,6 @@ function Settings({ onDone }: { onDone: () => void }) {
           <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />I understand, and
           agree to my child using the checks
         </label>
-      </Section>
-
-      <Section title="Trusted grown-ups">
-        <p>Your child can send something they checked to these people.</p>
-        <ul className="settings-list">
-          {exampleGrownUps.map((g) => (
-            <li key={g.name}>
-              <span>
-                <strong>{g.name}</strong> {g.note}
-              </span>
-              <button className="tool-text-button" type="button" disabled>
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-        <button className="tool-button" type="button" disabled>
-          Add a grown-up
-        </button>
       </Section>
 
       <Section title="Family code word">

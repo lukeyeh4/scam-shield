@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Buddy } from '../buddy/Buddy'
 import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
 import { Mockup } from '../mockups/Mockup'
 import { examplePicture, pictureMarks, pictureResult } from './examples'
@@ -11,35 +10,28 @@ const STEP: Record<Stage, number> = { choose: 0, check: 1, checking: 1, result: 
 
 // Check a picture, the main tool (a wireframe: any choice uses the example picture).
 // Choose a photo or screenshot, make sure it's the right one, then see the result.
-export function PictureCheck({ onHome, onTell, onAsk }: ToolNav) {
+export function PictureCheck({ onHome, onAsk }: ToolNav) {
   const [stage, setStage] = useState<Stage>('choose')
   const back = () => (stage === 'choose' ? onHome() : setStage(stage === 'result' ? 'check' : 'choose'))
 
   return (
-    <ToolScreen title="Check a picture" steps={['Choose', 'Check', 'Result']} step={STEP[stage]} onBack={back}>
+    <ToolScreen title="Check a picture" steps={3} step={STEP[stage]} onBack={back}>
       {stage === 'choose' && (
         <div className="tool-column">
-          <Buddy mood="curious" messages={['Show me the thing that feels weird. A screenshot or a photo works.']} />
-          <div className="tool-choices">
-            <button className="tool-choice" type="button" onClick={() => setStage('check')}>
-              <span className="tool-choice-icon">
-                <ImageIcon />
-              </span>
-              <span className="tool-choice-label">Choose a screenshot</span>
-              <span className="tool-choice-hint">From your photos</span>
+          <h2 className="tool-heading">Send a screenshot or photo</h2>
+          <div className="tool-actions">
+            <button className="tool-button tool-button-main" type="button" onClick={() => setStage('check')}>
+              <ImageIcon />
+              Choose a screenshot
             </button>
-            <button className="tool-choice" type="button" onClick={() => setStage('check')}>
-              <span className="tool-choice-icon">
-                <CameraIcon />
-              </span>
-              <span className="tool-choice-label">Take a photo</span>
-              <span className="tool-choice-hint">Use the camera</span>
+            <button className="tool-button" type="button" onClick={() => setStage('check')}>
+              <CameraIcon />
+              Take a photo
             </button>
           </div>
           <details className="tool-tip">
             <summary>How do I take a screenshot?</summary>
-            <p>On an iPad or iPhone: press the top button and the volume up button at the same time.</p>
-            <p>On most Android phones and tablets: press the power button and the volume down button together.</p>
+            <p>Press the top button and the volume up button at the same time.</p>
           </details>
         </div>
       )}
@@ -51,14 +43,13 @@ export function PictureCheck({ onHome, onTell, onAsk }: ToolNav) {
           </div>
           <div className="tool-column">
             <h2 className="tool-heading">Is this the right picture?</h2>
-            <p className="tool-text">Your picture is only used for this check.</p>
             <div className="tool-actions">
               <button className="tool-button tool-button-main" type="button" onClick={() => setStage('checking')}>
                 <ScanIcon />
-                Check this picture
+                Check it
               </button>
-              <button className="tool-button" type="button" onClick={() => setStage('choose')}>
-                Choose a different one
+              <button className="tool-text-button" type="button" onClick={() => setStage('choose')}>
+                Choose another
               </button>
             </div>
           </div>
@@ -75,7 +66,6 @@ export function PictureCheck({ onHome, onTell, onAsk }: ToolNav) {
             </div>
           }
           result={pictureResult}
-          onTell={onTell}
           onAgain={onAsk}
           onDone={onHome}
         />

@@ -9,7 +9,6 @@ import { EndScreen } from './screens/EndScreen'
 import { GrownUpsScreen } from './screens/GrownUpsScreen'
 import { MainMenu } from './screens/MainMenu'
 import { ScenarioScreen, type ScenarioStart } from './screens/ScenarioScreen'
-import { TellScreen } from './screens/TellScreen'
 import { PictureCheck } from './tools/PictureCheck'
 import { TextCheck } from './tools/TextCheck'
 
@@ -26,7 +25,6 @@ const TITLES: Record<Route['name'], string> = {
   learnDone: 'You did it!',
   ask: 'Ask Shield Buddy',
   check: 'Check for a scam',
-  tell: 'Tell a grown-up',
   grownUps: 'For grown-ups',
 }
 
@@ -38,10 +36,9 @@ const TOOL_TITLES: Record<Tool, string> = {
 
 const home = () => navigate({ name: 'home' })
 const check = (tool: Tool) => navigate({ name: 'check', tool })
-const tell = () => navigate({ name: 'tell' })
 const ask = () => navigate({ name: 'ask' })
 // Where every tool can lead next
-const toolNav = { onHome: home, onTell: tell, onAsk: ask }
+const toolNav = { onHome: home, onAsk: ask }
 const learn = (scenario: number, replace = false) => navigate({ name: 'learn', scenario }, { replace })
 
 export default function App() {
@@ -92,7 +89,7 @@ export default function App() {
   } else if (route.name === 'learnDone') {
     content = <EndScreen key={run} onPlayAgain={() => learn(1, true)} onMenu={home} />
   } else if (route.name === 'ask') {
-    content = <ChatScreen onBack={home} onLeave={(to) => (to === 'home' ? home() : to === 'tell' ? tell() : check(to))} />
+    content = <ChatScreen onBack={home} onLeave={(to) => (to === 'home' ? home() : check(to))} />
   } else if (route.name === 'check') {
     content =
       route.tool === 'picture' ? (
@@ -100,16 +97,13 @@ export default function App() {
       ) : (
         <TextCheck key={route.tool} kind={route.tool} {...toolNav} />
       )
-  } else if (route.name === 'tell') {
-    content = <TellScreen onHome={home} onAsk={ask} />
   } else if (route.name === 'grownUps') {
     content = <GrownUpsScreen onBack={home} />
   } else {
     content = (
       <MainMenu
-        onScan={() => check('picture')}
         onLearn={() => learn(1)}
-        onAsk={ask}
+        onCheck={ask}
         onGrownUps={() => navigate({ name: 'grownUps' })}
       />
     )

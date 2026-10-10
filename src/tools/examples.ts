@@ -57,10 +57,3 @@ export const messageResult: CheckResult = {
     },
   ],
 }
-
-// The trusted grown-ups a parent chose in setup (made up for the wireframes)
-export const exampleGrownUps = [
-  { name: 'Mom', note: 'Parent' },
-  { name: 'Dad', note: 'Parent' },
-  { name: 'Grandma', note: 'Family' },
-]

@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { IMAGES } from '../buddy/moods'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
-import { GrownUpIcon, LinkIcon, MessageIcon, MicIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
+import { LinkIcon, MessageIcon, MicIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
 import type { Mood } from '../types'
 import { type ChatIcon, type ChatOption, STEPS, type StepId } from './script'
 import './chat.css'
@@ -14,7 +14,6 @@ const ICONS: Record<ChatIcon, typeof ScanIcon> = {
   link: LinkIcon,
   message: MessageIcon,
   question: QuestionIcon,
-  grownUp: GrownUpIcon,
 }
 
 // What Buddy says on arriving at a step: its usual lines, or the ones for when

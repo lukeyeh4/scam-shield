@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Buddy } from '../buddy/Buddy'
-import { LinkIcon, MessageIcon } from '../icons'
+import { ScanIcon } from '../icons'
 import { exampleLink, exampleMessage, linkResult, messageResult } from './examples'
 import { MarkedText, ResultView } from './Result'
 import { Checking, ToolScreen, type ToolNav } from './ToolScreen'
@@ -10,52 +9,44 @@ import { Checking, ToolScreen, type ToolNav } from './ToolScreen'
 const KINDS = {
   link: {
     title: 'Check a link',
-    icon: LinkIcon,
-    buddy: ["Copy the link, then paste it here. I'll check where it really goes."],
-    label: 'The link',
+    heading: 'Paste the link',
     example: exampleLink,
-    tip: "Don't tap the link to check it! Press and hold it, then tap Copy.",
-    button: 'Check this link',
+    tip: "Don't tap the link. Press and hold it, then tap Copy.",
     result: linkResult,
   },
   message: {
     title: 'Check a message',
-    icon: MessageIcon,
-    buddy: ["Copy the message, then paste it here. I'll look for clues."],
-    label: 'The message',
+    heading: 'Paste the message',
     example: exampleMessage,
-    tip: 'Press and hold the message, then tap Copy. Has a picture in it? Check a picture instead.',
-    button: 'Check this message',
+    tip: 'Press and hold the message, then tap Copy.',
     result: messageResult,
   },
 }
 
 type Stage = 'paste' | 'checking' | 'result'
 
-export function TextCheck({ kind, onHome, onTell, onAsk }: ToolNav & { kind: keyof typeof KINDS }) {
+export function TextCheck({ kind, onHome, onAsk }: ToolNav & { kind: keyof typeof KINDS }) {
   const k = KINDS[kind]
   const [stage, setStage] = useState<Stage>('paste')
   const back = () => (stage === 'paste' ? onHome() : setStage('paste'))
-  const Icon = k.icon
 
   return (
-    <ToolScreen title={k.title} steps={['Paste', 'Result']} step={stage === 'paste' ? 0 : 1} onBack={back}>
+    <ToolScreen title={k.title} steps={2} step={stage === 'paste' ? 0 : 1} onBack={back}>
       {stage === 'paste' && (
         <div className="tool-column">
-          <Buddy mood="curious" messages={k.buddy} />
-          <label className="tool-field">
-            <span className="tool-field-label">{k.label}</span>
-            {kind === 'link' ? (
-              <input type="text" value={k.example} readOnly />
-            ) : (
-              <textarea value={k.example} rows={4} readOnly />
-            )}
-          </label>
+          <h2 className="tool-heading" id="paste-heading">
+            {k.heading}
+          </h2>
+          {kind === 'link' ? (
+            <input className="tool-input" type="text" value={k.example} readOnly aria-labelledby="paste-heading" />
+          ) : (
+            <textarea className="tool-input" value={k.example} rows={3} readOnly aria-labelledby="paste-heading" />
+          )}
           <p className="tool-text">{k.tip}</p>
           <div className="tool-actions">
             <button className="tool-button tool-button-main" type="button" onClick={() => setStage('checking')}>
-              <Icon />
-              {k.button}
+              <ScanIcon />
+              Check it
             </button>
           </div>
         </div>
@@ -65,14 +56,8 @@ export function TextCheck({ kind, onHome, onTell, onAsk }: ToolNav & { kind: key
 
       {stage === 'result' && (
         <ResultView
-          subject={
-            <div className={`checked-text checked-${kind}`}>
-              <span className="tool-field-label">{k.label}</span>
-              <MarkedText text={k.example} clues={k.result.clues} />
-            </div>
-          }
+          subject={<MarkedText text={k.example} clues={k.result.clues} className={`checked-${kind}`} />}
           result={k.result}
-          onTell={onTell}
           onAgain={onAsk}
           onDone={onHome}
         />

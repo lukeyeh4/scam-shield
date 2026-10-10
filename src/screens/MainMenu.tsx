@@ -1,39 +1,36 @@
 import { Buddy } from '../buddy/Buddy'
-import { IMAGES } from '../buddy/moods'
-import { LearnIcon } from '../icons'
-import { MenuTile, ScanCard } from './MenuCards'
+import { ScanIcon } from '../icons'
 
 type MainMenuProps = {
-  onScan: () => void
+  onCheck: () => void
   onLearn: () => void
-  onAsk: () => void
   onGrownUps: () => void
 }
 
-// The home screen: Check a picture first (the main tool), then the game (the
-// tutorial) and the chat with Buddy. The grown-ups' area is a small link at the bottom.
-export function MainMenu({ onScan, onLearn, onAsk, onGrownUps }: MainMenuProps) {
+// The home screen: one big button to check something (it opens the chat with
+// Buddy, which leads to the right checker), with the game and the grown-ups'
+// area as small links underneath
+export function MainMenu({ onCheck, onLearn, onGrownUps }: MainMenuProps) {
   return (
     <main className="menu home">
       <h1 className="menu-title">Scam Shield</h1>
 
-      <Buddy mood="happy" messages={["Hi! I'm Shield Buddy. What would you like to do?"]} />
+      <Buddy mood="happy" messages={["Hi! I'm Shield Buddy. Got something that feels weird? Let's check it."]} />
 
-      <ScanCard onClick={onScan} />
-
-      <div className="menu-tiles">
-        <MenuTile
-          icon={<img className="menu-tile-buddy" src={IMAGES.happy} alt="" />}
-          label="Ask Shield Buddy"
-          hint="Not sure about something? Let's check it together."
-          onClick={onAsk}
-        />
-        <MenuTile icon={<LearnIcon />} label="Learn about scams" hint="Play the game" onClick={onLearn} />
-      </div>
-
-      <button className="menu-grown-ups" type="button" onClick={onGrownUps}>
-        For grown-ups
+      <button className="home-check" type="button" onClick={onCheck}>
+        <ScanIcon />
+        Check something
       </button>
+
+      <nav className="home-links" aria-label="More">
+        <button type="button" onClick={onLearn}>
+          Learn about scams
+        </button>
+        <span aria-hidden="true">·</span>
+        <button type="button" onClick={onGrownUps}>
+          For grown-ups
+        </button>
+      </nav>
     </main>
   )
 }

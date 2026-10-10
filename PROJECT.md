@@ -29,24 +29,24 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 - **Results look like the recap.** A tool shows the thing being checked with the suspicious parts highlighted, each with a short kid-friendly reason, plus an overall risk level, just like the Stop, Check, Tell screen highlights red flags.
 - **Super accessible.** Big buttons, large text, simple words, read-aloud, works with screen readers (VoiceOver, TalkBack) and switch control, high contrast, and respects reduced motion.
 - **Check and Tell together.** Both are good choices; the exact message (e.g. "Check, then show a grown-up") is still to work out.
-- **Parent setup, kid use.** A grown-up sets the app up once (e.g. who the kid's trusted adults are, a family code word); after that the kid can open it and check something on their own, any time.
+- **Parent setup, kid use.** A grown-up sets the app up once (e.g. agreeing to how checks work, a family code word); after that the kid can open it and check something on their own, any time.
 - **An app.** Build it as a website first, then turn it into a phone and tablet app (see "Turning it into an app" below).
 - **Flagship: Check a picture.** The main feature, first on the home screen. A kid takes a screenshot or photo of anything (a text, a game chat, an ad, a website, a pop-up), and the AI marks the points of concern on the picture, each with a short reason, plus an overall risk level.
 
 **Menus and parent setup**
 
 - [x] Addresses for every place in the app (`src/router.ts`), so the back button works and a link (e.g. from a share button later) can open any part
-- [x] New home screen: Check a picture as the big main card, then Ask Shield Buddy and Learn about scams, and a small For grown-ups link
+- [x] Home screen, simplified: Buddy says hi, one big **Check something** button (opens the chat), and two text links: Learn about scams · For grown-ups
 - [x] "Check for a scam" screen listing the tools, each "Coming soon" until it's built
 - [x] **Wireframes for every screen the tools need** (branch `wireframes`), all on one shared frame (`src/tools/ToolScreen.tsx`): a "Preview" note, a numbered step bar, one step at a time, big buttons, and Menu / Back that go where they say. Nothing is really checked, sent or saved; every check shows a made-up example result.
   - Check a picture: Choose (screenshot or photo, with "How do I take a screenshot?") → Check (is this the right picture?) → Result
   - Check a link and Check a message: Paste → Result, with the clues marked and numbered in the text
-  - One result screen for every tool (`src/tools/Result.tsx`): what was checked, the risk level (never "safe"), numbered clues, then Tell a grown-up / Check something else / I'm done. Results follow one format (`CheckResult` in `src/tools/examples.ts`), ready for the AI to fill in
-  - Tell a grown-up: Who (the trusted grown-ups, or "a grown-up who is with me") → Tell (send them a message, or show it big on screen) → Done
-  - For grown-ups: a parent gate (a sum), then settings: how checks work (agree), trusted grown-ups, family code word, typing questions on/off, talking to Buddy on/off
+  - One result screen for every tool (`src/tools/Result.tsx`): what was checked, the risk level as a coloured heading (never "safe"), numbered clues, "show a grown-up", then Check something else / I'm done. Results follow one format (`CheckResult` in `src/tools/examples.ts`), ready for the AI to fill in
+  - For grown-ups: a parent gate (a sum), then settings: how checks work (agree), family code word, typing questions on/off, talking to Buddy on/off
   - The chat's answers open these screens
+  - Decluttered (2026-10-10): fewer boxes and words; a slim progress bar instead of step pills; a heading per step instead of Buddy's bubble; the preview note moved to the bottom; results without the outer card or clue boxes
 - [ ] Parent gate: replace the sum with something sturdier before launch, and check it meets each app store's rules
-- [ ] Parent setup, built together with the first AI tool, before any real check can be sent: agree to how checks work and what is sent, choose trusted adults, and set a family code word. The game never needs it.
+- [ ] Parent setup, built together with the first AI tool, before any real check can be sent: agree to how checks work and what is sent, and set a family code word. The game never needs it.
 - [ ] When the app is first opened: the kid can play the game straight away; the first time they open a tool that sends something to be checked, it asks them to get a grown-up to finish setup
 
 **Tools (in order)**
@@ -61,15 +61,15 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 - [ ] **QR code scanner:** scan a code with the camera, show where it really goes, then run it through the link checker before anything opens
 - [ ] **Message checker** (wireframe done): paste a text, email or DM; the AI highlights the red flags in it (rushing you, a prize, asking for a code, password, gift card or money, a new number) and explains each one
 - [ ] **"Is this real?" questions:** a short tap-through checklist for when there's nothing to scan (Is someone rushing me? Do they want money, a code or a password? Did I expect this?)
-- [ ] **Tell an adult helper** (wireframe done): send what was checked, with the highlights, to a trusted adult set up by the parent, or show the kid what to say ("I got this and I'm not sure")
+- Decided 2026-10-10: **no separate Tell a grown-up screen or option.** Telling isn't one of the things to check; Buddy and every result say to show a grown-up instead. (The Tell screen and the trusted grown-ups setting were removed.)
 - [ ] **Family code word:** set up a secret word with a grown-up (the tip from scenario 1)
 - [ ] **Scam library:** short cards on common scams kids meet (free Robux, fake giveaways, "new number" texts, account locked)
 
 **Ask Shield Buddy: one chat for checking**
 
-One chat with Shield Buddy, where kids tap options or (later) type a question. It would replace the "More checks" screen; the game stays separate as Learn about scams. Built in stages:
+One chat with Shield Buddy, where kids tap options or (later) type a question. The home screen's **Check something** button opens it; the game stays separate as Learn about scams. Built in stages:
 
-- [x] **Stage 1, tap options only (no AI):** Buddy asks "What do you want to check?" with big buttons (*A picture*, *A link*, *A message*, *I'm not sure*, *Tell a grown-up*). Every Buddy line is scripted, so today's rules still hold. *I'm not sure* walks through the "Is this real?" questions. Built on branch `buddy-chat` (`src/chat/`): it replaced the "More checks" screen, and *A picture* offers the example scan. The box for typing is shown but turned off.
+- [x] **Stage 1, tap options only (no AI):** Buddy asks "What do you want to check?" with big buttons (*A picture*, *A link*, *A message*, *I'm not sure*). Picture, link and message: one short line and one button that opens the checker. Every Buddy line is scripted, so today's rules still hold. *I'm not sure* walks through the "Is this real?" questions. Built on branch `buddy-chat` (`src/chat/`): it replaced the "More checks" screen, and *A picture* offers the example scan. The box for typing is shown but turned off.
 - [ ] **Stage 2, Check a picture inside the chat:** the kid sends a screenshot or photo, and Buddy replies with the scan result as a card (the picture with numbered boxes, the reasons, the risk level). This is where the AI comes in, for the scan result only.
 - [ ] **Stage 3, typed questions about scams:** e.g. "Someone in my game wants my code". The AI only answers scam and online-safety questions, and kindly sends everything else to a grown-up ("I can only help with scams"). Every answer ends by pointing to a grown-up, and Buddy reminds kids not to type their name, address, school or passwords. Parents can turn typing on or off in setup.
 - [ ] **Voice input: ask out loud.** The microphone button is in the chat (shown, turned off), and parents can turn it on or off in setup (wireframe). To build:
@@ -107,7 +107,6 @@ One chat with Shield Buddy, where kids tap options or (later) type a question. I
 - [ ] How Check and Tell fit together in the tutorial and in every tool result
 - [ ] What Shield Buddy says in the tools: today every Buddy line is scripted. Stage 3 of Ask Shield Buddy means changing that rule (and "Buddy isn't a trusted adult" must still hold)
 - [ ] Ask Shield Buddy: typing on for everyone, or only when a parent turns it on? Should AI-written answers look different from Buddy's scripted lines (e.g. a small "Buddy can make mistakes" note)?
-- [ ] Ask Shield Buddy: keep it as a tile on the home screen (as now), or make the chat the home screen?
 - [ ] What the parent setup includes, and whether parents get alerts or a history of checks
 
 ## 1. The game

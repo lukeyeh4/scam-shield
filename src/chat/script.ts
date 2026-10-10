@@ -3,6 +3,7 @@ import type { Mood } from '../types'
 // Everything Shield Buddy says in the chat, and the answers the player can tap.
 // All scripted (no AI yet), so the content rules in CLAUDE.md apply: simple words,
 // not scary, no shame, and Buddy always sends kids to a real grown-up.
+// Keep it short: a line or two from Buddy, and as few answers as possible.
 
 export type StepId =
   | 'start'
@@ -15,18 +16,17 @@ export type StepId =
   | 'question3'
   | 'question4'
   | 'answer'
-  | 'tell'
   | 'done'
 
-export type ChatIcon = 'picture' | 'link' | 'message' | 'question' | 'grownUp'
+export type ChatIcon = 'picture' | 'link' | 'message' | 'question'
 
 export type ChatOption = {
   label: string
   icon?: ChatIcon
   // The chat step this answer leads to
   next?: StepId
-  // Or leave the chat: open a tool, Tell a grown-up, or go back to the menu
-  leave?: 'picture' | 'link' | 'message' | 'tell' | 'home'
+  // Or leave the chat: open a tool, or go back to the menu
+  leave?: 'picture' | 'link' | 'message' | 'home'
   // A "yes" in the questions: counts as a scam clue
   clue?: boolean
 }
@@ -48,7 +48,6 @@ const CHECKS: ChatOption[] = [
   { label: 'A link', icon: 'link', next: 'link' },
   { label: 'A message', icon: 'message', next: 'message' },
   { label: "I'm not sure", icon: 'question', next: 'question1' },
-  { label: 'Tell a grown-up', icon: 'grownUp', next: 'tell' },
 ]
 
 const yesNo = (next: StepId): ChatOption[] => [
@@ -59,11 +58,7 @@ const yesNo = (next: StepId): ChatOption[] => [
 export const STEPS: Record<StepId, ChatStep> = {
   start: {
     mood: 'happy',
-    buddy: [
-      "Hi! I'm Shield Buddy.",
-      'Did you get something that feels a bit weird? We can check it together.',
-      'What do you want to check?',
-    ],
+    buddy: ["Hi! I'm Shield Buddy.", 'What do you want to check?'],
     options: CHECKS,
   },
   again: {
@@ -72,49 +67,28 @@ export const STEPS: Record<StepId, ChatStep> = {
     options: CHECKS,
   },
 
+  // Each kind of thing has its own checker: one line, then one button to open it
   picture: {
     mood: 'curious',
-    buddy: ["Send me a screenshot or a photo, and I'll look for scam clues.", 'I will show you where they are.'],
-    options: [
-      { label: 'Check a picture', icon: 'picture', leave: 'picture' },
-      { label: 'Check something else', next: 'again' },
-      { label: "I'm done", next: 'done' },
-    ],
+    buddy: ['Send me a screenshot or a photo of it.'],
+    options: [{ label: 'Check a picture', icon: 'picture', leave: 'picture' }],
   },
-
   link: {
-    mood: 'thinking',
-    buddy: [
-      "Let's check where that link really goes.",
-      'Scammers use names that look almost real, like rob1ox.com instead of roblox.com.',
-      'And never type your password on a website you got from a link.',
-    ],
-    options: [
-      { label: 'Check a link', icon: 'link', leave: 'link' },
-      { label: 'Ask me questions about it', icon: 'question', next: 'question1' },
-      { label: 'Tell a grown-up', icon: 'grownUp', next: 'tell' },
-      { label: 'Check something else', next: 'again' },
-    ],
+    mood: 'curious',
+    buddy: ["Let's check where that link really goes."],
+    options: [{ label: 'Check a link', icon: 'link', leave: 'link' }],
   },
-
   message: {
-    mood: 'thinking',
-    buddy: ["Let's check that message.", 'Paste it in, or I can ask you some questions about it.'],
-    options: [
-      { label: 'Check a message', icon: 'message', leave: 'message' },
-      { label: 'Ask me questions about it', icon: 'question', next: 'question1' },
-      { label: 'Tell a grown-up', icon: 'grownUp', next: 'tell' },
-    ],
+    mood: 'curious',
+    buddy: ["Let's look at that message for clues."],
+    options: [{ label: 'Check a message', icon: 'message', leave: 'message' }],
   },
 
   // "Is this real?" questions: a yes to any of them is a scam clue
   question1: {
     mood: 'curious',
     resetClues: true,
-    buddy: [
-      "Let's check it together. I have 4 quick questions.",
-      'Is someone rushing you? Like "Hurry!" or "Only 5 minutes left!"',
-    ],
+    buddy: ["Let's find out. I have 4 quick questions.", 'Is someone rushing you?'],
     options: yesNo('question2'),
   },
   question2: {
@@ -124,43 +98,22 @@ export const STEPS: Record<StepId, ChatStep> = {
   },
   question3: {
     mood: 'curious',
-    buddy: ['Does it promise you something free, like a prize or free Robux?'],
+    buddy: ['Does it promise you something free?'],
     options: yesNo('question4'),
   },
   question4: {
     mood: 'curious',
-    buddy: ["Is it from someone you don't know, or a new number?"],
+    buddy: ["Is it from someone you don't know?"],
     options: yesNo('answer'),
   },
   answer: {
     mood: 'neutral',
-    buddy: [
-      "I didn't spot any scam clues.",
-      'But if it still feels weird, show a grown-up before you do anything.',
-    ],
+    buddy: ["I didn't spot any scam clues. Still not sure? Show a grown-up."],
     ifClues: {
       mood: 'worried',
-      buddy: [
-        'You found {clues}. That means it could be a scam.',
-        "Don't answer it, tap on it, or send anything.",
-        'Show a grown-up. They can help you check.',
-      ],
+      buddy: ['You found {clues}. It could be a scam.', "Don't answer it or tap on it. Show a grown-up."],
     },
     options: [
-      { label: 'Tell a grown-up', icon: 'grownUp', next: 'tell' },
-      { label: 'Check something else', next: 'again' },
-    ],
-  },
-
-  tell: {
-    mood: 'cheering',
-    buddy: [
-      'Telling a grown-up is always a great choice!',
-      'Show them what you got. You can say: "I got this, and I\'m not sure if it\'s real."',
-      'You could tell a parent, a teacher, or another grown-up you trust.',
-    ],
-    options: [
-      { label: 'Send it to a grown-up', icon: 'grownUp', leave: 'tell' },
       { label: 'Check something else', next: 'again' },
       { label: "I'm done", next: 'done' },
     ],
@@ -168,10 +121,7 @@ export const STEPS: Record<StepId, ChatStep> = {
 
   done: {
     mood: 'cheering',
-    buddy: ['Great job checking!', 'Remember: stop, check, and tell a grown-up.'],
-    options: [
-      { label: 'Back to the menu', leave: 'home' },
-      { label: 'Check something else', next: 'again' },
-    ],
+    buddy: ['Great job checking! Remember: stop, check, and tell a grown-up.'],
+    options: [{ label: 'Back to the menu', leave: 'home' }],
   },
 }
