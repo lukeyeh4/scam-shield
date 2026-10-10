@@ -15,19 +15,20 @@
       "text": "Your Apple Account code is: 482913. Use it to reset your password. Don't share it with anyone."
     }
   },
-  "whatIf": { "do": "sent the code", "ignore": "ignored the texts", "tell": "told an adult" },
+  "checkIt": { "tool": "message", "text": "Hey sweetie, it’s Mom. I had to get a new number because my phone stopped working. I need a favor really quick. Can you send me the code that just came to your phone?", "buddy": ["Let's check these texts with Scam Shield.", "I put the texts in for you. Tap Check it!"] },
+  "whatIf": { "do": "sent the code", "check": "checked the texts with Scam Shield", "tell": "told an adult" },
   "outcomes": {
     "do":     { "result": "red",    "text": "You sent the code. It was the key to your game account. Now a stranger can log in as you." },
-    "ignore": { "result": "yellow", "text": "You didn't send the code. But the scammer keeps texting, and might trick someone else." },
+    "check":  { "result": "green",  "text": "Scam Shield found three clues, so you didn't send the code. You showed Dad, and he called Mom on her old number. Her phone was fine! They blocked the fake number." },
     "tell":   { "result": "green",  "text": "Dad called Mom on her old number. Her phone was fine! They blocked the fake number and reported it. Scam stopped!" }
   },
   "buddy": {
     "intro": "Ooh, a new text message just came in!",
     "explain": "Someone says they're your mom. They want the code that just came to your phone.",
-    "choices": "You can send them the code, ignore the texts, or tell an adult. What would you do?",
+    "choices": "You can send them the code, check the texts with Scam Shield, or tell an adult. What would you do?",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
-      "ignore": { "mood": "thinking", "text": "Safe for now… but the scam is still out there." },
+      "check":  { "mood": "cheering", "text": "Nice checking! Scam Shield spotted the clues." },
       "tell":   { "mood": "cheering", "text": "Great call! Checking with a grown-up stopped it!" }
     }
   },

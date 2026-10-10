@@ -6,7 +6,7 @@ export type BadgeId = 'clue-finder' | 'good-call' | 'super-spotter' | 'scam-shie
 // `text` says what the player did; `how` says how to earn a badge they don't have yet
 export const BADGES: { id: BadgeId; name: string; text: string; how: string; color: string }[] = [
   { id: 'clue-finder', name: 'Clue Finder', text: 'You found all the clues in a scam!', how: 'Find all the clues in a scam', color: '#e0a100' },
-  { id: 'good-call', name: 'Good Call', text: 'You told an adult about a scam!', how: 'Tell an adult about a scam', color: '#2e9e5b' },
+  { id: 'good-call', name: 'Good Call', text: 'You checked a scam or told an adult!', how: 'Check a scam with Scam Shield, or tell an adult', color: '#2e9e5b' },
   { id: 'super-spotter', name: 'Super Spotter', text: 'You found all the clues in every scam!', how: 'Find all the clues in every scam', color: '#7c5cff' },
   { id: 'scam-shield', name: 'Scam Shield', text: 'You finished the game!', how: 'Finish the game', color: '#2f6fed' },
 ]
@@ -14,7 +14,8 @@ export const BADGES: { id: BadgeId; name: string; text: string; how: string; col
 // What the player has done, kept on this device so badges stay after a reload
 type Progress = {
   earned: BadgeId[]
-  // Scenarios where every clue was found, and where the player told an adult
+  // Scenarios where every clue was found, and where the player checked it or told an
+  // adult (still saved as `told`, so badges from before Check was added stay)
   spotted: string[]
   told: string[]
 }
@@ -67,7 +68,7 @@ function record(change: Partial<Progress>, badge?: BadgeId) {
 const addOnce = (list: string[], id: string) => (list.includes(id) ? list : [...list, id])
 
 export const recordAllCluesFound = (scenarioId: string) => record({ spotted: addOnce(progress.spotted, scenarioId) })
-export const recordToldAdult = (scenarioId: string) => record({ told: addOnce(progress.told, scenarioId) })
+export const recordGoodCall = (scenarioId: string) => record({ told: addOnce(progress.told, scenarioId) })
 export const recordFinished = () => record({}, 'scam-shield')
 
 // The notification shows the oldest waiting badge; call this once it has been shown

@@ -16,16 +16,22 @@ type ResultViewProps = {
   // What was checked: the picture, the link or the message, with the clues marked
   subject: ReactNode
   result: CheckResult
-  onAgain: () => void
-  onDone: () => void
+  onAgain?: () => void
+  onDone?: () => void
+  // Buttons to show instead of Check something else / I'm done, in the game's
+  // "Check with Scam Shield" practice (which the chat doesn't hear about)
+  actions?: ReactNode
 }
 
 // The result of any check: what was checked beside how risky it looks, the
 // numbered clues (matching the numbers on what was checked), and what to do next
-export function ResultView({ subject, result, onAgain, onDone }: ResultViewProps) {
+export function ResultView({ subject, result, onAgain, onDone, actions }: ResultViewProps) {
   const risk = RISKS[result.risk]
+  const practice = actions !== undefined
   // Back in the chat, Buddy talks about what this check found
-  useEffect(() => noteCheck(result.risk), [result.risk])
+  useEffect(() => {
+    if (!practice) noteCheck(result.risk)
+  }, [practice, result.risk])
   return (
     <section className={`result result-${result.risk}`} aria-labelledby="result-title">
       <div className="result-subject">{subject}</div>
@@ -57,12 +63,16 @@ export function ResultView({ subject, result, onAgain, onDone }: ResultViewProps
         ) : null}
         <p className="result-tell">{risk.tell}</p>
         <div className="tool-actions">
-          <button className="tool-button tool-button-main" type="button" onClick={onAgain}>
-            Check something else
-          </button>
-          <button className="tool-text-button" type="button" onClick={onDone}>
-            I'm done
-          </button>
+          {actions ?? (
+            <>
+              <button className="tool-button tool-button-main" type="button" onClick={onAgain}>
+                Check something else
+              </button>
+              <button className="tool-text-button" type="button" onClick={onDone}>
+                I'm done
+              </button>
+            </>
+          )}
         </div>
       </div>
     </section>

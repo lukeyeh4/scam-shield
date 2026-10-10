@@ -11,19 +11,20 @@
     "button": "VERIFY NOW",
     "signature": "The PixelPals Team"
   },
-  "whatIf": { "do": "clicked the button", "ignore": "ignored the email", "tell": "told an adult" },
+  "checkIt": { "tool": "picture", "buddy": ["Let's check this email with Scam Shield.", "I took a screenshot for you. Tap Check it!"] },
+  "whatIf": { "do": "clicked the button", "check": "checked the email with Scam Shield", "tell": "told an adult" },
   "outcomes": {
     "do":     { "result": "red",    "text": "You typed in your password. Now someone else can log in as you and change your password so you can't get back in." },
-    "ignore": { "result": "yellow", "text": "You didn't click. But you keep worrying all day: what if your account really gets deleted?" },
+    "check":  { "result": "green",  "text": "Scam Shield found clues, so you didn't click. You showed your teacher, who helped you open the real PixelPals app. Your account was fine! Then you reported the email." },
     "tell":   { "result": "green",  "text": "Your teacher helped you open the real PixelPals app. Your account was fine! Then you reported the email as a scam." }
   },
   "buddy": {
     "intro": "You've got an email! Let's read it.",
     "explain": "It says your account will be deleted soon. It wants you to click a button and log in.",
-    "choices": "You can click the button, ignore the email, or tell an adult. What would you do?",
+    "choices": "You can click the button, check the email with Scam Shield, or tell an adult. What would you do?",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Oh no! Let's find out what happened." },
-      "ignore": { "mood": "thinking", "text": "Safe, but you're still worried, and the scam email is still out there." },
+      "check":  { "mood": "cheering", "text": "Smart move! Scam Shield spotted the fake email." },
       "tell":   { "mood": "cheering", "text": "Smart move! Now you know your account is safe." }
     }
   },

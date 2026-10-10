@@ -37,19 +37,20 @@
       "It says you won a gift card. But look at what it wants you to type in…"
     ]
   },
-  "whatIf": { "do": "tapped the link", "ignore": "scrolled past", "tell": "told an adult" },
+  "checkIt": { "tool": "picture", "buddy": ["Let's check this video with Scam Shield.", "I took a screenshot for you. Tap Check it!"] },
+  "whatIf": { "do": "tapped the link", "check": "checked the video with Scam Shield", "tell": "told an adult" },
   "outcomes": {
     "do":     { "result": "red",    "text": "The website asked for a parent's card to 'check you're real'. It said you wouldn't be charged. But the scammers took money from the card, and no gift card came." },
-    "ignore": { "result": "yellow", "text": "You scrolled past. But the video keeps spreading, and your friend thinks it's real." },
+    "check":  { "result": "green",  "text": "Scam Shield found three clues, so you didn't tap the link. You showed Mom, and you reported the fake video together. It was taken down!" },
     "tell":   { "result": "green",  "text": "Mom helped you check the real channel. There was no giveaway! You reported the fake video, and it was taken down." }
   },
   "buddy": {
     "intro": "Ooh, a new video popped up!",
     "explain": "It looks like a famous YouTuber is giving away free gift cards.",
-    "choices": "You can tap the link, scroll past the video, or tell an adult. What would you do?",
+    "choices": "You can tap the link, check the video with Scam Shield, or tell an adult. What would you do?",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Uh oh! Let's see what went wrong." },
-      "ignore": { "mood": "thinking", "text": "Safe for now… but the fake video is still out there." },
+      "check":  { "mood": "cheering", "text": "Great checking! Scam Shield spotted the fake." },
       "tell":   { "mood": "cheering", "text": "Great call! A grown-up helped spot the fake!" }
     }
   },

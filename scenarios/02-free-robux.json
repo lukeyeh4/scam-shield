@@ -55,15 +55,16 @@
       "It says you won Robux. But look at what it wants you to type in…"
     ]
   },
-  "whatIf": { "do": "tapped the top result", "ignore": "closed Safari", "tell": "told an adult" },
+  "checkIt": { "tool": "link", "text": "roblox-giveaway-official.net", "buddy": ["Let's check the top result's link with Scam Shield.", "I put the link in for you. Tap Check it!"] },
+  "whatIf": { "do": "tapped the top result", "check": "checked the link with Scam Shield", "tell": "told an adult" },
   "outcomes": {
     "do": {
       "result": "red",
       "text": "You typed in your password. The next day, you can't log in. Someone took your account and all your Robux."
     },
-    "ignore": {
-      "result": "yellow",
-      "text": "You closed it and kept your account safe. But your friend Mia tapped the same ad, and now her account is gone."
+    "check": {
+      "result": "green",
+      "text": "Scam Shield showed the link was pretending to be Roblox, so you didn't tap it. You showed Dad, and you reported the ad together. Nobody lost their account!"
     },
     "tell": {
       "result": "green",
@@ -73,15 +74,15 @@
   "buddy": {
     "intro": "You searched for free Robux. Look at all these results!",
     "explain": "The top one says you can get 10,000 free Robux. It wants you to log in on its website.",
-    "choices": "You can tap the top result, close Safari, or tell an adult. What would you do?",
+    "choices": "You can tap the top result, check its link with Scam Shield, or tell an adult. What would you do?",
     "reactions": {
       "do": {
         "mood": "worried",
         "text": "Oh no! Let's see what happened."
       },
-      "ignore": {
-        "mood": "thinking",
-        "text": "You're safe, but the scammer is still out there."
+      "check": {
+        "mood": "cheering",
+        "text": "Smart! Scam Shield caught the fake website."
       },
       "tell": {
         "mood": "cheering",

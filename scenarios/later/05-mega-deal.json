@@ -13,19 +13,20 @@
     "popupText": "Only 3 pairs left! Enter your card details now before they're gone.",
     "popupButton": "BUY NOW"
   },
-  "whatIf": { "do": "bought the sneakers", "ignore": "closed the page", "tell": "told an adult" },
+  "checkIt": { "tool": "picture", "buddy": ["Let's check this website with Scam Shield.", "I took a screenshot for you. Tap Check it!"] },
+  "whatIf": { "do": "bought the sneakers", "check": "checked the website with Scam Shield", "tell": "told an adult" },
   "outcomes": {
     "do":     { "result": "red",    "text": "You used your parent's card. The money was taken, and the sneakers never arrived." },
-    "ignore": { "result": "yellow", "text": "You closed the page and kept your money. But the next 'mega deal' might be harder to spot." },
+    "check":  { "result": "green",  "text": "Scam Shield found clues, so you didn't buy them. You showed Dad, and he found warnings that the store is fake. He reported it, and your family's money stayed safe." },
     "tell":   { "result": "green",  "text": "Dad looked up the store and found warnings that it's fake. He reported it, and your family's money stayed safe." }
   },
   "buddy": {
     "intro": "You're looking for new sneakers online, and this pops up!",
     "explain": "These sneakers are almost free! The pop-up wants your card number to buy them.",
-    "choices": "You can buy them now, close the page, or tell an adult. What would you do?",
+    "choices": "You can buy them now, check the website with Scam Shield, or tell an adult. What would you do?",
     "reactions": {
       "do":     { "mood": "worried",  "text": "Oh no! Let's see what happened." },
-      "ignore": { "mood": "thinking", "text": "You kept your money, but the fake store is still out there." },
+      "check":  { "mood": "cheering", "text": "Nice work! Scam Shield spotted the fake store!" },
       "tell":   { "mood": "cheering", "text": "Nice work! A grown-up helped spot the fake store!" }
     }
   },

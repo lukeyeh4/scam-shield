@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react'
-import { recordToldAdult } from '../badges'
+import { recordGoodCall } from '../badges'
 import { Buddy } from '../buddy/Buddy'
 import { CHOICES } from '../labels'
 import { arrivalDelay } from '../mockups/arrival'
 import { Mockup } from '../mockups/Mockup'
 import type { Choice, Scenario } from '../types'
+import { CheckItScreen } from './CheckItScreen'
 import { DoItScreen } from './DoItScreen'
 import { OutcomeScreen } from './OutcomeScreen'
 import { RecapScreen } from './RecapScreen'
@@ -15,7 +16,7 @@ import { SpotScreen } from './SpotScreen'
 const CHOOSE_PROMPT = 'Read it carefully. Then pick what you would do.'
 
 // DEV CONSOLE: open a scenario part-way through, as if `choice` had been picked
-export type ScenarioStart = { choice: Choice; stage: 'doIt' | 'outcome' | 'spot' | 'recap' | 'summary' }
+export type ScenarioStart = { choice: Choice; stage: 'doIt' | 'checkIt' | 'outcome' | 'spot' | 'recap' | 'summary' }
 
 type ScenarioScreenProps = {
   scenario: Scenario
@@ -25,9 +26,10 @@ type ScenarioScreenProps = {
   start?: ScenarioStart
 }
 
-// Wireframe: the scam screen with Shield Buddy beside it. Once Buddy has finished
+// The scam screen with Shield Buddy beside it. Once Buddy has finished
 // talking, the three choices slide up from the bottom. Picking one leads to
-// "What happened", then "Stop, Check, Tell".
+// "What happened" (after the Do it or Check page, if there is one), then
+// "Stop, Check, Tell".
 export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: ScenarioScreenProps) {
   const [showChoices, setShowChoices] = useState(false)
   const revealChoices = useCallback(() => setShowChoices(true), [])
@@ -36,6 +38,8 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: Scen
   const [showRecap, setShowRecap] = useState(start?.stage === 'recap' || start?.stage === 'summary')
   // Some scenarios show where "Do it" takes you (e.g. a fake website) before the outcome
   const [doItSeen, setDoItSeen] = useState(start !== undefined && start.stage !== 'doIt')
+  // "Check with Scam Shield" opens the matching tool before the outcome
+  const [checkSeen, setCheckSeen] = useState(start !== undefined && start.stage !== 'checkIt')
 
   if (showRecap) {
     return (
@@ -51,6 +55,9 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: Scen
   if (showSpot) return <SpotScreen scenario={scenario} onBack={onBack} onContinue={() => setShowRecap(true)} />
   if (choice === 'do' && scenario.doIt && !doItSeen) {
     return <DoItScreen scenario={scenario} doIt={scenario.doIt} onBack={onBack} onContinue={() => setDoItSeen(true)} />
+  }
+  if (choice === 'check' && !checkSeen) {
+    return <CheckItScreen scenario={scenario} onBack={onBack} onContinue={() => setCheckSeen(true)} />
   }
   if (choice) {
     return <OutcomeScreen scenario={scenario} choice={choice} onBack={onBack} onContinue={() => setShowSpot(true)} />
@@ -92,7 +99,7 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: Scen
               className="choice"
               type="button"
               onClick={() => {
-                if (c.id === 'tell') recordToldAdult(scenario.id)
+                if (c.id !== 'do') recordGoodCall(scenario.id)
                 setChoice(c.id)
               }}
             >

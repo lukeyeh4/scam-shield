@@ -17,10 +17,10 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 
 **Tutorial changes**
 
-- [ ] Change the three choices to **Do it**, **Check with Scam Shield** and **Tell an adult**. Do it still goes wrong (red); Check and Tell both work (green). Ignore it goes away.
-- [ ] Check with Scam Shield opens a tutorial version of **Check a picture** with the scenario's scam screen already in it, so the kid sees a real-looking scan mark the clues (the recap's highlighting already does most of this)
-- [ ] Rework the outcome screen, "What if you had…" cards and badges for the new choices (Good Call would cover Check as well as Tell)
-- [ ] Update the content rules in `CLAUDE.md` and the key lesson in `README.md`: the old lesson was "Ignore keeps you safe once, but Tell stops the scam"
+- [x] Change the three choices to **Do it**, **Check with Scam Shield** and **Tell an adult**. Do it still goes wrong (red); Check and Tell both work (green). Ignore it goes away.
+- [x] Check with Scam Shield opens a tutorial version of the matching tool with the scam already in it (`CheckItScreen`): scenario 1's texts in Check a message, scenario 2's link in the real link checker, scenario 3's video in Check a picture
+- [x] Rework the outcome screen, "What if you had…" cards and badges for the new choices (Good Call would cover Check as well as Tell)
+- [x] Update the content rules in `CLAUDE.md` and the key lesson in `README.md`: the old lesson was "Ignore keeps you safe once, but Tell stops the scam"
 - [ ] After the tutorial, the main menu leads to the toolkit; the tutorial can be replayed any time
 
 **Decided**
@@ -159,8 +159,8 @@ One chat with Shield Buddy, where kids tap options or (later) type a question. T
 
 Ideas to make the game shorter or gentler, to try after kids have played it.
 
-- [ ] Remove the "What if you had…" cards from the What happened screen, if it feels like too much reading. Only do this if the difference between Ignore and Tell is still taught somewhere (it's the main lesson).
-- [ ] Add a "Try again" button so kids who pick Do it or Ignore it can go back and choose again, so a wrong pick doesn't feel like a punishment. For now, the end of each scenario only offers "Next scenario".
+- [ ] Remove the "What if you had…" cards from the What happened screen, if it feels like too much reading. Only do this if the difference between Do it and Check or Tell is still taught somewhere (it's the main lesson).
+- [ ] Add a "Try again" button so kids who pick Do it can go back and choose again, so a wrong pick doesn't feel like a punishment. For now, the end of each scenario only offers "Next scenario".
 
 ## 2. Fake screens
 
