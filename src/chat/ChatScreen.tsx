@@ -1,10 +1,10 @@
-import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import { type FormEvent, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { IMAGES } from '../buddy/moods'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
 import { LinkIcon, MessageIcon, MicIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
 import type { Mood } from '../types'
-import { type ChatIcon, type ChatOption, STEPS, type StepId } from './script'
+import { type ChatIcon, type ChatOption, replyTo, STEPS, type StepId } from './script'
 import './chat.css'
 
 type Entry = { from: 'buddy'; text: string; mood: Mood } | { from: 'kid'; text: string }
@@ -40,14 +40,17 @@ type ChatScreenProps = {
 
 // Ask Shield Buddy: a chat where Buddy helps check something that feels weird.
 // Buddy's messages type out one at a time, like everywhere else in the game; once
-// it has finished, the answers slide up and the player taps one. Everything Buddy
-// says is in script.ts. Typing or saying a question is shown but not built yet.
+// it has finished, the answers slide up and the player taps one, or types a
+// question in the box (Buddy's replies are placeholders until the AI answers them).
+// Everything Buddy says is in script.ts. Asking out loud is shown but not built yet.
 export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const [step, setStep] = useState<StepId>('start')
   const [entries, setEntries] = useState<Entry[]>(() => buddyLines('start'))
   // How many entries are showing; the last one may still be typing
   const [shown, setShown] = useState(1)
   const [hurried, setHurried] = useState(-1)
+  // What the player is typing in the box
+  const [draft, setDraft] = useState('')
 
   const latest = entries[shown - 1]
   const latestText = latest.from === 'buddy' ? latest.text : ''
@@ -110,13 +113,27 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
     }
   }, [])
 
+  // The player says something (a tapped answer or a typed question), and Buddy
+  // replies with the lines for `next`. Anything Buddy hadn't finished saying shows
+  // at once, so the player's message comes straight after it.
+  const say = (text: string, next: StepId) => {
+    setStep(next)
+    setEntries([...entries, { from: 'kid', text }, ...buddyLines(next)])
+    setShown(entries.length + 1)
+    following.current = true
+  }
+
   const choose = (option: ChatOption) => {
     if (option.leave) return onLeave(option.leave)
-    if (!option.next) return
-    setStep(option.next)
-    setEntries([...entries, { from: 'kid', text: option.label }, ...buddyLines(option.next)])
-    setShown(shown + 1)
-    following.current = true
+    if (option.next) say(option.label, option.next)
+  }
+
+  const send = (e: FormEvent) => {
+    e.preventDefault()
+    const text = draft.trim()
+    if (!text) return
+    say(text, replyTo(text))
+    setDraft('')
   }
 
   const groups = groupEntries(entries.slice(0, shown))
@@ -206,16 +223,24 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
         )}
 
         {/* Lights up when Buddy says to ask it down here */}
-        <form className={ready && STEPS[step].pointAtBox ? 'ask-compose is-pointed' : 'ask-compose'} onSubmit={(e) => e.preventDefault()}>
+        <form className={ready && STEPS[step].pointAtBox ? 'ask-compose is-pointed' : 'ask-compose'} onSubmit={send}>
           <label className="sr-only" htmlFor="ask-question">
             Type a question
           </label>
-          <input id="ask-question" type="text" placeholder="Typing and talking are coming soon" disabled />
+          <input
+            id="ask-question"
+            type="text"
+            placeholder="Type a question"
+            autoComplete="off"
+            maxLength={300}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+          />
           {/* Voice input: ask out loud instead of typing (not built yet, see PROJECT.md) */}
           <button className="ask-mic" type="button" disabled aria-label="Talk to Shield Buddy">
             <MicIcon />
           </button>
-          <button type="submit" disabled aria-label="Send">
+          <button className="ask-send" type="submit" disabled={!draft.trim()} aria-label="Send">
             <SendIcon />
           </button>
         </form>

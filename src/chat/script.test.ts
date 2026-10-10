@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { STEPS, type StepId } from './script'
+import { replyTo, STEPS, type StepId, TYPED_STEPS } from './script'
 
 const ids = Object.keys(STEPS) as StepId[]
 
@@ -19,8 +19,18 @@ function reachable() {
 }
 
 describe('chat script', () => {
-  it('can reach every step from the start', () => {
-    expect([...reachable()].sort()).toEqual([...ids].sort())
+  it('can reach every step from the start, or by typing', () => {
+    expect([...reachable(), ...TYPED_STEPS].sort()).toEqual([...ids].sort())
+  })
+
+  it.each([
+    ['is roblox-giveaway-official.net real?', 'typedLink'],
+    ['someone sent me https://bit.ly/3xVid', 'typedLink'],
+    ['check www.example.com', 'typedLink'],
+    ['someone in my game wants my password', 'typed'],
+    ['is this a scam? i got a text from a new number', 'typed'],
+  ])('replies to "%s" with %s', (text, step) => {
+    expect(replyTo(text)).toBe(step)
   })
 
   it.each(ids)('gives "%s" something for Buddy to say and answers to tap', (id) => {

@@ -5,7 +5,7 @@ import type { Mood } from '../types'
 // not scary, no shame, and Buddy always sends kids to a real grown-up.
 // Keep it short: a line or two from Buddy, and as few answers as possible.
 
-export type StepId = 'start' | 'again' | 'picture' | 'link' | 'message' | 'notSure'
+export type StepId = 'start' | 'again' | 'picture' | 'link' | 'message' | 'notSure' | 'typed' | 'typedLink'
 
 export type ChatIcon = 'picture' | 'link' | 'message' | 'question'
 
@@ -70,4 +70,25 @@ export const STEPS: Record<StepId, ChatStep> = {
     options: [{ label: 'Check something', next: 'again' }],
     pointAtBox: true,
   },
+
+  // Buddy's replies to a typed question. Placeholders until the AI answers
+  // questions (stage 3 in PROJECT.md): something that looks like a link gets the
+  // link checker, anything else gets sent to a grown-up.
+  typed: {
+    mood: 'thinking',
+    buddy: ["Thanks for asking! I can't answer questions yet.", 'For now, show it to a grown-up. They can help.'],
+    options: [{ label: 'Check something', next: 'again' }],
+  },
+  typedLink: {
+    mood: 'curious',
+    buddy: ["That looks like a link. Let's check where it goes."],
+    options: [{ label: 'Check a link', icon: 'link', leave: 'link' }],
+  },
 }
+
+// Steps reached by typing instead of tapping an answer
+export const TYPED_STEPS: StepId[] = ['typed', 'typedLink']
+
+// Which reply a typed question gets (see `typed` and `typedLink`)
+export const replyTo = (text: string): StepId =>
+  /https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|io|gg|ly|co|xyz|info)\b/i.test(text) ? 'typedLink' : 'typed'

@@ -184,6 +184,11 @@
   font: inherit;
 }
 
+.ask-compose input:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
 .ask-compose input:disabled {
   background: var(--surface-soft);
   box-shadow: none;
