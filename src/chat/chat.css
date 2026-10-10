@@ -43,8 +43,8 @@
 
 .ask-avatar {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 80px;
+  height: 80px;
 }
 
 .ask-group-buddy .buddy-body {
@@ -216,8 +216,8 @@
 
 @media (max-width: 560px) {
   .ask-avatar {
-    width: 48px;
-    height: 48px;
+    width: 60px;
+    height: 60px;
   }
 
   .ask-options .option-card,

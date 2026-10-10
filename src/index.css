@@ -95,8 +95,8 @@ button:active {
 
 .buddy-image {
   flex: none;
-  width: 128px;
-  height: 128px;
+  width: 160px;
+  height: 160px;
   /* The artwork has empty space around the shield */
   margin: -16px -12px -20px;
 }
@@ -320,8 +320,8 @@ button:active {
 }
 
 .menu .buddy-image {
-  width: 160px;
-  height: 160px;
+  width: 200px;
+  height: 200px;
 }
 
 .menu-steps {
@@ -728,13 +728,13 @@ button:active {
   }
 
   .buddy-image {
-    width: 96px;
-    height: 96px;
+    width: 120px;
+    height: 120px;
   }
 
   .menu .buddy-image {
-    width: 128px;
-    height: 128px;
+    width: 160px;
+    height: 160px;
   }
 }
 
