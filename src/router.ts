@@ -8,8 +8,8 @@ export type Route =
   // The game, used as the tutorial: `scenario` counts from 1
   | { name: 'learn'; scenario: number }
   | { name: 'learnDone' }
-  // The tools for checking something real (not built yet)
-  | { name: 'check' }
+  // Ask Shield Buddy: a chat for checking something real
+  | { name: 'ask' }
   // Check a picture: the main tool
   | { name: 'scan' }
   // The grown-ups' area: setup and settings (not built yet)
@@ -23,8 +23,8 @@ export function toHash(route: Route): string {
       return `#/learn/${route.scenario}`
     case 'learnDone':
       return '#/learn/done'
-    case 'check':
-      return '#/check'
+    case 'ask':
+      return '#/ask'
     case 'scan':
       return '#/check/picture'
     case 'grownUps':
@@ -40,7 +40,7 @@ export function parseHash(hash: string): Route {
     const scenario = parts[1] === undefined ? 1 : Number(parts[1])
     if (Number.isInteger(scenario) && scenario >= 1) return { name: 'learn', scenario }
   }
-  if (parts[0] === 'check' && parts.length === 1) return { name: 'check' }
+  if (parts[0] === 'ask' && parts.length === 1) return { name: 'ask' }
   if (parts[0] === 'check' && parts[1] === 'picture' && parts.length === 2) return { name: 'scan' }
   if (parts[0] === 'grown-ups' && parts.length === 1) return { name: 'grownUps' }
   return { name: 'home' }

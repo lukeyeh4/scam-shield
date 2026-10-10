@@ -1,19 +1,8 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import type { Mood } from '../types'
-import cheering from '../../shield_buddy/cheering.png'
-import curious from '../../shield_buddy/curious.png'
-import happy from '../../shield_buddy/happy.png'
-import neutral from '../../shield_buddy/neutral.png'
-import thinking from '../../shield_buddy/thinking.png'
-import worried from '../../shield_buddy/worried.png'
 import { isFast } from '../dev/devSettings'
-import { useTypewriter } from './useTypewriter'
-
-const IMAGES: Record<Mood, string> = { cheering, curious, happy, neutral, thinking, worried }
-
-// Time to read a message once it has finished typing, before the next one appears:
-// longer messages get longer
-const readingPause = (message: string) => Math.min(3500, 1000 + 80 * message.split(/\s+/).length)
+import { IMAGES } from './moods'
+import { readingPause, useTypewriter } from './useTypewriter'
 
 type BuddyProps = {
   mood: Mood

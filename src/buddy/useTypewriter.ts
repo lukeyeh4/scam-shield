@@ -4,6 +4,10 @@ import { reduceMotion } from '../motion'
 // How long each character takes to appear, at a pace a young reader can follow
 const CHAR_MS = 50
 
+// Time to read a message once it has finished typing, before the next one appears:
+// longer messages get longer
+export const readingPause = (message: string) => Math.min(3500, 1000 + 80 * message.split(/\s+/).length)
+
 // Short breaths after punctuation, like when someone reads aloud
 const pauseAfter = (char: string) => ('.!?…'.includes(char) ? 450 : ',;:'.includes(char) ? 200 : 0)
 

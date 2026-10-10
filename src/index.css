@@ -1515,3 +1515,9 @@ button:active {
 .fake-link {
   text-decoration: underline;
 }
+
+/* Buddy's own face as the icon for Ask Shield Buddy */
+.menu-tile-buddy {
+  width: 44px;
+  height: 44px;
+}

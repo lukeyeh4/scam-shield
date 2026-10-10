@@ -1,10 +1,10 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { recordFinished } from './badges'
+import { ChatScreen } from './chat/ChatScreen'
 import type { DevJump } from './dev/DevConsole'
 import { navigate, type Route, useRoute } from './router'
 import { scenarios } from './scenarios'
 import { BadgeToast } from './screens/Badges'
-import { CheckScreen } from './screens/CheckScreen'
 import { EndScreen } from './screens/EndScreen'
 import { GrownUpsScreen } from './screens/GrownUpsScreen'
 import { MainMenu } from './screens/MainMenu'
@@ -22,7 +22,7 @@ const TITLES: Record<Route['name'], string> = {
   home: 'Scam Shield',
   learn: 'Learn about scams',
   learnDone: 'You did it!',
-  check: 'Check for a scam',
+  ask: 'Ask Shield Buddy',
   scan: 'Check a picture',
   grownUps: 'For grown-ups',
 }
@@ -77,8 +77,8 @@ export default function App() {
     )
   } else if (route.name === 'learnDone') {
     content = <EndScreen key={run} onPlayAgain={() => learn(1, true)} onMenu={home} />
-  } else if (route.name === 'check') {
-    content = <CheckScreen onBack={home} onScan={scan} />
+  } else if (route.name === 'ask') {
+    content = <ChatScreen onBack={home} onLeave={(to) => (to === 'scan' ? scan() : home())} />
   } else if (route.name === 'scan') {
     content = <ScanScreen onBack={home} />
   } else if (route.name === 'grownUps') {
@@ -88,7 +88,7 @@ export default function App() {
       <MainMenu
         onScan={scan}
         onLearn={() => learn(1)}
-        onCheck={() => navigate({ name: 'check' })}
+        onAsk={() => navigate({ name: 'ask' })}
         onGrownUps={() => navigate({ name: 'grownUps' })}
       />
     )
