@@ -355,7 +355,7 @@ button:active {
   color: var(--muted);
 }
 
-/* Home: a header card with the logo, big warm cards, then Shield Buddy */
+/* Home: a header card with the logo, then big warm cards */
 .home {
   display: flex;
   flex-direction: column;
@@ -415,48 +415,6 @@ button:active {
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-/* Shield Buddy at the bottom, with a speech bubble: tap to open the chat */
-.home-buddy {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  margin-top: 8px;
-  padding: 0;
-  background: none;
-  text-align: left;
-}
-
-.home-buddy-image {
-  display: block;
-  width: 120px;
-  height: 120px;
-}
-
-.home-buddy-bubble {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-bottom: 24px;
-  padding: 14px 18px;
-  border-radius: 22px 22px 22px 8px;
-  background: var(--surface);
-  box-shadow: var(--shadow-sm);
-}
-
-.home-buddy-bubble strong {
-  font-size: var(--text-large);
-}
-
-.home-buddy-bubble span {
-  color: var(--muted);
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .home-buddy:hover .home-buddy-bubble {
-    box-shadow: var(--shadow-md), inset 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent);
-  }
 }
 
 /* A big, warm card to tap (OptionCard): on the home screen and in the chat */

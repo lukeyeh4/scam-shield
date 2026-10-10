@@ -169,7 +169,7 @@ Done so far:
 
 To do (mostly when it becomes an app):
 
-- [x] Home screen like the mock-up, without the tab bar: a header card (logo, tagline, gear for grown-ups), big warm cards for Check a picture, Check a message, Check a link and Learn about scams, then Shield Buddy with a speech bubble that opens the chat. The chat's answers use the same cards (`OptionCard`). One font everywhere (Nunito)
+- [x] Home screen like the mock-up, without the tab bar: a header card (logo, tagline, gear for grown-ups), then two big warm cards: Check something (a picture, a message or a link; opens the chat) and Learn about scams. The chat's answers use the same cards (`OptionCard`). One font everywhere (Nunito)
 - [ ] Tab bar (Home, Learn, History, More), if wanted in the app (left out for now)
 - [ ] History: past checks. Decide what's kept, where (on the device only?), and for how long, since it's kids' data
 - [ ] Night colours for later (a dark mode), with darker result banners
