@@ -1,11 +1,19 @@
 import { type FormEvent, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { IMAGES } from '../buddy/moods'
+import { useDots } from '../buddy/useDots'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
 import { LinkIcon, MessageIcon, MicIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
 import type { Mood } from '../types'
 import { type ChatIcon, type ChatOption, replyTo, STEPS, type StepId } from './script'
 import './chat.css'
+
+// EXPERIMENT: how Buddy's messages appear in the chat. 'dots' shows moving
+// "typing" dots, then the whole message at once; 'typewriter' types each message
+// out letter by letter, like the rest of the game. To undo, set it back to
+// 'typewriter' (or delete this, useDots.ts and the .ask-dots styles).
+const REVEAL = 'dots' as 'dots' | 'typewriter'
+const useReveal = REVEAL === 'dots' ? useDots : useTypewriter
 
 type Entry = { from: 'buddy'; text: string; mood: Mood } | { from: 'kid'; text: string }
 
@@ -54,7 +62,7 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
 
   const latest = entries[shown - 1]
   const latestText = latest.from === 'buddy' ? latest.text : ''
-  const typed = useTypewriter(latestText, hurried === shown - 1)
+  const typed = useReveal(latestText, hurried === shown - 1)
   const done = latest.from === 'kid' || typed === latestText
   const ready = done && shown === entries.length
 
@@ -178,6 +186,16 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
                 <div className="ask-bubbles">
                   {group.entries.map((entry, i) => {
                     const isTyping = group.start + i === shown - 1 && !done
+                    // EXPERIMENT (REVEAL): the moving dots, until the whole message appears
+                    if (REVEAL === 'dots' && isTyping) {
+                      return (
+                        <p key={`${i}-dots`} className="ask-bubble ask-bubble-buddy ask-dots" aria-hidden="true">
+                          <span />
+                          <span />
+                          <span />
+                        </p>
+                      )
+                    }
                     return (
                       <p key={i} className="ask-bubble ask-bubble-buddy">
                         <span className="sr-only">Shield Buddy: {entry.text}</span>
