@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { IMAGES } from '../buddy/moods'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
-import { GrownUpIcon, LinkIcon, MessageIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
+import { GrownUpIcon, LinkIcon, MessageIcon, MicIcon, QuestionIcon, ScanIcon, SendIcon } from '../icons'
 import type { Mood } from '../types'
 import { type ChatIcon, type ChatOption, STEPS, type StepId } from './script'
 import './chat.css'
@@ -39,13 +39,13 @@ function groupEntries(entries: Entry[]) {
 
 type ChatScreenProps = {
   onBack: () => void
-  onLeave: (to: 'scan' | 'home') => void
+  onLeave: (to: NonNullable<ChatOption['leave']>) => void
 }
 
 // Ask Shield Buddy: a chat where Buddy helps check something that feels weird.
 // Buddy's messages type out one at a time, like everywhere else in the game; once
 // it has finished, the answers slide up and the player taps one. Everything Buddy
-// says is in script.ts. Typing a question is shown but not built yet.
+// says is in script.ts. Typing or saying a question is shown but not built yet.
 export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const [step, setStep] = useState<StepId>('start')
   const [clues, setClues] = useState(0)
@@ -217,7 +217,11 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
           <label className="sr-only" htmlFor="ask-question">
             Type a question
           </label>
-          <input id="ask-question" type="text" placeholder="Typing questions is coming soon" disabled />
+          <input id="ask-question" type="text" placeholder="Typing and talking are coming soon" disabled />
+          {/* Voice input: ask out loud instead of typing (not built yet, see PROJECT.md) */}
+          <button className="ask-mic" type="button" disabled aria-label="Talk to Shield Buddy">
+            <MicIcon />
+          </button>
           <button type="submit" disabled aria-label="Send">
             <SendIcon />
           </button>

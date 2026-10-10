@@ -10,10 +10,15 @@ export type Route =
   | { name: 'learnDone' }
   // Ask Shield Buddy: a chat for checking something real
   | { name: 'ask' }
-  // Check a picture: the main tool
-  | { name: 'scan' }
+  // The tools: Check a picture (the main one), a link or a message
+  | { name: 'check'; tool: Tool }
+  // Tell a grown-up: send what was checked to a trusted grown-up
+  | { name: 'tell' }
   // The grown-ups' area: setup and settings (not built yet)
   | { name: 'grownUps' }
+
+export type Tool = 'picture' | 'link' | 'message'
+const TOOLS: Tool[] = ['picture', 'link', 'message']
 
 export function toHash(route: Route): string {
   switch (route.name) {
@@ -25,8 +30,10 @@ export function toHash(route: Route): string {
       return '#/learn/done'
     case 'ask':
       return '#/ask'
-    case 'scan':
-      return '#/check/picture'
+    case 'check':
+      return `#/check/${route.tool}`
+    case 'tell':
+      return '#/tell'
     case 'grownUps':
       return '#/grown-ups'
   }
@@ -41,7 +48,9 @@ export function parseHash(hash: string): Route {
     if (Number.isInteger(scenario) && scenario >= 1) return { name: 'learn', scenario }
   }
   if (parts[0] === 'ask' && parts.length === 1) return { name: 'ask' }
-  if (parts[0] === 'check' && parts[1] === 'picture' && parts.length === 2) return { name: 'scan' }
+  const tool = TOOLS.find((t) => t === parts[1])
+  if (parts[0] === 'check' && tool && parts.length === 2) return { name: 'check', tool }
+  if (parts[0] === 'tell' && parts.length === 1) return { name: 'tell' }
   if (parts[0] === 'grown-ups' && parts.length === 1) return { name: 'grownUps' }
   return { name: 'home' }
 }

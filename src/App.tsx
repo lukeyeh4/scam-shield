@@ -2,14 +2,16 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { recordFinished } from './badges'
 import { ChatScreen } from './chat/ChatScreen'
 import type { DevJump } from './dev/DevConsole'
-import { navigate, type Route, useRoute } from './router'
+import { navigate, type Route, type Tool, useRoute } from './router'
 import { scenarios } from './scenarios'
 import { BadgeToast } from './screens/Badges'
 import { EndScreen } from './screens/EndScreen'
 import { GrownUpsScreen } from './screens/GrownUpsScreen'
 import { MainMenu } from './screens/MainMenu'
-import { ScanScreen } from './screens/ScanScreen'
 import { ScenarioScreen, type ScenarioStart } from './screens/ScenarioScreen'
+import { TellScreen } from './screens/TellScreen'
+import { PictureCheck } from './tools/PictureCheck'
+import { TextCheck } from './tools/TextCheck'
 
 // DEV CONSOLE: remove before shipping (see "Dev console" in PROJECT.md).
 // Only loaded by `npm run dev`, so it's left out of the built game.
@@ -23,12 +25,23 @@ const TITLES: Record<Route['name'], string> = {
   learn: 'Learn about scams',
   learnDone: 'You did it!',
   ask: 'Ask Shield Buddy',
-  scan: 'Check a picture',
+  check: 'Check for a scam',
+  tell: 'Tell a grown-up',
   grownUps: 'For grown-ups',
 }
 
+const TOOL_TITLES: Record<Tool, string> = {
+  picture: 'Check a picture',
+  link: 'Check a link',
+  message: 'Check a message',
+}
+
 const home = () => navigate({ name: 'home' })
-const scan = () => navigate({ name: 'scan' })
+const check = (tool: Tool) => navigate({ name: 'check', tool })
+const tell = () => navigate({ name: 'tell' })
+const ask = () => navigate({ name: 'ask' })
+// Where every tool can lead next
+const toolNav = { onHome: home, onTell: tell, onAsk: ask }
 const learn = (scenario: number, replace = false) => navigate({ name: 'learn', scenario }, { replace })
 
 export default function App() {
@@ -41,9 +54,10 @@ export default function App() {
   // DEV CONSOLE: leaving the scenarios forgets the jump, so it isn't replayed later
   if (jumped && route.name !== 'learn') setJumped(undefined)
 
+  const title = route.name === 'check' ? TOOL_TITLES[route.tool] : TITLES[route.name]
   useEffect(() => {
-    document.title = route.name === 'home' ? 'Scam Shield' : `${TITLES[route.name]} - Scam Shield`
-  }, [route.name])
+    document.title = route.name === 'home' ? title : `${title} - Scam Shield`
+  }, [route.name, title])
 
   const jump = (j: DevJump) => {
     setRun((r) => r + 1)
@@ -78,17 +92,24 @@ export default function App() {
   } else if (route.name === 'learnDone') {
     content = <EndScreen key={run} onPlayAgain={() => learn(1, true)} onMenu={home} />
   } else if (route.name === 'ask') {
-    content = <ChatScreen onBack={home} onLeave={(to) => (to === 'scan' ? scan() : home())} />
-  } else if (route.name === 'scan') {
-    content = <ScanScreen onBack={home} />
+    content = <ChatScreen onBack={home} onLeave={(to) => (to === 'home' ? home() : to === 'tell' ? tell() : check(to))} />
+  } else if (route.name === 'check') {
+    content =
+      route.tool === 'picture' ? (
+        <PictureCheck {...toolNav} />
+      ) : (
+        <TextCheck key={route.tool} kind={route.tool} {...toolNav} />
+      )
+  } else if (route.name === 'tell') {
+    content = <TellScreen onHome={home} onAsk={ask} />
   } else if (route.name === 'grownUps') {
     content = <GrownUpsScreen onBack={home} />
   } else {
     content = (
       <MainMenu
-        onScan={scan}
+        onScan={() => check('picture')}
         onLearn={() => learn(1)}
-        onAsk={() => navigate({ name: 'ask' })}
+        onAsk={ask}
         onGrownUps={() => navigate({ name: 'grownUps' })}
       />
     )

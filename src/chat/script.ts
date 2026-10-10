@@ -25,8 +25,8 @@ export type ChatOption = {
   icon?: ChatIcon
   // The chat step this answer leads to
   next?: StepId
-  // Or leave the chat: open Check a picture, or go back to the menu
-  leave?: 'scan' | 'home'
+  // Or leave the chat: open a tool, Tell a grown-up, or go back to the menu
+  leave?: 'picture' | 'link' | 'message' | 'tell' | 'home'
   // A "yes" in the questions: counts as a scam clue
   clue?: boolean
 }
@@ -74,13 +74,9 @@ export const STEPS: Record<StepId, ChatStep> = {
 
   picture: {
     mood: 'curious',
-    buddy: [
-      'Soon you can send me a screenshot or a photo.',
-      "I'll look for scam clues and show you where they are.",
-      'For now, show it to a grown-up. They can check it with you.',
-    ],
+    buddy: ["Send me a screenshot or a photo, and I'll look for scam clues.", 'I will show you where they are.'],
     options: [
-      { label: 'Show me an example', icon: 'picture', leave: 'scan' },
+      { label: 'Check a picture', icon: 'picture', leave: 'picture' },
       { label: 'Check something else', next: 'again' },
       { label: "I'm done", next: 'done' },
     ],
@@ -89,12 +85,12 @@ export const STEPS: Record<StepId, ChatStep> = {
   link: {
     mood: 'thinking',
     buddy: [
-      'Soon I can check links for you.',
-      'Here is a trick for now: look closely at the web address.',
+      "Let's check where that link really goes.",
       'Scammers use names that look almost real, like rob1ox.com instead of roblox.com.',
       'And never type your password on a website you got from a link.',
     ],
     options: [
+      { label: 'Check a link', icon: 'link', leave: 'link' },
       { label: 'Ask me questions about it', icon: 'question', next: 'question1' },
       { label: 'Tell a grown-up', icon: 'grownUp', next: 'tell' },
       { label: 'Check something else', next: 'again' },
@@ -103,12 +99,10 @@ export const STEPS: Record<StepId, ChatStep> = {
 
   message: {
     mood: 'thinking',
-    buddy: [
-      'Soon you can show me a message, and I will look for clues.',
-      'For now, I can ask you some questions about it.',
-    ],
+    buddy: ["Let's check that message.", 'Paste it in, or I can ask you some questions about it.'],
     options: [
-      { label: "OK, let's go", icon: 'question', next: 'question1' },
+      { label: 'Check a message', icon: 'message', leave: 'message' },
+      { label: 'Ask me questions about it', icon: 'question', next: 'question1' },
       { label: 'Tell a grown-up', icon: 'grownUp', next: 'tell' },
     ],
   },
@@ -166,6 +160,7 @@ export const STEPS: Record<StepId, ChatStep> = {
       'You could tell a parent, a teacher, or another grown-up you trust.',
     ],
     options: [
+      { label: 'Send it to a grown-up', icon: 'grownUp', leave: 'tell' },
       { label: 'Check something else', next: 'again' },
       { label: "I'm done", next: 'done' },
     ],
