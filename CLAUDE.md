@@ -18,8 +18,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The game is data-driven. Every scenario uses the same screens, and scenarios differ only in their data in `scenarios/NN-<slug>.json` (loaded in filename order by `src/scenarios.ts`; the format is `Scenario` in `src/types.ts`). Scenarios 4–5 are set aside in `scenarios/later/`, which isn't loaded.
 
-**Flow** (`src/screens/`):
-1. `MainMenu`: Start plays the scenarios in order (the dev console can jump to any one).
+**Menus** (`src/router.ts`): every place in the app has an address after the `#` (`#/`, `#/learn/2`, `#/learn/done`, `#/check`, `#/check/picture`, `#/grown-ups`), so the back button works and links can open any part. `App.tsx` picks the screen for the address; add new places to `Route` there. The home screen (`MainMenu`) leads with **Check a picture**, the flagship tool (`ScanScreen`: not built yet; shows an example scan made from scenario 1's clues), then Learn about scams (the game, which is becoming the tutorial), More checks (`CheckScreen`: the other tools, each "Coming soon" until built) and a small For grown-ups link (`GrownUpsScreen`: parent setup, not built yet; written for adults). The cards and tiles are in `screens/MenuCards.tsx`, and the menu icons in `src/icons.tsx` (simple line icons, never emojis).
+
+**Game flow** (`src/screens/`):
+1. Learn about scams plays the scenarios in order (the dev console can jump to any one). Each next scenario replaces the last in the browser history, so back leads to the menu.
 2. `ScenarioScreen`: the scam plays in on a fake screen; Shield Buddy says `buddy.intro`, `buddy.explain` and `buddy.choices`; then the Do it / Ignore it / Tell an adult buttons slide up.
 3. `DoItScreen` (only after Do it, only if the scenario has `doIt`): where the scam leads, e.g. a fake website.
 4. `OutcomeScreen`: Buddy explains the result, then "What if you had…" cards (worded by `whatIf`) show the other two choices. Results are always `do` → red, `ignore` → yellow, `tell` → green.

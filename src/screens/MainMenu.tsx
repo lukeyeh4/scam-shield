@@ -1,29 +1,32 @@
 import { Buddy } from '../buddy/Buddy'
+import { LearnIcon, ToolsIcon } from '../icons'
+import { MenuTile, ScanCard } from './MenuCards'
 
-const STEPS = [
-  { label: 'Stop', hint: 'Slow down' },
-  { label: 'Check', hint: 'Look for clues' },
-  { label: 'Tell', hint: 'Tell a grown-up' },
-]
+type MainMenuProps = {
+  onScan: () => void
+  onLearn: () => void
+  onCheck: () => void
+  onGrownUps: () => void
+}
 
-export function MainMenu({ onStart }: { onStart: () => void }) {
+// The home screen: Check a picture first (the main tool), then the game (the
+// tutorial) and the other checks. The grown-ups' area is a small link at the bottom.
+export function MainMenu({ onScan, onLearn, onCheck, onGrownUps }: MainMenuProps) {
   return (
-    <main className="menu">
+    <main className="menu home">
       <h1 className="menu-title">Scam Shield</h1>
 
-      <Buddy mood="happy" messages={["Hi! I'm Shield Buddy. Let's learn to spot scams together!"]} />
+      <Buddy mood="happy" messages={["Hi! I'm Shield Buddy. What would you like to do?"]} />
 
-      <ol className="menu-steps">
-        {STEPS.map((s) => (
-          <li key={s.label}>
-            <span className="menu-step-label">{s.label}</span>
-            <span className="menu-step-hint">{s.hint}</span>
-          </li>
-        ))}
-      </ol>
+      <ScanCard onClick={onScan} />
 
-      <button className="menu-start" type="button" onClick={onStart}>
-        Start
+      <div className="menu-tiles">
+        <MenuTile icon={<LearnIcon />} label="Learn about scams" hint="Play the game" onClick={onLearn} />
+        <MenuTile icon={<ToolsIcon />} label="More checks" hint="Links, QR codes and messages" onClick={onCheck} />
+      </div>
+
+      <button className="menu-grown-ups" type="button" onClick={onGrownUps}>
+        For grown-ups
       </button>
     </main>
   )

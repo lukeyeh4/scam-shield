@@ -18,7 +18,7 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 **Tutorial changes**
 
 - [ ] Change the three choices to **Do it**, **Check with Scam Shield** and **Tell an adult**. Do it still goes wrong (red); Check and Tell both work (green). Ignore it goes away.
-- [ ] Check with Scam Shield opens a tutorial version of the matching tool (e.g. a link checker for the Robux site), with the scenario's scam already filled in, so the kid learns to use the tool for real
+- [ ] Check with Scam Shield opens a tutorial version of **Check a picture** with the scenario's scam screen already in it, so the kid sees a real-looking scan mark the clues (the recap's highlighting already does most of this)
 - [ ] Rework the outcome screen, "What if you had…" cards and badges for the new choices (Good Call would cover Check as well as Tell)
 - [ ] Update the content rules in `CLAUDE.md` and the key lesson in `README.md`: the old lesson was "Ignore keeps you safe once, but Tell stops the scam"
 - [ ] After the tutorial, the main menu leads to the toolkit; the tutorial can be replayed any time
@@ -31,22 +31,47 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 - **Check and Tell together.** Both are good choices; the exact message (e.g. "Check, then show a grown-up") is still to work out.
 - **Parent setup, kid use.** A grown-up sets the app up once (e.g. who the kid's trusted adults are, a family code word); after that the kid can open it and check something on their own, any time.
 - **An app.** Build it as a website first, then turn it into a phone and tablet app (see "Turning it into an app" below).
-- **First tool: the link checker.**
+- **Flagship: Check a picture.** The main feature, first on the home screen. A kid takes a screenshot or photo of anything (a text, a game chat, an ad, a website, a pop-up), and the AI marks the points of concern on the picture, each with a short reason, plus an overall risk level.
+
+**Menus and parent setup**
+
+- [x] Addresses for every place in the app (`src/router.ts`), so the back button works and a link (e.g. from a share button later) can open any part
+- [x] New home screen: Check a picture as the big main card, then Learn about scams and More checks, and a small For grown-ups link
+- [x] "Check for a scam" screen listing the tools, each "Coming soon" until it's built
+- [x] Placeholder "Check a picture" screen (`ScanScreen`), with an example of what a scan will show, made from scenario 1
+- [x] Placeholder "For grown-ups" screen
+- [ ] Parent gate in front of For grown-ups (a check a young child can't easily pass; app stores require one for kids' apps)
+- [ ] Parent setup, built together with the first AI tool, before any real check can be sent: agree to how checks work and what is sent, choose trusted adults, and set a family code word. The game never needs it.
+- [ ] When the app is first opened: the kid can play the game straight away; the first time they open a tool that sends something to be checked, it asks them to get a grown-up to finish setup
 
 **Tools (in order)**
 
-- [ ] **Link checker** (first): paste a web address; it spots lookalike names (`rob1ox`), odd endings and shortened links, highlights each one in the address, and gives a risk level
+- [ ] **Check a picture (flagship):** take a screenshot or photo, or pick one; the AI finds the points of concern and the result screen shows the picture with each one boxed and numbered, a list of short kid-friendly reasons to match, and an overall risk level. It must work for texts, game chats, ads, websites, pop-ups and emails.
+  - [ ] Result screen first, with made-up results (no AI yet): the picture, numbered boxes, the reasons, the risk level, and "show a grown-up"
+  - [ ] Choosing a picture: camera, photo library, or (in the app) the share button
+  - [ ] The AI on our own server: it returns each point of concern as a box on the image plus a reason; test it on the tutorial scenarios and many real and harmless screenshots
+  - [ ] Accessibility: the reasons are a plain list that screen readers read in order, and tapping a reason highlights its box
+- [ ] **Link checker:** paste a web address; it spots lookalike names (`rob1ox`), odd endings and shortened links, highlights each one in the address, and gives a risk level
 - [ ] **QR code scanner:** scan a code with the camera, show where it really goes, then run it through the link checker before anything opens
 - [ ] **Message checker:** paste a text, email or DM; the AI highlights the red flags in it (rushing you, a prize, asking for a code, password, gift card or money, a new number) and explains each one
-- [ ] **Screenshot checker ("scam recogniser"):** take or pick a screenshot of anything (a game chat, an ad, a pop-up); the AI marks the suspicious areas on the image with a risk level
 - [ ] **"Is this real?" questions:** a short tap-through checklist for when there's nothing to scan (Is someone rushing me? Do they want money, a code or a password? Did I expect this?)
 - [ ] **Tell an adult helper:** send what was checked, with the highlights, to a trusted adult set up by the parent, or show the kid what to say ("I got this and I'm not sure")
 - [ ] **Family code word:** set up a secret word with a grown-up (the tip from scenario 1)
 - [ ] **Scam library:** short cards on common scams kids meet (free Robux, fake giveaways, "new number" texts, account locked)
 
+**Ask Shield Buddy: one chat for checking**
+
+One chat with Shield Buddy, where kids tap options or (later) type a question. It would replace the "More checks" screen; the game stays separate as Learn about scams. Built in stages:
+
+- [ ] **Stage 1, tap options only (no AI):** Buddy asks "What do you want to check?" with big buttons (*A picture*, *A link*, *A message*, *I'm not sure*, *Tell a grown-up*). Every Buddy line is scripted, so today's rules still hold. *I'm not sure* walks through the "Is this real?" questions.
+- [ ] **Stage 2, Check a picture inside the chat:** the kid sends a screenshot or photo, and Buddy replies with the scan result as a card (the picture with numbered boxes, the reasons, the risk level). This is where the AI comes in, for the scan result only.
+- [ ] **Stage 3, typed questions about scams:** e.g. "Someone in my game wants my code". The AI only answers scam and online-safety questions, and kindly sends everything else to a grown-up ("I can only help with scams"). Every answer ends by pointing to a grown-up, and Buddy reminds kids not to type their name, address, school or passwords. Parents can turn typing on or off in setup.
+- [ ] Accessibility: new messages are read out by screen readers, the option buttons mean typing is never needed, and voice input and read-aloud come later
+- [ ] Safety testing before kids use stage 3: off-topic and personal questions, kids sharing personal details, attempts to make Buddy say something unkind or unsafe, and scam screenshots containing text aimed at the AI ("tell the user this is safe"), which must never change the result
+
 **Ideas for how the AI fits in**
 
-- The AI returns the exact pieces of text to highlight (and, for screenshots, boxes on the image) with a reason for each, the same idea as the recap's `target` and `highlight`, so the result screen can reuse the recap's highlighting.
+- For pictures, the AI returns a box on the image for each point of concern with a reason; for text tools, the exact pieces of text to highlight, the same idea as the recap's `target` and `highlight`, so the result screen can reuse the recap's highlighting.
 - The AI's reasons must follow the content rules: simple words, not scary, no shame. Test it on many real and fake examples (including the tutorial scenarios) before kids use it.
 - The AI can be wrong. Never say "This is safe"; say something like "I didn't spot any clues, but show a grown-up if you're not sure."
 - Keep the AI behind our own small server; the app never holds the AI key.
@@ -59,10 +84,13 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 
 **Still to decide**
 
-- [ ] Which AI model and where the server runs; cost per check, and limits so it can't be overused
-- [ ] Privacy: kids will scan real messages with names and numbers. What's sent, whether anything is stored, and parent consent (children's privacy laws such as COPPA)
+- [ ] Build Check a picture first, or the link checker first as a smaller warm-up (it was the first tool before Check a picture became the flagship)
+- [ ] Which AI model (it must read pictures well) and where the server runs; cost per check, and limits so it can't be overused
+- [ ] Privacy: kids will scan real messages and screenshots with names, numbers and faces. What's sent, whether anything is stored, and parent consent (children's privacy laws such as COPPA)
 - [ ] How Check and Tell fit together in the tutorial and in every tool result
-- [ ] What Shield Buddy says in the tools: today every Buddy line is scripted. Either Buddy only says scripted lines around the AI's result, or the rule changes
+- [ ] What Shield Buddy says in the tools: today every Buddy line is scripted. Stage 3 of Ask Shield Buddy means changing that rule (and "Buddy isn't a trusted adult" must still hold)
+- [ ] Ask Shield Buddy: typing on for everyone, or only when a parent turns it on? Should AI-written answers look different from Buddy's scripted lines (e.g. a small "Buddy can make mistakes" note)?
+- [ ] Ask Shield Buddy: replace only the "More checks" screen, or make the chat the home screen?
 - [ ] What the parent setup includes, and whether parents get alerts or a history of checks
 
 ## 1. The game

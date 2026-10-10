@@ -1,10 +1,14 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { recordFinished } from './badges'
 import type { DevJump } from './dev/DevConsole'
+import { navigate, type Route, useRoute } from './router'
 import { scenarios } from './scenarios'
 import { BadgeToast } from './screens/Badges'
+import { CheckScreen } from './screens/CheckScreen'
 import { EndScreen } from './screens/EndScreen'
+import { GrownUpsScreen } from './screens/GrownUpsScreen'
 import { MainMenu } from './screens/MainMenu'
+import { ScanScreen } from './screens/ScanScreen'
 import { ScenarioScreen, type ScenarioStart } from './screens/ScenarioScreen'
 
 // DEV CONSOLE: remove before shipping (see "Dev console" in PROJECT.md).
@@ -13,44 +17,79 @@ const DevConsole = import.meta.env.DEV
   ? lazy(() => import('./dev/DevConsole').then((m) => ({ default: m.DevConsole })))
   : null
 
-type View =
-  | { screen: 'menu' }
-  | { screen: 'end' }
-  | { screen: 'scenario'; index: number; start?: ScenarioStart }
+// Names each place in the browser tab, which screen readers also read out
+const TITLES: Record<Route['name'], string> = {
+  home: 'Scam Shield',
+  learn: 'Learn about scams',
+  learnDone: 'You did it!',
+  check: 'Check for a scam',
+  scan: 'Check a picture',
+  grownUps: 'For grown-ups',
+}
+
+const home = () => navigate({ name: 'home' })
+const scan = () => navigate({ name: 'scan' })
+const learn = (scenario: number, replace = false) => navigate({ name: 'learn', scenario }, { replace })
 
 export default function App() {
-  const [view, setView] = useState<View>({ screen: 'menu' })
+  const route = useRoute()
   // DEV CONSOLE: changes on every jump, so the same screen can start over
   const [run, setRun] = useState(0)
+  // DEV CONSOLE: the scenario a jump opened part-way through, and where
+  const [jumped, setJumped] = useState<{ scenario: number; start?: ScenarioStart }>()
 
-  const play = (index: number) => setView({ screen: 'scenario', index })
-  const menu = () => setView({ screen: 'menu' })
+  // DEV CONSOLE: leaving the scenarios forgets the jump, so it isn't replayed later
+  if (jumped && route.name !== 'learn') setJumped(undefined)
+
+  useEffect(() => {
+    document.title = route.name === 'home' ? 'Scam Shield' : `${TITLES[route.name]} - Scam Shield`
+  }, [route.name])
 
   const jump = (j: DevJump) => {
     setRun((r) => r + 1)
-    setView(j.to === 'scenario' ? { screen: 'scenario', index: j.index, start: j.start } : { screen: j.to })
+    if (j.to === 'scenario') {
+      setJumped({ scenario: j.index + 1, start: j.start })
+      learn(j.index + 1)
+    } else {
+      navigate({ name: j.to === 'menu' ? 'home' : 'learnDone' })
+    }
   }
 
   let content
-  if (view.screen === 'menu') {
-    content = <MainMenu onStart={() => play(0)} />
-  } else if (view.screen === 'end') {
-    content = <EndScreen key={run} onPlayAgain={() => play(0)} onMenu={menu} />
-  } else {
-    const { index, start } = view
-    const isLast = index === scenarios.length - 1
+  if (route.name === 'learn' && route.scenario <= scenarios.length) {
+    const index = route.scenario - 1
+    const isLast = route.scenario === scenarios.length
     content = (
       <ScenarioScreen
         key={`${scenarios[index].id}-${run}`}
         scenario={scenarios[index]}
         isLast={isLast}
-        start={start}
-        onBack={menu}
+        start={jumped?.scenario === route.scenario ? jumped.start : undefined}
+        onBack={home}
         onNext={() => {
-          if (!isLast) return play(index + 1)
+          setJumped(undefined)
+          // Each new scenario replaces the last, so back always leads to the menu
+          if (!isLast) return learn(route.scenario + 1, true)
           recordFinished()
-          setView({ screen: 'end' })
+          navigate({ name: 'learnDone' }, { replace: true })
         }}
+      />
+    )
+  } else if (route.name === 'learnDone') {
+    content = <EndScreen key={run} onPlayAgain={() => learn(1, true)} onMenu={home} />
+  } else if (route.name === 'check') {
+    content = <CheckScreen onBack={home} onScan={scan} />
+  } else if (route.name === 'scan') {
+    content = <ScanScreen onBack={home} />
+  } else if (route.name === 'grownUps') {
+    content = <GrownUpsScreen onBack={home} />
+  } else {
+    content = (
+      <MainMenu
+        onScan={scan}
+        onLearn={() => learn(1)}
+        onCheck={() => navigate({ name: 'check' })}
+        onGrownUps={() => navigate({ name: 'grownUps' })}
       />
     )
   }
