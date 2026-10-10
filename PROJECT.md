@@ -164,6 +164,7 @@ Done so far:
 
 - [x] Cream colours as the default (`:root` in `src/index.css`): cream background with corner glows, off-white cards, brown text, orange buttons (`--accent`), yellow (`--sun`) and teal (`--teal`) for icon tiles. The old greys and other palettes are still in the dev console's Colours picker to compare
 - [x] Home: the yellow shield logo and a tagline
+- [x] New Shield Buddy: a friendly yellow shield with a face and hands (replaces the silver robot shield), about 1.5x bigger, centred, and lined up with the bottom of its speech bubbles
 - [x] Chat answers as soft rounded cards, two to a row, every icon on a soft tint of the main orange (the mixed orange, yellow and teal tiles clashed)
 - [ ] Fonts: **Nunito** everywhere for now (rounded and very readable, like the mock-up). Also in the dev console: Fredoka + Nunito (bouncier), Baloo 2 + Nunito, Andika (made for children learning to read), and the old system font. The fake scam screens always keep the real phone font. Loaded from Google Fonts for now; bundle the chosen ones with the app so they work offline and nothing is fetched from Google
 
@@ -172,6 +173,8 @@ To do (mostly when it becomes an app):
 - [x] Home screen like the mock-up, without the tab bar: a header card (logo, tagline, gear for grown-ups), then two big warm cards: Check something (a picture, a message or a link; opens the chat) and Learn about scams. The chat's answers use the same cards (`OptionCard`). One font everywhere (Nunito)
 - [ ] Tab bar (Home, Learn, History, More), if wanted in the app (left out for now)
 - [ ] History: past checks. Decide what's kept, where (on the device only?), and for how long, since it's kids' data
+- [ ] Retake the README screenshots (`docs/screenshots/`): they show the old grey look and robot Buddy
+- [ ] The game's own screens (outcome, Spot the clues, recap, end screen) still use some soft placeholder tints: bring them into the cream look
 - [ ] Night colours for later (a dark mode), with darker result banners
 - [ ] Once settled, copy the final colours into `:root` and remove the dev palettes
 - [ ] Bright, friendly style with big buttons and large text (see "Look and feel" in `README.md`)

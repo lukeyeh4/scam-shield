@@ -59,13 +59,24 @@ Every scam follows the same steps, so kids always know what's coming.
 
 <img src="docs/screenshots/scam-shorts.png" alt="A fake giveaway on YouTube Shorts" width="50%">
 
+*The screenshots show an earlier look (grey colours and the old robot Buddy); the game now uses the cream look below.*
+
 ## Shield Buddy
 
-A friendly shield that guides each scam in short speech bubbles. It has six moods (`happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`) and a little move for each.
+A friendly yellow shield with a face and little hands, who guides each scam in short speech bubbles. It has six moods (`happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`) and a little move for each.
 
 - **No hints before the choice.** Kids find the clues themselves.
 - **Not a trusted adult.** It always sends kids to a real grown-up.
 - **Every line is scripted** in the scenario files. Nothing is generated.
+
+## Look and feel
+
+Warm and friendly, so it feels safe to use:
+
+- **Cream colours:** a warm cream background with soft peach and yellow glows, off-white cards with big rounded corners and gentle shadows, dark brown text, and orange buttons. Icon tiles use warm tones that sit close together (orange, peach, gold, amber), so nothing clashes.
+- **One rounded font:** Nunito, friendly but very easy to read.
+- **Big, calm screens:** few boxes and few words, one main button, simple line icons.
+- **Fake screens stay real:** the scam screens keep the real phone colours and font, so they look like what kids actually see.
 
 ## Design rules
 
@@ -85,7 +96,7 @@ npm run lint
 npm test         # check every scenario file and the red-flag highlighting
 ```
 
-While running `npm run dev`, a **Dev** button in the corner jumps to any screen and has a fast mode that skips Buddy's typing. It's left out of the build and must be removed before shipping (see `PROJECT.md`).
+While running `npm run dev`, a **Dev** button in the corner jumps to any screen, has a fast mode that skips Buddy's typing, and lets you try other colour palettes and fonts. It's left out of the build and must be removed before shipping (see `PROJECT.md`).
 
 ## How it's built
 
