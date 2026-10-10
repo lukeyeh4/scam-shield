@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Run: `npm run dev`
 - Build (type-checks first): `npm run build`
 - Lint: `npm run lint` (oxlint)
-- Tests: Vitest is installed, but there's no `test` script or tests yet
+- Tests: `npm test` (Vitest). `src/scenarios.test.ts` checks every scenario file; its list of target names per fake screen mirrors the `<Field name=...>` and `useMark` names in `src/mockups/`, so update it when you add or rename one
 
 ## Architecture
 

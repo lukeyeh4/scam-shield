@@ -108,12 +108,13 @@ Replace the grey wireframe with the real look.
 
 ## 4. Tests and checks
 
-Vitest is installed, but there's no test script or tests yet.
+Run them with `npm test`.
 
-- [ ] Add a `test` script to `package.json`
-- [ ] Test that every scenario file is valid: every recap `target` is a real content field, and every `highlight` appears exactly in that field's text
-- [ ] Test the red-flag highlighting helper (`src/highlight.ts`)
-- [ ] Add the test command to `CLAUDE.md` and the "Getting started" section of `README.md`
+- [x] Add a `test` script to `package.json`
+- [x] Test that every scenario file is valid, including those in `scenarios/later/` (`src/scenarios.test.ts`): every recap `target` is a real part of its screen, every `highlight` appears exactly in that part's text, and each choice has its usual result
+- [x] Test the red-flag highlighting helper (`src/highlight.ts`)
+- [x] Add the test command to `CLAUDE.md` and the "Getting started" section of `README.md`
+- [ ] Run the tests in the deploy workflow too, so a broken scenario never goes live
 
 ## 5. Content review
 

@@ -82,6 +82,7 @@ npm install
 npm run dev      # play it locally
 npm run build    # type-check and build static files for hosting
 npm run lint
+npm test         # check every scenario file and the red-flag highlighting
 ```
 
 While running `npm run dev`, a **Dev** button in the corner jumps to any screen and has a fast mode that skips Buddy's typing. It's left out of the build and must be removed before shipping (see `PROJECT.md`).
