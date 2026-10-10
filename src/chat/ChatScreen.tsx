@@ -16,13 +16,10 @@ const ICONS: Record<ChatIcon, typeof ScanIcon> = {
   question: QuestionIcon,
 }
 
-// What Buddy says on arriving at a step: its usual lines, or the ones for when
-// the player found scam clues
-function buddyLines(id: StepId, clues: number): Entry[] {
+// What Buddy says on arriving at a step
+function buddyLines(id: StepId): Entry[] {
   const step = STEPS[id]
-  const said = step.ifClues && clues > 0 ? step.ifClues : step
-  const count = `${clues} scam clue${clues === 1 ? '' : 's'}`
-  return said.buddy.map((text) => ({ from: 'buddy', text: text.replace('{clues}', count), mood: said.mood }))
+  return step.buddy.map((text) => ({ from: 'buddy', text, mood: step.mood }))
 }
 
 // Entries in a row from the same side, shown together like in a messaging app
@@ -47,8 +44,7 @@ type ChatScreenProps = {
 // says is in script.ts. Typing or saying a question is shown but not built yet.
 export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const [step, setStep] = useState<StepId>('start')
-  const [clues, setClues] = useState(0)
-  const [entries, setEntries] = useState<Entry[]>(() => buddyLines('start', 0))
+  const [entries, setEntries] = useState<Entry[]>(() => buddyLines('start'))
   // How many entries are showing; the last one may still be typing
   const [shown, setShown] = useState(1)
   const [hurried, setHurried] = useState(-1)
@@ -117,11 +113,8 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const choose = (option: ChatOption) => {
     if (option.leave) return onLeave(option.leave)
     if (!option.next) return
-    const next = STEPS[option.next]
-    const count = (next.resetClues ? 0 : clues) + (option.clue ? 1 : 0)
-    setClues(count)
     setStep(option.next)
-    setEntries([...entries, { from: 'kid', text: option.label }, ...buddyLines(option.next, count)])
+    setEntries([...entries, { from: 'kid', text: option.label }, ...buddyLines(option.next)])
     setShown(shown + 1)
     following.current = true
   }
@@ -212,7 +205,8 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
           </div>
         )}
 
-        <form className="ask-compose" onSubmit={(e) => e.preventDefault()}>
+        {/* Lights up when Buddy says to ask it down here */}
+        <form className={ready && STEPS[step].pointAtBox ? 'ask-compose is-pointed' : 'ask-compose'} onSubmit={(e) => e.preventDefault()}>
           <label className="sr-only" htmlFor="ask-question">
             Type a question
           </label>

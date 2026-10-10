@@ -89,7 +89,7 @@ export default function App() {
   } else if (route.name === 'learnDone') {
     content = <EndScreen key={run} onPlayAgain={() => learn(1, true)} onMenu={home} />
   } else if (route.name === 'ask') {
-    content = <ChatScreen onBack={home} onLeave={(to) => (to === 'home' ? home() : check(to))} />
+    content = <ChatScreen onBack={home} onLeave={check} />
   } else if (route.name === 'check') {
     content =
       route.tool === 'picture' ? (

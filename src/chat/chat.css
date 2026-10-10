@@ -240,6 +240,25 @@
   }
 }
 
+/* When Buddy says "ask me down here", the box glows so it's easy to find */
+.ask-compose.is-pointed {
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 6px #f5b700;
+  animation: box-glow 1.6s ease-in-out 3;
+}
+
+@keyframes box-glow {
+  50% {
+    box-shadow: 0 0 0 3px var(--bg), 0 0 0 10px rgb(245 183 0 / 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ask-compose.is-pointed {
+    animation: none;
+  }
+}
+
 /* The microphone stays a little easier to see than the send button, so it's
    clear talking will be an option */
 .ask-compose .ask-mic:disabled {

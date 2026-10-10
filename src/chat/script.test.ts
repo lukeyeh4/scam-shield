@@ -39,9 +39,7 @@ describe('chat script', () => {
     for (const id of ids) expect(canFinish(id), id).toBe(true)
   })
 
-  it('only uses {clues} where the clue count is known', () => {
-    for (const id of ids) {
-      expect(STEPS[id].buddy.join(' '), id).not.toContain('{clues}')
-    }
+  it('sends a kid who is not sure to a grown-up', () => {
+    expect(STEPS.notSure.buddy.join(' ')).toContain('grown-up')
   })
 })
