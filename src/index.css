@@ -97,8 +97,9 @@ button:active {
   flex: none;
   width: 160px;
   height: 160px;
-  /* The artwork has empty space around the shield */
-  margin: -16px -12px -20px;
+  /* The artwork has empty space above and beside the shield; its bottom lines
+     up with the bottom of the newest bubble (which sits 1em up in its box) */
+  margin: -16px -12px 1em;
 }
 
 /* The bubbles stack up inside a box. Once the stack is too tall it fades out at the
