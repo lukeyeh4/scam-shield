@@ -8,7 +8,9 @@ export type Risk = 'high' | 'medium' | 'none'
 
 export type Clue = { label: string; reason: string; highlight?: string }
 
-export type CheckResult = { risk: Risk; clues: Clue[] }
+// `good`: facts in its favour (e.g. "This is the real Roblox website"), shown only
+// when there are no clues. Never "safe": a check can miss things.
+export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[] }
 
 // Check a picture: the "new number" scam from the game, with its "Spot the clues" red flags
 export const examplePicture = scenarios.find((s) => s.id === 'new-number')

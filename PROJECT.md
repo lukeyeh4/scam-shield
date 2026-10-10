@@ -59,9 +59,25 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
   - [ ] Accessibility: the reasons are a plain list that screen readers read in order, and tapping a reason highlights its box
 - [ ] **Link checker**, in layers so the result is based on facts, not guesses:
   - [x] **Layer 1, on the device** (branch `link-checker`, `src/tools/linkCheck.ts`): a real link box with a Paste button; checks the address only, never opens it: pretending to be a brand kids use (Roblox, YouTube, Google, Apple, Fortnite, Discord, ...: its name in the address but not its real website, lookalike characters like rob1ox, or one letter added, missing or swapped), letters from other alphabets, an @ that hides the real address, numbers instead of a name, short links, very long addresses, endings used by many scam sites, bait words after the name (free, claim, giveaway, ...), and http. Strong clues mean "This looks like a scam", smaller ones "Be careful", none "No clues found" (still "show a grown-up"). A link typed in the chat fills in the checker. Tested with real and scam addresses
-  - [ ] **Layer 2, on a small server** (e.g. a Cloudflare Worker, which holds the keys): Google Safe Browsing (free, non-commercial only) or Google Web Risk (for a commercial app) and URLhaus for known dangerous sites; RDAP for how new the website is ("made 3 days ago"); following short links to the real address (without opening the page); a DNS lookup to see if the site exists. Never store the links kids check; prefer Google's private hash-prefix lookups. Needs a Cloudflare account and a Google Cloud key, and a decision: will Scam Shield be commercial?
+  - [x] **Layer 2, on a small server** (`worker/`, a Cloudflare Worker that holds the Google key; `src/tools/linkLookup.ts` in the app): Google Safe Browsing (free for non-commercial use, and Scam Shield is non-commercial), RDAP for how new the website is ("made 3 days ago"), a DNS lookup to see if the site exists, and following short links to the real address (without opening the page; bit.ly's own warning page counts as a clue). Nothing is stored. Runs while "Checking" shows; if the server doesn't answer, the device's clues show on their own
+  - [x] Deployed at https://scam-shield-links.lukeyeh4.workers.dev (Cloudflare account lukeyeh4; `npm run deploy` in `worker/`; the key is set with `npx wrangler secret put SAFE_BROWSING_KEY`). Its address is in `.env.production` as `VITE_LINK_SERVER`; it only answers the live game and localhost
+  - [ ] Maybe: URLhaus (needs a free abuse.ch key now); Safe Browsing's private hash-prefix lookups (v5) instead of sending the whole link to Google; a limit on checks per minute so the key can't be overused
   - [ ] Each clue says where it came from (e.g. "Google's safety list says...", "This website was made 3 days ago")
-  - [ ] Layer 3, maybe: AI only to reword the reasons for kids; the facts still decide the risk
+  - [x] **Layer 3, AI reads the page** (`worker/src/page.ts`, Claude Haiku 5.5): only when layers 1 and 2 find nothing and it isn't a real brand's website. The Worker fetches the page (text and forms, no scripts) and Claude answers fixed questions; the app words the clues. Tested: catches made-up Robux and prize scams (including one telling the AI to say it's safe), passes Wikipedia and a kids' games page. About $0.0005 per page read; 20 checks a minute per person
+  - [x] Unlicensed streaming websites (streamed.pk) and pop-up ad networks: "Be careful", since they aren't scams themselves but their ads lead to them. "Not on Google's list" is now worded as a small sign: "Google hasn't marked it as dangerous yet"
+  - [ ] Pages behind bot protection (e.g. bloxflip.com) can't be read; a real browser (Cloudflare Browser Rendering) with a screenshot for Claude to look at might get further
+  - [x] Tested (2026-10-10) against the live server: 40 real websites kids and families use (39 "No clues found", GitHub's login page "Be careful"), 40 live phishing links from OpenPhish (27 "This looks like a scam", 12 "Be careful", mostly pages already taken down, 1 missed), and 15 made-up pages in `worker/test/pages.ts` (`npm run test-pages` in `worker/`: every scam caught, including one telling the AI to say it's safe; no false alarms on a fan wiki, kids' news, free games). What the tests changed: free website makers (vercel.app, pages.dev, github.io, ...) are judged per site, not by the platform's age, and are a small clue themselves; a password or card form on one is a strong clue; new AI questions for downloads and unreal deals; the AI reads the page whenever nothing strong was found
+  - [x] A short link the server followed to a website with no clues is no longer "Be careful": the result says where it goes ("This short link goes to youtube.com") and that website's good signs. Short links that can't be followed stay "Be careful"; bit.ly's warning page and tinyurl's blocked-link page are strong clues. Tested with real bit.ly, is.gd and tinyurl links
+  - [ ] Little-known short links (s4w.in) aren't on the list, so they aren't followed
+  - [ ] The website-age lookup sometimes fails for .xyz (the registry is slow); it's tried twice
+  - [ ] Compare Haiku with Opus on the made-up pages and a bigger set of real ones
+  - [ ] It sometimes names a brand that's only offered as a prize ("copies PlayStation" for a free-PS5 page)
+  - [ ] Set a monthly spending limit in the Anthropic Console (Claude costs about $0.0003–0.0005 per page read; everything else is free)
+  - [ ] A daily cap on AI page reads in the Worker, and remembering recent answers per website, so misuse can't run up the bill
+  - [ ] VirusTotal (free for non-commercial use, about 90 security companies' verdicts, lookup only): would catch sites like vmsvedaweb.com that web filters block but Google doesn't list. Needs a free key in `worker/.dev.vars`
+  - [ ] Pop-up ads hidden inside a page's own code (streamed.pk) aren't seen; a screenshot of the page for Claude might catch them
+  - [x] Layer 1 rebuilt on the Public Suffix List (`tldts`): the real website, subdomains, path and @ are told apart; brand copies by missing, extra, changed or swapped letters, lookalike numbers and letters from other alphabets; official addresses in `src/tools/brands.ts`; fan websites of games (`fans: true`) only "Be careful"; links found inside pasted messages
+  - [x] Every clue explains the trick in this link and why it matters ("It says "ronlox", not "roblox". One letter is different: "n" instead of "b"."), with the result in soft red, yellow or green, each with its own icon
   - Original idea (wireframe done): paste a web address; it spots lookalike names (`rob1ox`), odd endings and shortened links, highlights each one in the address, and gives a risk level
 - [ ] **QR code scanner:** scan a code with the camera, show where it really goes, then run it through the link checker before anything opens
 - [ ] **Message checker** (wireframe done): paste a text, email or DM; the AI highlights the red flags in it (rushing you, a prize, asking for a code, password, gift card or money, a new number) and explains each one
@@ -74,6 +90,7 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 
 One chat with Shield Buddy, where kids tap options or (later) type a question. The home screen's **Check something** button opens it; the game stays separate as Learn about scams. Built in stages:
 
+- [x] The conversation carries on after a check (in memory only): Buddy greets once, then reacts to what the check found, in a different way each time (`alternatives` in `chat/script.ts`)
 - [x] **Stage 1, tap options only (no AI):** Buddy asks "What do you want to check?" with big buttons (*A picture*, *A link*, *A message*, *I'm not sure*). Picture, link and message: one short line and one button that opens the checker. Every Buddy line is scripted, so today's rules still hold. *I'm not sure*: ask a grown-up, or ask Buddy below by typing or talking. The box for typing and the microphone are shown but turned off.
 - [ ] **Stage 2, Check a picture inside the chat:** the kid sends a screenshot or photo, and Buddy replies with the scan result as a card (the picture with numbered boxes, the reasons, the risk level). This is where the AI comes in, for the scan result only.
 - [x] Typing works, with placeholder replies (branch `wireframes`): the kid's question shows as their message; Buddy replies "I can't answer questions yet... show it to a grown-up", or offers the link checker if it looks like a link. Nothing typed is kept or sent. The parents' typing switch doesn't control it yet.
@@ -205,7 +222,9 @@ Run them with `npm test`.
 ## Later
 
 - [ ] Spot the clues: on narrow phones the checklist takes a lot of room under the iPad screen
-- [ ] Read-aloud audio for Shield Buddy's lines
+- [x] Read-aloud for Shield Buddy's lines: a "Read aloud" switch in the top corner (off by default) uses the device's own voice (Web Speech API, `src/readAloud.ts`), so it can read AI tool results too
+- [ ] Read-aloud: the switch sits in the top-right corner and covers the home screen's gear on phones; find it a better place (e.g. a speaker button by Buddy, or the grown-ups settings)
+- [ ] Read-aloud: test on iPad Safari and Android; pick a nicer voice where one is available; maybe make audio files for one consistent Buddy voice
 - [ ] More scenarios
 
 ## Still to decide
@@ -228,7 +247,7 @@ It's left out of `npm run build`, but remove it before shipping anyway. Everythi
 - [ ] Delete the `src/dev/` folder
 - [ ] `src/App.tsx`: remove the `DevConsole` import, `DevJump`, `run` and `jump`, and the `key={run}` parts
 - [ ] `src/motion.ts`: remove `isFast()`
-- [ ] `src/buddy/Buddy.tsx`: remove `isFast()` from the wait between messages
+- [ ] `src/buddy/Buddy.tsx`: remove `isFast()` from the wait between messages and from `readAloud`
 - [ ] `src/screens/ScenarioScreen.tsx`: remove `ScenarioStart` and the `start` prop
 - [ ] `src/screens/RecapScreen.tsx`: remove the `startAtSummary` prop
 - [ ] `src/badges.ts`: remove `resetBadges`

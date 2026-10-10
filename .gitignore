@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Worker secrets for local testing (never commit)
+.dev.vars
+.wrangler
+*.tsbuildinfo

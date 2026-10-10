@@ -21,6 +21,28 @@ function Icon({ className, children }: IconProps & { children: ReactNode }) {
   )
 }
 
+// How risky a check's result looks: a warning sign, a question, a tick
+export const DangerIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M10.3 3.9 2.6 17.5a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+    <path d="M12 9.5v4M12 17h.01" />
+  </Icon>
+)
+
+export const UnsureIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.3-2.4 3.8M12 17h.01" />
+  </Icon>
+)
+
+export const GoodIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="m8 12.5 2.7 2.7L16 9.8" />
+  </Icon>
+)
+
 // A viewfinder with a magnifying glass: looking closely at a picture
 export const ScanIcon = (p: IconProps) => (
   <Icon {...p}>

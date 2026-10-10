@@ -5,8 +5,8 @@ import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
 import { CameraIcon, LinkIcon, MessageIcon, MicIcon, QuestionIcon, SendIcon } from '../icons'
 import { OptionCard, type Tone } from '../screens/OptionCard'
-import type { Mood } from '../types'
-import { type ChatIcon, type ChatOption, findLink, replyTo, STEPS, type StepId } from './script'
+import { BACK_AFTER, buddySays, type ChatIcon, type ChatOption, findLink, replyTo, STEPS, type StepId } from './script'
+import { checkSinceChat, type Entry, forgetCheck, saveChat, savedChat } from './session'
 import './chat.css'
 
 // How Buddy's messages appear in the chat: 'dots' shows moving "typing" dots,
@@ -14,8 +14,6 @@ import './chat.css'
 // message out letter by letter, like the rest of the game.
 const REVEAL = 'dots' as 'dots' | 'typewriter'
 const useReveal = REVEAL === 'dots' ? useDots : useTypewriter
-
-type Entry = { from: 'buddy'; text: string; mood: Mood } | { from: 'kid'; text: string }
 
 // The same icons and warm colours as the cards on the home screen
 const ICONS: Record<ChatIcon, { Icon: typeof CameraIcon; tone: Tone }> = {
@@ -25,10 +23,30 @@ const ICONS: Record<ChatIcon, { Icon: typeof CameraIcon; tone: Tone }> = {
   question: { Icon: QuestionIcon, tone: 'amber' },
 }
 
-// What Buddy says on arriving at a step
-function buddyLines(id: StepId): Entry[] {
-  const step = STEPS[id]
-  return step.buddy.map((text) => ({ from: 'buddy', text, mood: step.mood }))
+// What Buddy says on arriving at a step (the `turn`th time, for steps it says in turn)
+function buddyLines(id: StepId, turn = 0): Entry[] {
+  return buddySays(id, turn).map((text) => ({ from: 'buddy', text, mood: STEPS[id].mood }))
+}
+
+// Steps where Buddy has just asked what to check, so there's nothing to add
+const ASKING: StepId[] = ['start', 'again', ...Object.values(BACK_AFTER)]
+
+// Where the chat starts: Buddy's greeting the first time; after that, the chat so
+// far (all showing at once) and Buddy carrying on: about what a check just found,
+// or asking what to check next (unless it just asked)
+function resume() {
+  const chat = savedChat()
+  if (!chat) return { step: 'start' as StepId, entries: buddyLines('start'), shown: 1, typedLink: undefined, backTurns: 0 }
+  const risk = checkSinceChat()
+  if (!risk && ASKING.includes(chat.step)) return { ...chat, shown: chat.entries.length }
+  const next = risk ? BACK_AFTER[risk] : 'again'
+  return {
+    step: next,
+    entries: [...chat.entries, ...buddyLines(next, chat.backTurns)],
+    shown: chat.entries.length + 1,
+    typedLink: chat.typedLink,
+    backTurns: chat.backTurns + (risk ? 1 : 0),
+  }
 }
 
 // Entries in a row from the same side, shown together like in a messaging app
@@ -48,20 +66,26 @@ type ChatScreenProps = {
   onLeave: (to: NonNullable<ChatOption['leave']>, link?: string) => void
 }
 
-// Ask Shield Buddy: a chat where Buddy helps check something that feels weird.
+// Ask Shield Buddy: a chat where Buddy helps check something that feels weird. The
+// conversation carries on after leaving to check something (session.ts).
 // Buddy's messages appear one at a time (typing dots, then the whole message); once
 // it has finished, the answers slide up and the player taps one, or types a
 // question in the box (Buddy's replies are placeholders until the AI answers them).
 // Everything Buddy says is in script.ts. Asking out loud is shown but not built yet.
 export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
-  const [step, setStep] = useState<StepId>('start')
-  const [entries, setEntries] = useState<Entry[]>(() => buddyLines('start'))
+  const [start] = useState(resume)
+  const [step, setStep] = useState<StepId>(start.step)
+  const [entries, setEntries] = useState<Entry[]>(start.entries)
   // How many entries are showing; the last one may still be typing
-  const [shown, setShown] = useState(1)
+  const [shown, setShown] = useState(start.shown)
   const [hurried, setHurried] = useState(-1)
   // What the player is typing in the box, and the last link they typed
   const [draft, setDraft] = useState('')
-  const [typedLink, setTypedLink] = useState<string>()
+  const [typedLink, setTypedLink] = useState(start.typedLink)
+
+  // Keep the conversation for coming back, and Buddy has now talked about the last check
+  useEffect(() => forgetCheck(), [])
+  useEffect(() => saveChat({ step, entries, typedLink, backTurns: start.backTurns }), [step, entries, typedLink, start.backTurns])
 
   const latest = entries[shown - 1]
   const latestText = latest.from === 'buddy' ? latest.text : ''

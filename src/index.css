@@ -16,6 +16,17 @@
   /* Friendly extra colours for icon tiles */
   --sun: #f4c04f;
   --teal: #3aa79a;
+  /* How risky a checked thing looks: soft, warm tints with dark text that's easy
+     to read (each also has its own icon, so colour isn't the only sign) */
+  --danger-bg: #fbe4dc;
+  --danger-line: #eeb3a2;
+  --danger-ink: #9a2f1f;
+  --unsure-bg: #fdf0cc;
+  --unsure-line: #ecd08a;
+  --unsure-ink: #7a5300;
+  --good-bg: #e4f0e2;
+  --good-line: #a9cfa7;
+  --good-ink: #2f6b3e;
   --shadow-sm: 0 1px 2px rgb(90 55 20 / 0.06), 0 2px 8px rgb(90 55 20 / 0.06);
   --shadow-md: 0 2px 4px rgb(90 55 20 / 0.06), 0 10px 28px rgb(90 55 20 / 0.1);
   --radius: 22px;
@@ -305,7 +316,8 @@ button:active {
   gap: 28px;
   max-width: 560px;
   margin: 0 auto;
-  padding: 40px 16px 48px;
+  /* Room at the top for the read-aloud switch */
+  padding: 76px 16px 48px;
 }
 
 .menu-title {
@@ -528,6 +540,7 @@ button:active {
   border-radius: 50%;
   background: var(--surface-soft);
   font-weight: 700;
+  line-height: 1;
 }
 
 /* End screen: reuses the menu layout */
@@ -566,7 +579,8 @@ button:active {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px 16px 4px;
+  /* Room on the right for the read-aloud switch */
+  padding: 16px 200px 4px 16px;
 }
 
 .scenario-title {
@@ -586,6 +600,29 @@ button:active {
 
 .back:hover {
   box-shadow: var(--shadow-md);
+}
+
+/* Read-aloud switch, in the top corner on every screen (headers leave room for it) */
+.read-aloud {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-weight: 600;
+}
+
+.read-aloud:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.read-aloud[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--surface);
 }
 
 /* Tablets and up: the scam screen and Shield Buddy side by side */

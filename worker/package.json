@@ -1,0 +1,17 @@
+{
+  "name": "scam-shield-links",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test-pages": "wrangler dev test/pages.ts --port 8799"
+  },
+  "devDependencies": {
+    "wrangler": "4.149.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.133.0",
+    "zod": "4.6.5"
+  }
+}

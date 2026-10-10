@@ -8,6 +8,7 @@ import { BadgeToast } from './screens/Badges'
 import { EndScreen } from './screens/EndScreen'
 import { GrownUpsScreen } from './screens/GrownUpsScreen'
 import { MainMenu } from './screens/MainMenu'
+import { ReadAloudToggle } from './screens/ReadAloudToggle'
 import { ScenarioScreen, type ScenarioStart } from './screens/ScenarioScreen'
 import { PictureCheck } from './tools/PictureCheck'
 import { TextCheck } from './tools/TextCheck'
@@ -123,6 +124,7 @@ export default function App() {
   return (
     <>
       {content}
+      <ReadAloudToggle />
       <BadgeToast />
       {DevConsole && (
         <Suspense>
