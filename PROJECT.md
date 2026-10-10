@@ -177,7 +177,7 @@ To do (mostly when it becomes an app):
 - [ ] Bright, friendly style with big buttons and large text (see "Look and feel" in `README.md`)
 - [ ] Colours for the outcomes and the Stop, Check, Tell steps (the wireframe has soft placeholder tints)
 - [ ] In the recap the phone is a little smaller, so the notification's phone number gets cut off on tablets
-- [ ] Shrink large images: Buddy's (each a 1000×1000 PNG of about 360 KB) and `public/images/robux-avatar.png` (about 520 KB), all shown much smaller
+- [ ] Shrink large images: Buddy's (each a 1000×1000 PNG of about 300 KB) and `public/images/robux-avatar.png` (about 520 KB), all shown much smaller
 
 ## 4. Tests and checks
 
