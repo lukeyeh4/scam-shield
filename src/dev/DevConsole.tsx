@@ -30,7 +30,7 @@ export type DevJump =
   | { to: 'end' }
   | { to: 'scenario'; index: number; start?: ScenarioStart }
 
-const CHOICES: Choice[] = ['do', 'check', 'tell']
+const CHOICES: Choice[] = ['do', 'ignore', 'tell']
 
 // A small panel for testing: jump to any screen, and turn on fast mode to skip
 // waiting for Buddy. Open it with the "Dev" button or the ` key.
@@ -161,9 +161,6 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
           onClick={() => go({ choice: 'do', stage: 'doIt' })}
         >
           Do it page
-        </button>
-        <button type="button" onClick={() => go({ choice: 'check', stage: 'checkIt' })}>
-          Check page
         </button>
         <button type="button" onClick={() => go({ choice, stage: 'outcome' })}>
           Outcome

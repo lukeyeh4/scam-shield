@@ -21,11 +21,11 @@ Every scam follows the same steps, so kids always know what's coming.
 <table>
   <tr>
     <td width="50%"><img src="docs/screenshots/scam-search.png" alt="Google search results with a fake sponsored ad"></td>
-    <td width="50%"><img src="docs/screenshots/outcome.png" alt="The outcome screen after a choice"></td>
+    <td width="50%"><img src="docs/screenshots/outcome.png" alt="The outcome screen after choosing Ignore it"></td>
   </tr>
   <tr>
-    <td><b>1. The scam.</b> A realistic fake screen with red flags planted in it. Shield Buddy explains what's happening, without hinting. Then: <i>Do it</i>, <i>Check with Scam Shield</i> or <i>Tell an adult</i>. Check opens the matching checker with the scam already in it.</td>
-    <td><b>2. What happened.</b> Do it is red ("Uh oh"); Check and Tell are green ("Scam stopped!"). "What if you had…" cards show the other two paths.</td>
+    <td><b>1. The scam.</b> A realistic fake screen with red flags planted in it. Shield Buddy explains what's happening, without hinting. Then: <i>Do it</i>, <i>Ignore it</i> or <i>Tell an adult</i>.</td>
+    <td><b>2. What happened.</b> Do it is red ("Uh oh"), Ignore is yellow ("Safe… for now"), Tell is green ("Scam stopped!"). "What if you had…" cards show the other two paths.</td>
   </tr>
   <tr>
     <td><img src="docs/screenshots/spot-the-clues.png" alt="Spot the clues: a checklist of three clues and a Hint button"></td>
@@ -45,7 +45,7 @@ Every scam follows the same steps, so kids always know what's coming.
   </tr>
 </table>
 
-**The key lesson:** don't do what the scam asks. Check it with Scam Shield, and show a grown-up.
+**The key lesson:** ignoring keeps *you* safe once, but telling an adult stops the scam.
 
 ## The scams
 

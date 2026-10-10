@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { tutorialCheck } from './tools/tutorial'
 import type { Choice, Result, Scenario, ScenarioScreen } from './types'
 
 // Every scenario file, including the ones set aside in scenarios/later/
@@ -75,7 +74,7 @@ function expectOnScreen(screen: ScenarioScreen, where: string, target: string, h
   expect(text, `${where}: "${highlight}" isn't in the text of "${target}"`).toContain(highlight)
 }
 
-const RESULTS: Record<Choice, Result> = { do: 'red', check: 'green', tell: 'green' }
+const RESULTS: Record<Choice, Result> = { do: 'red', ignore: 'yellow', tell: 'green' }
 
 describe.each(Object.entries(files))('%s', (_path, scenario) => {
   const { recap } = scenario
@@ -113,26 +112,11 @@ describe.each(Object.entries(files))('%s', (_path, scenario) => {
     }
   })
 
-  it('gives "Check with Scam Shield" something to check', () => {
-    const { tool, text } = scenario.checkIt
-    if (tool === 'picture') expect(text, 'checkIt: a picture checks the scam screen, so it has no text').toBeUndefined()
-    else expect(text, `checkIt: a ${tool} check needs the text to check`).toBeTruthy()
-  })
-
   it('points the tip at a real part of the scam screen', () => {
     const tip = recap.tip
     if (tip?.target) expectOnScreen(scenario, 'recap.tip', tip.target, tip.highlight)
     else expect(tip?.highlight, 'recap.tip has a highlight but no target').toBeUndefined()
   })
-})
-
-// The scenarios in the game (not the ones set aside, which have no "Spot the clues" yet)
-const playable = Object.entries(files).filter(([path]) => !path.includes('/later/'))
-
-it.each(playable)('%s: "Check with Scam Shield" finds clues', (_path, scenario) => {
-  const { result } = tutorialCheck(scenario)
-  expect(result.risk).not.toBe('none')
-  expect(result.clues.length).toBeGreaterThan(0)
 })
 
 it('gives every scenario its own id', () => {

@@ -29,10 +29,9 @@ The game is data-driven. Every scenario uses the same screens, and scenarios dif
 
 **Game flow** (`src/screens/`):
 1. Learn about scams plays the scenarios in order (the dev console can jump to any one). Each next scenario replaces the last in the browser history, so back leads to the menu.
-2. `ScenarioScreen`: the scam plays in on a fake screen; Shield Buddy says `buddy.intro`, `buddy.explain` and `buddy.choices`; then the Do it / Check with Scam Shield / Tell an adult buttons slide up.
+2. `ScenarioScreen`: the scam plays in on a fake screen; Shield Buddy says `buddy.intro`, `buddy.explain` and `buddy.choices`; then the Do it / Ignore it / Tell an adult buttons slide up.
 3. `DoItScreen` (only after Do it, only if the scenario has `doIt`): where the scam leads, e.g. a fake website.
-   `CheckItScreen` (after Check): a practice version of the matching tool with the scam filled in (`checkIt`: `message`, `link` or `picture`), then its result (`tools/tutorial.ts`), with "See what happens" instead of the tool's own buttons (the chat isn't told about it). Links are really checked; messages and pictures find the scenario's "Spot the clues" items.
-4. `OutcomeScreen`: Buddy explains the result, then "What if you had…" cards (worded by `whatIf`) show the other two choices. Results are always `do` → red, `check` and `tell` → green.
+4. `OutcomeScreen`: Buddy explains the result, then "What if you had…" cards (worded by `whatIf`) show the other two choices. Results are always `do` → red, `ignore` → yellow, `tell` → green.
    Then `SpotScreen`: the scam comes back and the player taps the clues on a short checklist.
 5. `RecapScreen`: Stop, Check, Tell with a 3-step progress bar. Each step highlights a red flag on the fake screen while Buddy explains it. Tell ends with `recap.tip` (what you can do, e.g. a family code word), then `SummaryCard` (`recap.summary`: what you can do, and "Make sure to avoid").
 6. `EndScreen`: after "Finish" on the last scenario, with the player's badges.
@@ -59,5 +58,5 @@ Animations respect `prefers-reduced-motion` (`src/motion.ts`).
 - No shame. Wrong choices get "Here's what to watch for next time," never "You failed."
 - No emojis in the game's own interface (buttons, labels, headings). Emojis are fine inside the fake scam screens.
 - Shield Buddy never hints before the choice: its intro, explanation and list of choices stay neutral. It isn't a trusted adult: its lines always send kids to a real grown-up. All its lines are scripted, never generated, except its answers to questions kids type in the chat, which the AI writes (`worker/src/ask.ts`) and which are always followed by a scripted line pointing to a grown-up.
-- Keep the key lesson: don't do what the scam asks. Check it with Scam Shield, and show a grown-up. Check and Tell both stop the scam, and the Check outcome always ends with showing a grown-up.
+- Keep the key lesson: Ignore keeps *you* safe once, but Tell stops the scam. The yellow outcomes should show why ignoring isn't the full answer.
 - Every scenario ends with what the kid can do next time (`tip` and `summary`), worded gently.

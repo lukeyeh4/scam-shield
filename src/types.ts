@@ -1,5 +1,5 @@
-export type Choice = 'do' | 'check' | 'tell'
-export type Result = 'red' | 'green'
+export type Choice = 'do' | 'ignore' | 'tell'
+export type Result = 'red' | 'yellow' | 'green'
 export type Mood = 'happy' | 'curious' | 'thinking' | 'worried' | 'cheering' | 'neutral'
 
 export type SmsContent = {
@@ -192,16 +192,4 @@ export type Scenario = ScenarioScreen & {
   // Optional extra step after "Do it": where the scam takes you (e.g. a website),
   // with what Shield Buddy says there
   doIt?: ScenarioScreen & { buddy: string[] }
-  // After "Check with Scam Shield": a tutorial version of the matching tool, with the
-  // scam already filled in, and what Shield Buddy says there
-  checkIt: CheckIt
-}
-
-// Which tool checks the scam. A message checks `text` (a clue is found where a
-// "Spot the clues" item's highlight is in it); a link really checks `text` with the
-// link checker; a picture checks the scam screen itself, finding its "Spot the clues" items.
-export type CheckIt = {
-  tool: 'message' | 'link' | 'picture'
-  text?: string
-  buddy: string[]
 }
