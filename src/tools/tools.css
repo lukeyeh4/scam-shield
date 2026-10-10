@@ -586,6 +586,31 @@
   transform: translateX(24px);
 }
 
+/* Can't be turned on until the grown-up agrees to how checks work */
+.switch:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+/* What is sent, and where */
+.settings-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+}
+
+.settings-list strong,
+.settings-section a {
+  color: var(--ink);
+}
+
+.settings-section .settings-off {
+  font-size: var(--text-small);
+  font-style: italic;
+}
+
 /* Below tablet-landscape width the picture goes above its words */
 @media (max-width: 860px) {
   .tool-split,

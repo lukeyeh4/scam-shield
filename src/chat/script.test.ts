@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { BACK_AFTER, buddySays, findLink, replyTo, STEPS, type StepId, TYPED_STEPS } from './script'
+import { ANSWERED, BACK_AFTER, buddySays, findLink, replyTo, STEPS, type StepId, TOPIC_STEPS, TYPED_STEPS } from './script'
 
 const ids = Object.keys(STEPS) as StepId[]
 
@@ -29,6 +29,12 @@ describe('chat script', () => {
     }
   })
 
+  it("sends a kid to a grown-up after every AI answer, or when the AI can't answer", () => {
+    for (const id of [...Object.values(ANSWERED), ...Object.values(TOPIC_STEPS), 'askFailed' as const]) {
+      for (const lines of [STEPS[id].buddy, ...(STEPS[id].alternatives ?? [])]) expect(lines.join(' '), id).toContain('grown-up')
+    }
+  })
+
   it("says it a different way each time, and only says 'Good thinking' the first time", () => {
     for (const id of Object.values(BACK_AFTER)) {
       const said = [0, 1, 2].map((turn) => buddySays(id, turn).join(' '))
@@ -41,8 +47,15 @@ describe('chat script', () => {
     ['is roblox-giveaway-official.net real?', 'typedLink'],
     ['someone sent me https://bit.ly/3xVid', 'typedLink'],
     ['check www.example.com', 'typedLink'],
+    ['is free-robux.site real?', 'typedLink'],
+    ['they sent me roblox.gift/claim', 'typedLink'],
     ['someone in my game wants my password', 'typed'],
     ['is this a scam? i got a text from a new number', 'typed'],
+    ['what does e.g. mean? it was in a message', 'typed'],
+    ['i have 3.5 dollars of robux. is that ok?', 'typed'],
+    ['my password is fluffy123, is that ok?', 'personal'],
+    ['i live at 12 oak street, can i say that?', 'personal'],
+    ['someone asked me to send nudes', 'upset'],
   ])('replies to "%s" with %s', (text, step) => {
     expect(replyTo(text)).toBe(step)
   })
@@ -67,7 +80,9 @@ describe('chat script', () => {
     ['is roblox-giveaway-official.net real?', 'roblox-giveaway-official.net'],
     ['someone sent me https://bit.ly/3xVid!', 'https://bit.ly/3xVid'],
     ['my friend said (www.free-robux.com) works', 'www.free-robux.com'],
+    ['is free-robux.site real?', 'free-robux.site'],
     ['no link here', undefined],
+    ['the end.Then they asked again', undefined],
   ])('finds the link in "%s"', (text, link) => {
     expect(findLink(text)).toBe(link)
   })

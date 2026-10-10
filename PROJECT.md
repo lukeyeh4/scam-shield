@@ -46,8 +46,10 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
   - The chat's answers open these screens
   - Decluttered (2026-10-10): fewer boxes and words; a slim progress bar instead of step pills; a heading per step instead of Buddy's bubble; the preview note moved to the bottom; results without the outer card or clue boxes
 - [ ] Parent gate: replace the sum with something sturdier before launch, and check it meets each app store's rules
-- [ ] Parent setup, built together with the first AI tool, before any real check can be sent: agree to how checks work and what is sent, and set a family code word. The game never needs it.
-- [ ] When the app is first opened: the kid can play the game straight away; the first time they open a tool that sends something to be checked, it asks them to get a grown-up to finish setup
+- [x] Parent setup (`src/setup.ts`): nothing is sent anywhere until a grown-up agrees in For grown-ups, which lists what is sent where (links, questions, pictures and messages, speech) and links to Anthropic's and Google's privacy policies. Until then: the game works, links are checked on the device only (with a note), Buddy doesn't answer questions or listen, and the picture and message checkers say "Ask a grown-up first" with a button through the parent gate and back. Unticking stops everything straight away. The game never needs it
+- [x] The challenge build starts set up (agreed, Buddy's answers on): `VITE_SET_UP_BY_DEFAULT=true` in `.env.production` (false for now)
+- [ ] Family code word: save it on the device only; use it in the "new number" scenario's tip and in Buddy's scripted line after "someone says they're your mom" questions
+- [ ] A privacy policy page, and advice on what consent is needed for photos, messages and voice from under-13s (COPPA), before real families use it
 
 **Tools (in order)**
 
@@ -93,12 +95,16 @@ One chat with Shield Buddy, where kids tap options or (later) type a question. T
 - [x] The conversation carries on after a check (in memory only): Buddy greets once, then reacts to what the check found, in a different way each time (`alternatives` in `chat/script.ts`)
 - [x] **Stage 1, tap options only (no AI):** Buddy asks "What do you want to check?" with big buttons (*A picture*, *A link*, *A message*, *I'm not sure*). Picture, link and message: one short line and one button that opens the checker. Every Buddy line is scripted, so today's rules still hold. *I'm not sure*: ask a grown-up, or ask Buddy below by typing or talking. The box for typing and the microphone are shown but turned off.
 - [ ] **Stage 2, Check a picture inside the chat:** the kid sends a screenshot or photo, and Buddy replies with the scan result as a card (the picture with numbered boxes, the reasons, the risk level). This is where the AI comes in, for the scan result only.
-- [x] Typing works, with placeholder replies (branch `wireframes`): the kid's question shows as their message; Buddy replies "I can't answer questions yet... show it to a grown-up", or offers the link checker if it looks like a link. Nothing typed is kept or sent. The parents' typing switch doesn't control it yet.
-- [ ] **Stage 3, typed questions about scams:** e.g. "Someone in my game wants my code". The AI only answers scam and online-safety questions, and kindly sends everything else to a grown-up ("I can only help with scams"). Every answer ends by pointing to a grown-up, and Buddy reminds kids not to type their name, address, school or passwords. Parents can turn typing on or off in setup.
-- [ ] **Voice input: ask out loud.** The microphone button is in the chat (shown, turned off), and parents can turn it on or off in setup (wireframe). To build:
-  - Speech to text: the browser's speech recognition on the website (not every browser has it), the phone's own speech recognition in the app
-  - Show the words as they're heard, so the kid can check them before sending, then send them like a typed question (so it comes after stage 3)
-  - Hold to talk or tap to start and stop: test which kids find easier
+- [x] Typing works, with placeholder replies (branch `wireframes`): the kid's question shows as their message; Buddy replies "I can't answer questions yet... show it to a grown-up", or offers the link checker if it looks like a link. Nothing typed is kept or sent. These are now the replies when the parents' questions switch is off.
+- [x] **Stage 3, typed questions about scams:** e.g. "Someone in my game wants my code". Built: the Worker's `/ask` (`worker/src/ask.ts`, Claude Opus 5.5 with the same `ANTHROPIC_API_KEY`) writes 1–3 short bubbles, a mood and a checker to offer. It only answers scam and online-safety questions and kindly sends everything else to a grown-up; it reminds kids not to share their name, address, school or passwords. After every answer a scripted line points to a grown-up (`ANSWERED` in `chat/script.ts`). Parents turn it on in setup (off by default, saved on the device); without it Buddy's scripted replies are used.
+- [x] Strict rules, in layers (`src/chat/askRules.ts`): links (any real website ending) go to the link checker; personal details and upsetting messages get scripted lines and are never sent; the AI labels each question and only writes answers about scams and staying safe (other topics get scripted lines); its words are checked in code and thrown away if they break a rule; 24 tricky test questions (`npm run test-questions` in `worker/`) all pass
+- [ ] Decide on the upset reply: add an emergency number or a kids' helpline (it depends on the country), or keep "tell a grown-up you trust right now"
+- [ ] Try Claude Haiku 5.5 for `/ask` (cheaper and faster, as the page check uses) against the same test questions, and pick one
+- [ ] Remember earlier answers across chats? For now only the last 12 messages are sent, and nothing is kept
+- [ ] **Voice input: ask out loud.**
+  - [x] Speech to text on the website (`src/voiceInput.ts`): the browser's Web Speech API (free, no key; Chrome sends the voice to Google, Safari usually to Apple). Tap the microphone to start and stop; the words fill the box as they're heard, to check before sending like a typed question. Off until a grown-up turns it on in setup (saved on the device, and the setting says where the voice goes); hidden in browsers without it (e.g. Firefox). If it can't hear or isn't allowed, the box says so.
+  - [ ] In the app: the phone's own speech recognition (on device where possible)
+  - [ ] Hold to talk or tap to start and stop: test which kids find easier
   - Privacy: turn speech into text on the device where possible, never keep recordings, and say so in setup
   - Test with kids' voices and different accents; if it can't understand, Buddy says so kindly and offers the buttons
 - [ ] Accessibility: new messages are read out by screen readers, the option buttons mean typing is never needed, and read-aloud comes later
@@ -128,7 +134,7 @@ One chat with Shield Buddy, where kids tap options or (later) type a question. T
   - Check each provider's terms for apps used by children, and pick one that doesn't keep or train on the pictures; cost per check, and limits so it can't be overused
 - [ ] Privacy: kids will scan real messages and screenshots with names, numbers and faces. What's sent, whether anything is stored, and parent consent (children's privacy laws such as COPPA)
 - [ ] How Check and Tell fit together in the tutorial and in every tool result
-- [ ] What Shield Buddy says in the tools: today every Buddy line is scripted. Stage 3 of Ask Shield Buddy means changing that rule (and "Buddy isn't a trusted adult" must still hold)
+- [x] What Shield Buddy says in the tools: every Buddy line is scripted except its AI answers to typed questions (stage 3), which are always followed by a scripted line pointing to a grown-up, so "Buddy isn't a trusted adult" still holds
 - [ ] Ask Shield Buddy: typing on for everyone, or only when a parent turns it on? Should AI-written answers look different from Buddy's scripted lines (e.g. a small "Buddy can make mistakes" note)?
 - [ ] What the parent setup includes, and whether parents get alerts or a history of checks
 
@@ -224,7 +230,9 @@ Run them with `npm test`.
 - [ ] Spot the clues: on narrow phones the checklist takes a lot of room under the iPad screen
 - [x] Read-aloud for Shield Buddy's lines: a "Read aloud" switch in the top corner (off by default) uses the device's own voice (Web Speech API, `src/readAloud.ts`), so it can read AI tool results too
 - [ ] Read-aloud: the switch sits in the top-right corner and covers the home screen's gear on phones; find it a better place (e.g. a speaker button by Buddy, or the grown-ups settings)
-- [ ] Read-aloud: test on iPad Safari and Android; pick a nicer voice where one is available; maybe make audio files for one consistent Buddy voice
+- [x] One Buddy voice on every device: Google Cloud Text-to-Speech on the Worker (`POST /speak`, Chirp 3: HD voice "Alnilam"), each line made once and kept in KV, at most 500,000 characters a month (half of Google's free amount; `GET /usage` shows the count); the device's voice if the server is slow or the month is used up
+- [ ] Read-aloud: pick Buddy's voice (try a few Chirp 3: HD voices with kids), and test on iPad Safari and Android
+- [ ] A Google Cloud budget alert (e.g. $1) as a second safety net
 - [ ] More scenarios
 
 ## Still to decide

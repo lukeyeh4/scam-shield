@@ -1,3 +1,4 @@
+import { isSetUp } from '../setup'
 import type { Clue } from './examples'
 import { brandNamed } from './brands'
 import { checkLink, type LinkCheck, onFreeHost } from './linkCheck'
@@ -6,8 +7,9 @@ import { checkLink, type LinkCheck, onFreeHost } from './linkCheck'
 // find out about a link (Google's list of dangerous websites, how new the website
 // is, where a short link really goes and, when none of that finds anything, what
 // Claude sees on the page), then adds those facts to the device's clues in kid
-// words. If there's no server, or it's slow or down, the device's clues are shown
-// on their own.
+// words. If there's no server, or it's slow or down, or a grown-up hasn't finished
+// setup (setup.ts: nothing is sent before that), the device's clues are shown on
+// their own.
 
 // The server's address: set VITE_LINK_SERVER in .env.production (and in
 // .env.development.local for `npm run dev`, e.g. http://localhost:8787)
@@ -61,7 +63,7 @@ const ASKS: Record<PageFacts['asksFor'][number], string> = {
 
 // Asks the server about a link; null if it can't answer in time
 export async function lookUpLink(url: string): Promise<LinkFacts | null> {
-  if (!SERVER) return null
+  if (!SERVER || !isSetUp()) return null
   try {
     const res = await fetch(`${SERVER}/link`, {
       method: 'POST',

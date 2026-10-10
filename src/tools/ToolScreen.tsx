@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useEffectEvent } from 'react'
 import { Buddy } from '../buddy/Buddy'
+import { LockIcon } from '../icons'
 import './tools.css'
 
 type ToolScreenProps = {
@@ -67,8 +68,31 @@ export function Checking({ onDone, ms = 3000 }: { onDone: () => void; ms?: numbe
   )
 }
 
-// Where every tool can lead next
+// Where every tool can lead next. `onSetUp` opens the grown-ups' setup, then
+// comes back to this tool.
 export type ToolNav = {
   onHome: () => void
   onAsk: () => void
+  onSetUp: () => void
+}
+
+// Instead of a tool that sends something to be checked, until a grown-up has
+// finished setup (setup.ts). `what`: what the tool checks, e.g. "pictures".
+export function SetupFirst({ title, what, onHome, onSetUp }: { title: string; what: string; onHome: () => void; onSetUp: () => void }) {
+  return (
+    <ToolScreen title={title} onBack={onHome} note={null}>
+      <div className="tool-column gate">
+        <span className="gate-icon">
+          <LockIcon />
+        </span>
+        <h2 className="tool-heading">Ask a grown-up first</h2>
+        <p className="tool-text">A grown-up needs to set up Scam Shield before I can check {what}.</p>
+        <div className="tool-actions">
+          <button className="tool-button tool-button-main" type="button" onClick={onSetUp}>
+            Get a grown-up
+          </button>
+        </div>
+      </div>
+    </ToolScreen>
+  )
 }

@@ -1,24 +1,35 @@
 import { checkLink, SHORTENERS, siteOf } from '../../src/tools/linkCheck'
 import type { LinkFacts } from '../../src/tools/linkLookup'
+import { answerKid, readEntries } from './ask'
 import { judgePage, readPage } from './page'
+import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, savedSpeech } from './speak'
 
 // The link checker's server (a Cloudflare Worker): looks a link up in places the
 // device can't reach, and keeps the keys secret. Only when none of that finds
 // anything does it read the page itself and ask Claude about it (page.ts). It
 // never keeps the links it's sent. It only answers with facts; the app turns them
 // into kid words (src/tools/linkLookup.ts).
+// It also answers questions kids ask Shield Buddy in the chat (ask.ts), and gives
+// Buddy its voice (speak.ts).
 //
 // POST /link { url } → LinkFacts
+// POST /ask { entries } → BuddyAnswer
+// POST /speak { text } → MP3 audio
+// GET /usage → this month's speech characters, and the limit
 
 type Env = {
   // Google Safe Browsing API key: `wrangler secret put SAFE_BROWSING_KEY` (or .dev.vars)
   SAFE_BROWSING_KEY: string
-  // Claude API key, for reading pages: `wrangler secret put ANTHROPIC_API_KEY`
+  // Claude API key, for reading pages and Buddy's answers: `wrangler secret put ANTHROPIC_API_KEY`
   ANTHROPIC_API_KEY?: string
   // Websites allowed to ask, separated by commas (any localhost is always allowed)
   ALLOWED_ORIGINS: string
   // Checks per minute for each person (wrangler.toml), since each AI check costs money
   LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> }
+  // Google Cloud Text-to-Speech key, for Buddy's voice: `wrangler secret put GOOGLE_TTS_KEY`
+  GOOGLE_TTS_KEY?: string
+  // Buddy's saved audio and this month's character count (wrangler.toml, speak.ts)
+  SPEECH?: Parameters<typeof savedSpeech>[1]
 }
 
 const DAY = 24 * 60 * 60 * 1000
@@ -183,10 +194,42 @@ export default {
       new Response(JSON.stringify(body), { status, headers: { ...cors, 'content-type': 'application/json', 'cache-control': 'no-store' } })
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors })
-    if (request.method !== 'POST' || new URL(request.url).pathname !== '/link') return json({ error: 'Not found' }, 404)
+    const path = new URL(request.url).pathname
+
+    // How much of this month's speech allowance is used (open it in a browser)
+    if (request.method === 'GET' && path === '/usage') {
+      if (!env.SPEECH) return json({ error: 'No speech storage' }, 503)
+      const characters = await charactersUsed(env.SPEECH)
+      return json({ month: new Date().toISOString().slice(0, 7), characters, limit: MONTHLY_LIMIT, left: Math.max(0, MONTHLY_LIMIT - characters) })
+    }
+
+    if (request.method !== 'POST' || !['/link', '/ask', '/speak'].includes(path)) return json({ error: 'Not found' }, 404)
     if (!cors['access-control-allow-origin']) return json({ error: 'Not allowed' }, 403)
     const who = request.headers.get('cf-connecting-ip') ?? 'unknown'
-    if (env.LIMITER && !(await env.LIMITER.limit({ key: who })).success) return json({ error: 'Too many checks' }, 429)
+    const limited = async () => env.LIMITER && !(await env.LIMITER.limit({ key: who })).success
+
+    // Buddy's voice: a line spoken before is replayed for free (and doesn't count
+    // toward the per-minute limit); a new one is made, within the month's limit
+    if (path === '/speak') {
+      if (!env.SPEECH || !env.GOOGLE_TTS_KEY) return json({ error: 'No voice' }, 503)
+      const text = readSpeech(await request.json().catch(() => null))
+      if (!text) return json({ error: `Send { "text": "..." } (at most ${MAX_SPEECH} characters)` }, 400)
+      const audio = (await savedSpeech(text, env.SPEECH)) ?? ((await limited()) ? 'busy' : await makeSpeech(text, env.SPEECH, env.GOOGLE_TTS_KEY).catch(() => null))
+      if (audio === 'busy') return json({ error: 'Too many checks' }, 429)
+      if (audio === 'limit') return json({ error: "This month's speech is used up" }, 429)
+      if (!audio) return json({ error: 'No speech' }, 502)
+      return new Response(audio, { headers: { ...cors, 'content-type': 'audio/mpeg', 'cache-control': 'public, max-age=31536000, immutable' } })
+    }
+
+    if (await limited()) return json({ error: 'Too many checks' }, 429)
+
+    if (path === '/ask') {
+      if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
+      const entries = readEntries(await request.json().catch(() => null))
+      if (!entries) return json({ error: 'Send { "entries": [..., { "from": "kid", "text": "..." }] }' }, 400)
+      const answer = await answerKid(entries, env.ANTHROPIC_API_KEY).catch(() => null)
+      return answer ? json(answer) : json({ error: 'No answer' }, 502)
+    }
 
     let url: string
     try {

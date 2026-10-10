@@ -1,9 +1,14 @@
 import type { Risk } from '../tools/examples'
 import type { Mood } from '../types'
+import { checkLink } from '../tools/linkCheck'
+import type { BuddyAnswer } from './askBuddy'
+import { hasPersonalDetails, soundsUpset } from './askRules'
 
 // Everything Shield Buddy says in the chat, and the answers the player can tap.
-// All scripted (no AI yet), so the content rules in CLAUDE.md apply: simple words,
-// not scary, no shame, and Buddy always sends kids to a real grown-up.
+// All scripted, so the content rules in CLAUDE.md apply: simple words, not scary,
+// no shame, and Buddy always sends kids to a real grown-up. The one exception is
+// Buddy's answer to a typed question, which the AI writes (askBuddy.ts); the
+// scripted line after it (the `answered` steps) still sends the kid to a grown-up.
 // Keep it short: a line or two from Buddy, and as few answers as possible.
 
 export type StepId =
@@ -15,6 +20,14 @@ export type StepId =
   | 'notSure'
   | 'typed'
   | 'typedLink'
+  | 'answered'
+  | 'answeredPicture'
+  | 'answeredLink'
+  | 'answeredMessage'
+  | 'askFailed'
+  | 'offTopic'
+  | 'personal'
+  | 'upset'
   | 'backScam'
   | 'backCareful'
   | 'backClean'
@@ -85,9 +98,8 @@ export const STEPS: Record<StepId, ChatStep> = {
     pointAtBox: true,
   },
 
-  // Buddy's replies to a typed question. Placeholders until the AI answers
-  // questions (stage 3 in PROJECT.md): something that looks like a link gets the
-  // link checker, anything else gets sent to a grown-up.
+  // Buddy's replies to a typed question when it can't ask the AI (no grown-up's
+  // OK, or no server), and for a link (see `replyTo`)
   typed: {
     mood: 'thinking',
     buddy: ["Thanks for asking! I can't answer questions yet.", 'For now, show it to a grown-up. They can help.'],
@@ -97,6 +109,66 @@ export const STEPS: Record<StepId, ChatStep> = {
     mood: 'curious',
     buddy: ["That looks like a link. Let's check where it goes."],
     options: [{ label: 'Check a link', icon: 'link', leave: 'link' }],
+  },
+
+  // After the AI's answer to a typed question: a scripted line that always points
+  // to a grown-up, and the checker the AI suggested, if any (see ANSWERED)
+  answered: {
+    mood: 'happy',
+    buddy: ['A grown-up can help too.'],
+    alternatives: [['If you are not sure, ask a grown-up.'], ['You can always show a grown-up.']],
+    options: [{ label: 'Check something', next: 'again' }],
+  },
+  answeredPicture: {
+    mood: 'curious',
+    buddy: ['You can send me a picture of it. And show a grown-up.'],
+    options: [
+      { label: 'Check a picture', icon: 'picture', leave: 'picture' },
+      { label: 'Something else', next: 'again' },
+    ],
+  },
+  answeredLink: {
+    mood: 'curious',
+    buddy: ["Let's check that link. And show a grown-up."],
+    options: [
+      { label: 'Check a link', icon: 'link', leave: 'link' },
+      { label: 'Something else', next: 'again' },
+    ],
+  },
+  answeredMessage: {
+    mood: 'curious',
+    buddy: ["Let's look at that message. And show a grown-up."],
+    options: [
+      { label: 'Check a message', icon: 'message', leave: 'message' },
+      { label: 'Something else', next: 'again' },
+    ],
+  },
+  // The AI couldn't answer (offline, too slow, or it wouldn't)
+  askFailed: {
+    mood: 'thinking',
+    buddy: ["Sorry, I can't answer that right now.", 'Show it to a grown-up. They can help.'],
+    options: [{ label: 'Check something', next: 'again' }],
+  },
+
+  // Questions the AI doesn't answer itself: always these scripted lines
+  // (TOPIC_STEPS, and `replyTo` before anything is sent)
+  offTopic: {
+    mood: 'happy',
+    buddy: ['I can only help with scams and staying safe online.', 'For other questions, ask a grown-up.'],
+    options: [{ label: 'Check something', next: 'again' }],
+  },
+  personal: {
+    mood: 'thinking',
+    buddy: [
+      'Please keep things like your name, address, school and passwords private.',
+      "Don't share them here or anywhere online. A grown-up can help you keep them safe.",
+    ],
+    options: [{ label: 'Check something', next: 'again' }],
+  },
+  upset: {
+    mood: 'neutral',
+    buddy: ['Thank you for telling me. You are not in trouble.', 'Please tell a grown-up you trust right now, like a parent or teacher. They can help.'],
+    options: [{ label: 'Check something', next: 'again' }],
   },
 
   // Back in the chat after a check: Buddy carries on from what the check found
@@ -142,18 +214,50 @@ export function buddySays(id: StepId, turn = 0): string[] {
 export const BACK_AFTER: Record<Risk, StepId> = { high: 'backScam', medium: 'backCareful', none: 'backClean' }
 
 // Steps reached by typing instead of tapping an answer
-export const TYPED_STEPS: StepId[] = ['typed', 'typedLink']
+export const TYPED_STEPS: StepId[] = [
+  'typed',
+  'typedLink',
+  'answered',
+  'answeredPicture',
+  'answeredLink',
+  'answeredMessage',
+  'askFailed',
+  'offTopic',
+  'personal',
+  'upset',
+]
 
-const LINKISH = /https?:\/\/|www\.|\b[a-z0-9-]+\.(com|net|org|io|gg|ly|co|xyz|info)\b/i
+// The step after the AI's answer, by the checker it suggested
+export const ANSWERED: Record<BuddyAnswer['offer'], StepId> = {
+  none: 'answered',
+  picture: 'answeredPicture',
+  link: 'answeredLink',
+  message: 'answeredMessage',
+}
+
+// The step for each kind of question the AI doesn't answer itself (it only says
+// which kind it is; askRules.ts and worker/src/ask.ts)
+export const TOPIC_STEPS: Record<Exclude<BuddyAnswer['topic'], 'safety'>, StepId> = {
+  offTopic: 'offTopic',
+  personal: 'personal',
+  upset: 'upset',
+}
 
 // The link in a typed question, if there is one (without punctuation around it):
-// "is roblox-giveaway-official.net real?" → "roblox-giveaway-official.net"
+// "is roblox-giveaway-official.net real?" → "roblox-giveaway-official.net". Any
+// real website ending counts (.site, .gift, ...), as the link checker sees it.
 export const findLink = (text: string) =>
   text
     .split(/\s+/)
-    .find((word) => LINKISH.test(word))
-    ?.replace(/^[([{<"']+/, '')
-    .replace(/[)\]}>"'.,!?;:]+$/, '')
+    .map((word) => word.replace(/^[([{<"'“‘«]+/, '').replace(/[)\]}>"'”’».,!?;:]+$/, ''))
+    .find((word) => /^https?:\/\//i.test(word) || (/[a-z]\.[a-z]/i.test(word) && checkLink(word) !== null))
 
-// Which reply a typed question gets (see `typed` and `typedLink`)
-export const replyTo = (text: string): StepId => (findLink(text) ? 'typedLink' : 'typed')
+// The scripted reply to a typed question, before any AI: a link gets the link
+// checker; personal details or something upsetting get Buddy's own words (and are
+// never sent); anything else gets `typed`, or the AI's answer when it's allowed
+export function replyTo(text: string): StepId {
+  if (soundsUpset(text)) return 'upset'
+  if (hasPersonalDetails(text)) return 'personal'
+  if (findLink(text)) return 'typedLink'
+  return 'typed'
+}
