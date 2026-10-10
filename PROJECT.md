@@ -163,14 +163,15 @@ Chosen 2026-10-10: the **Cream** colours, inspired by a mock-up of the home scre
 Done so far:
 
 - [x] Cream colours as the default (`:root` in `src/index.css`): cream background with corner glows, off-white cards, brown text, orange buttons (`--accent`), yellow (`--sun`) and teal (`--teal`) for icon tiles. The old greys and other palettes are still in the dev console's Colours picker to compare
-- [x] Home: the yellow shield logo and a tagline; the chat's answer buttons have coloured icon tiles
+- [x] Home: the yellow shield logo and a tagline
+- [x] Chat answers as soft rounded cards, two to a row, every icon on a soft tint of the main orange (the mixed orange, yellow and teal tiles clashed)
+- [ ] Fonts, being tried (branch `try/fonts`): **Fredoka** (bouncy, rounded) for headings and buttons with **Nunito** (rounded, very readable) for text. Also in the dev console: Nunito only, Baloo 2 + Nunito, Andika (made for children learning to read), and the old system font. The fake scam screens always keep the real phone font. Loaded from Google Fonts for now; bundle the chosen ones with the app so they work offline and nothing is fetched from Google
 
 To do (mostly when it becomes an app):
 
 - [ ] Decide whether the home screen becomes the three tool cards from the mock-up, or stays one big Check something button
 - [ ] Tab bar (Home, Learn, History, More) and a settings gear for grown-ups (behind the parent gate)
 - [ ] History: past checks. Decide what's kept, where (on the device only?), and for how long, since it's kids' data
-- [ ] A rounded, friendly font (e.g. Nunito), bundled with the app so it works offline
 - [ ] Night colours for later (a dark mode), with darker result banners
 - [ ] Once settled, copy the final colours into `:root` and remove the dev palettes
 - [ ] Bright, friendly style with big buttons and large text (see "Look and feel" in `README.md`)
@@ -215,6 +216,7 @@ Run them with `npm test`.
 A testing panel that only appears with `npm run dev`. Click "Dev" in the bottom-right corner, or press the `` ` `` key. It can:
 
 - Turn on **fast mode**: Buddy's text appears at once and nothing waits, so you don't have to sit through each conversation. It stays on after a reload.
+- Try **fonts** (Font): Fredoka + Nunito (now), Nunito, Baloo 2 + Nunito, Andika, the old system font, from `src/dev/fonts.css`. Once one is chosen, copy it into `:root` in `src/index.css` and trim the Google Fonts link in `index.html`.
 - Try **colour palettes** (Colours): Cloud (now), Cream, Night, Sky, Mint, Lavender, Sunset, from `src/dev/palettes.css`. Once one is chosen, copy its colours into `:root` in `src/index.css`.
 - Jump to the menu, the end screen, or any scenario at any stage (the scam, the Do it page, the outcome for a chosen answer, the recap, or the summary card).
 

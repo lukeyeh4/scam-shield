@@ -7,6 +7,38 @@ const PALETTE_KEY = 'scam-shield-dev-palette'
 export const PALETTES = ['cream', 'cloud', 'night', 'sky', 'mint', 'lavender', 'sunset'] as const
 export type Palette = (typeof PALETTES)[number]
 
+const FONT_KEY = 'scam-shield-dev-font'
+
+// Fonts to try (in dev/fonts.css); 'fredoka' (Fredoka headings, Nunito text) is the one in index.css
+export const FONTS = ['fredoka', 'nunito', 'baloo', 'andika', 'system'] as const
+export type Font = (typeof FONTS)[number]
+export const FONT_NAMES: Record<Font, string> = {
+  fredoka: 'Fredoka + Nunito (now)',
+  nunito: 'Nunito',
+  baloo: 'Baloo 2 + Nunito',
+  andika: 'Andika',
+  system: 'System (old)',
+}
+
+export function getFont(): Font {
+  try {
+    const saved = localStorage.getItem(FONT_KEY)
+    return FONTS.find((f) => f === saved) ?? 'fredoka'
+  } catch {
+    return 'fredoka'
+  }
+}
+
+export function setFont(font: Font) {
+  if (font === 'fredoka') delete document.documentElement.dataset.font
+  else document.documentElement.dataset.font = font
+  try {
+    localStorage.setItem(FONT_KEY, font)
+  } catch {
+    // Storage blocked: the font just isn't remembered
+  }
+}
+
 export function getPalette(): Palette {
   try {
     const saved = localStorage.getItem(PALETTE_KEY)

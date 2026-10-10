@@ -26,8 +26,12 @@
   --text-large: 1.2em;
   --text-heading: 1.4em;
   --text-title: 2.4em;
+  /* Fonts: a bouncy one for headings and buttons, a rounded, very readable one
+     for everything else (the fake screens keep the real phone font) */
+  --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
+  --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   /* Large, easy-to-read text that grows a little on bigger screens */
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   font-size: clamp(18px, 1rem + 0.5vw, 22px);
   line-height: 1.5;
   color: var(--ink);
@@ -63,6 +67,14 @@ button {
     transform 150ms var(--ease),
     box-shadow 150ms var(--ease),
     background-color 150ms var(--ease);
+}
+
+/* Headings and buttons in the bouncy font */
+h1,
+h2,
+h3,
+button {
+  font-family: var(--font-display);
 }
 
 button:focus-visible {
@@ -658,7 +670,13 @@ button:active {
 }
 
 /* Fake screens keep realistic, slightly enlarged text, whatever the screen size */
+.mockup :is(h1, h2, h3, button) {
+  font-family: inherit;
+}
+
 .mockup {
+  /* Fake screens use the real phone font, whatever the game's font is */
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   display: flex;
   justify-content: center;
   width: 100%;

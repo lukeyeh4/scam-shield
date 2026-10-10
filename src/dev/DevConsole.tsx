@@ -4,12 +4,26 @@ import { resetBadges } from '../badges'
 import { scenarios } from '../scenarios'
 import type { ScenarioStart } from '../screens/ScenarioScreen'
 import type { Choice } from '../types'
-import { getPalette, isFast, type Palette, PALETTES, setFast, setPalette } from './devSettings'
+import {
+  type Font,
+  FONT_NAMES,
+  FONTS,
+  getFont,
+  getPalette,
+  isFast,
+  type Palette,
+  PALETTES,
+  setFast,
+  setFont,
+  setPalette,
+} from './devSettings'
 import './devConsole.css'
+import './fonts.css'
 import './palettes.css'
 
-// The palette picked last time
+// The palette and font picked last time
 setPalette(getPalette())
+setFont(getFont())
 
 export type DevJump =
   | { to: 'menu' }
@@ -25,6 +39,7 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
   const [open, setOpen] = useState(false)
   const [fast, setFastState] = useState(isFast)
   const [palette, setPaletteState] = useState(getPalette)
+  const [font, setFontState] = useState(getFont)
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<Choice>('do')
   const scenario = scenarios[index]
@@ -79,6 +94,23 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
             <option key={p} value={p}>
               {p.charAt(0).toUpperCase() + p.slice(1)}
               {p === 'cream' ? ' (now)' : ''}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="dev-row">
+        Font
+        <select
+          value={font}
+          onChange={(e) => {
+            setFont(e.target.value as Font)
+            setFontState(e.target.value as Font)
+          }}
+        >
+          {FONTS.map((f) => (
+            <option key={f} value={f}>
+              {FONT_NAMES[f]}
             </option>
           ))}
         </select>

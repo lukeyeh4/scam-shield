@@ -1,0 +1,26 @@
+/* DEV CONSOLE: fonts to try (pick one in the dev console). Each sets the two font
+   colours of :root in index.css: --font-display (headings, buttons) and
+   --font-body (everything else). Once one is chosen, copy it into :root, trim the
+   Google Fonts link in index.html to the fonts used, and delete this file. */
+
+/* Nunito for everything: rounded and calm */
+:root[data-font='nunito'] {
+  --font-display: 'Nunito', system-ui, sans-serif;
+}
+
+/* Baloo 2 headings and buttons: chunkier and bouncier */
+:root[data-font='baloo'] {
+  --font-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+}
+
+/* Andika for everything: made for children learning to read */
+:root[data-font='andika'] {
+  --font-display: 'Andika', system-ui, sans-serif;
+  --font-body: 'Andika', system-ui, sans-serif;
+}
+
+/* The old system font */
+:root[data-font='system'] {
+  --font-display: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
