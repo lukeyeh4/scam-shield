@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect } from 'react'
 import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
-import { DangerIcon, GoodIcon, UnsureIcon } from '../icons'
+import { DangerIcon, GoodIcon, GrownUpIcon, UnsureIcon } from '../icons'
 import type { CheckResult, Clue, Risk } from './examples'
 
 // How each risk level is shown: soft red, yellow or green, each with its own icon
@@ -23,8 +23,13 @@ type ResultViewProps = {
   actions?: ReactNode
 }
 
-// The result of any check: what was checked beside how risky it looks, the
-// numbered clues (matching the numbers on what was checked), and what to do next
+// The line under the risk heading
+const found = (count: number) =>
+  count === 0 ? "Scam Shield didn't spot any clues." : `Scam Shield found ${count} ${count === 1 ? 'clue' : 'clues'}.`
+
+// The result of any check, each part in its own box: what was checked beside how
+// risky it looks, the clues (one card each, numbered to match the marks), good
+// signs when there are no clues, and what to do next
 export function ResultView({ subject, result, onAgain, onDone, actions }: ResultViewProps) {
   const risk = RISKS[result.risk]
   const practice = actions !== undefined
@@ -34,15 +39,24 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
   }, [practice, result.risk])
   return (
     <section className={`result result-${result.risk}`} aria-labelledby="result-title">
-      <div className="result-subject">{subject}</div>
+      <div className="result-subject">
+        <h3 className="result-label">What you checked</h3>
+        {subject}
+      </div>
 
       <div className="result-panel">
-        <h2 id="result-title" className={`result-title risk-${result.risk}`}>
+        <div className={`result-banner risk-${result.risk}`}>
           <span className="result-icon">{risk.icon}</span>
-          {risk.title}
-        </h2>
+          <div>
+            <h2 id="result-title" className="result-title">
+              {risk.title}
+            </h2>
+            <p className="result-found">{found(result.clues.length)}</p>
+          </div>
+        </div>
+
         {result.clues.length > 0 && (
-          <ol className="result-clues">
+          <ol className="result-clues" aria-label="Clues">
             {result.clues.map((c) => (
               <li key={c.label} className="result-clue">
                 <strong>{c.label}</strong>
@@ -51,9 +65,10 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
             ))}
           </ol>
         )}
+
         {result.risk === 'none' && result.good?.length ? (
           <div className="result-good">
-            <h3>Good signs</h3>
+            <h3 className="result-label">Good signs</h3>
             <ul>
               {result.good.map((g) => (
                 <li key={g}>{g}</li>
@@ -61,7 +76,17 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
             </ul>
           </div>
         ) : null}
-        <p className="result-tell">{risk.tell}</p>
+
+        <div className="result-tell">
+          <span className="result-tell-icon">
+            <GrownUpIcon />
+          </span>
+          <div>
+            <h3 className="result-label">What to do</h3>
+            <p>{risk.tell}</p>
+          </div>
+        </div>
+
         <div className="tool-actions">
           {actions ?? (
             <>

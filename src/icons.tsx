@@ -139,3 +139,13 @@ export const ChevronIcon = (p: IconProps) => (
     <path d="m9 6 6 6-6 6" />
   </Icon>
 )
+
+// Two people, one taller: showing a grown-up
+export const GrownUpIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="9" cy="6" r="2.5" />
+    <path d="M5 21v-6a4 4 0 0 1 8 0v6" />
+    <circle cx="17" cy="10" r="2" />
+    <path d="M14.5 21v-3.5a2.5 2.5 0 0 1 5 0V21" />
+  </Icon>
+)

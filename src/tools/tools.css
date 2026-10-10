@@ -263,13 +263,15 @@
   }
 }
 
-/* The result: what was checked beside how risky it looks and the numbered clues */
+/* The result: what was checked (in its own card) beside how risky it looks, the
+   clues (one card each), good signs and what to do. Each part has its own box,
+   so nothing runs together. */
 .result {
   display: grid;
-  grid-template-columns: minmax(0, 340px) minmax(0, 440px);
+  grid-template-columns: minmax(0, 380px) minmax(0, 460px);
   justify-content: center;
-  gap: 40px;
-  align-items: center;
+  align-items: start;
+  gap: 32px;
   width: 100%;
 }
 
@@ -279,37 +281,66 @@
   color: #1d1d1f;
 }
 
+/* Small headings over each part: "What you checked", "Good signs", "What to do" */
+.result-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-small);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.result-subject {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
 .result-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 
-/* How risky it looks, as one softly coloured heading with its icon: red for a
-   scam, yellow for be careful, green for no clues */
-.result-title {
+/* How risky it looks: soft red, yellow or green, with its icon, the heading, and
+   how many clues were found */
+.result-banner {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   padding: 14px 20px;
-  border-radius: var(--radius);
-  font-size: var(--text-heading);
-  font-weight: 800;
-  line-height: 1.2;
+  border-radius: 24px;
 }
 
 .result-icon {
   display: grid;
   flex: none;
   place-items: center;
-  width: 1.4em;
-  height: 1.4em;
+  width: 40px;
+  height: 40px;
 }
 
 .result-icon svg {
   width: 100%;
   height: 100%;
   stroke-width: 2.4;
+}
+
+.result-title {
+  font-size: var(--text-heading);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.result-found {
+  margin-top: 2px;
+  font-weight: 700;
+  opacity: 0.85;
 }
 
 .risk-high {
@@ -330,23 +361,11 @@
   color: var(--good-ink);
 }
 
-/* What was checked gets a matching soft frame */
-.result-high .marked-text.checked-link {
-  box-shadow: inset 0 0 0 2px var(--danger-line);
-}
-
-.result-medium .marked-text.checked-link {
-  box-shadow: inset 0 0 0 2px var(--unsure-line);
-}
-
-.result-none .marked-text.checked-link {
-  box-shadow: inset 0 0 0 2px var(--good-line);
-}
-
+/* Each clue in its own card, numbered to match the marks on what was checked */
 .result-clues {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -355,8 +374,14 @@
 
 .result-clue {
   display: grid;
-  grid-template-columns: 32px 1fr;
+  grid-template-columns: 34px 1fr;
   column-gap: 14px;
+  row-gap: 2px;
+  align-items: start;
+  padding: 10px 16px 10px 12px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
   counter-increment: clue;
 }
 
@@ -365,30 +390,36 @@
   display: grid;
   grid-row: span 2;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: #ffe066;
-  box-shadow: 0 0 0 2px #f5b700;
+  box-shadow: inset 0 0 0 2px #f5b700;
   color: #1d1d1f;
   font-weight: 800;
   line-height: 1;
 }
 
+.result-clue strong {
+  line-height: 1.3;
+  padding-top: 4px;
+}
+
 .result-clue span {
   color: var(--muted);
   font-size: var(--text-small);
-}
-
-.result-tell {
-  font-weight: 700;
+  line-height: 1.45;
 }
 
 /* Facts in a link's favour, when there are no clues (never "safe") */
-.result-good h3 {
-  margin: 0 0 8px;
-  font-size: var(--text-body);
-  font-weight: 800;
+.result-good {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .result-good ul {
@@ -418,42 +449,97 @@
   transform: rotate(45deg);
 }
 
+/* What to do next: always show a grown-up */
+.result-tell {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.result-tell-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.result-tell-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.result-tell p {
+  margin-top: 2px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.result-panel .tool-actions {
+  margin-top: 4px;
+}
+
 /* A checked link or message, with each clue's words marked and numbered */
 .marked-text {
-  line-height: 2;
+  line-height: 1.9;
   overflow-wrap: anywhere;
 }
 
 .marked-text.checked-link {
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-radius: 16px;
-  background: var(--surface);
+  background: var(--bg);
   box-shadow: inset 0 0 0 2px var(--hairline);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
+/* What was checked gets a frame in the risk's colour */
+.result-high .marked-text.checked-link {
+  box-shadow: inset 0 0 0 2px var(--danger-line);
+}
+
+.result-medium .marked-text.checked-link {
+  box-shadow: inset 0 0 0 2px var(--unsure-line);
+}
+
+.result-none .marked-text.checked-link {
+  box-shadow: inset 0 0 0 2px var(--good-line);
+}
+
+/* A message looks like a text bubble */
 .marked-text.checked-message {
-  justify-self: start;
+  align-self: start;
   padding: 12px 18px;
   border-radius: 22px 22px 22px 8px;
   background: #e9e9eb;
-}
-
-.result-mark {
-  padding: 2px 4px;
-  border-radius: 6px;
-  background: #ffe066;
-  box-shadow: 0 0 0 2px #f5b700;
   color: #1d1d1f;
 }
 
-/* Round badges hold their number in the middle: line-height 1, so the tall
-   lines of the text around them can't push the number down */
+/* Marked words: a highlighter stripe that wraps neatly onto the next line */
+.result-mark {
+  padding: 1px 3px;
+  border-radius: 6px;
+  background: #ffe066;
+  box-shadow: inset 0 -2px 0 #f5b700;
+  color: #1d1d1f;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* The clue's number, sitting just after the marked words. line-height 1, so the
+   tall lines of the text around it can't push the number down */
 .result-mark-number {
   display: inline-grid;
   place-items: center;
-  width: 1.6em;
-  height: 1.6em;
+  width: 1.3em;
+  height: 1.3em;
   margin-left: 4px;
   border-radius: 50%;
   background: #1d1d1f;
@@ -462,7 +548,7 @@
   font-size: 0.7em;
   font-weight: 800;
   line-height: 1;
-  vertical-align: middle;
+  vertical-align: 0.2em;
 }
 
 /* Grown-ups: the parent gate */
