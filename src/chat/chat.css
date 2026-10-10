@@ -258,8 +258,25 @@
   }
 }
 
+/* ...and the microphone lights up, since Buddy says "talk to me" (even while
+   it's turned off) */
+.ask-compose.is-pointed .ask-mic,
+.ask-compose.is-pointed .ask-mic:disabled {
+  opacity: 1;
+  background: #ffe066;
+  box-shadow: 0 0 0 3px #f5b700;
+  animation: mic-pulse 1.6s ease-in-out 3;
+}
+
+@keyframes mic-pulse {
+  50% {
+    transform: scale(1.12);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .ask-compose.is-pointed {
+  .ask-compose.is-pointed,
+  .ask-compose.is-pointed .ask-mic {
     animation: none;
   }
 }
