@@ -1,7 +1,7 @@
 import { type FormEvent, useRef, useState } from 'react'
 import { ScanIcon } from '../icons'
 import type { CheckResult } from './examples'
-import { exampleMessage, messageResult } from './examples'
+import { exampleMessage, inTextOrder, messageResult } from './examples'
 import { checkLink } from './linkCheck'
 import { lookUpLink, withFacts } from './linkLookup'
 import { MarkedText, ResultView } from './Result'
@@ -72,6 +72,8 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
     })
   }
   const showResult = stage === 'checking' && waited && lookedUp
+  // Numbered in the order they come in the text
+  const shown = result && inTextOrder(result, text.trim())
   // Messages will be sent to be checked, so a grown-up has to finish setup first.
   // Links are checked on the device until then, with a note saying so.
   if (kind === 'message' && !setUp) return <SetupFirst title={k.title} what="messages" onHome={onHome} onSetUp={onSetUp} />
@@ -144,10 +146,10 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
         <Checking onDone={() => setWaited(true)} ms={kind === 'link' ? 1500 : 3000} />
       )}
 
-      {showResult && result && (
+      {showResult && shown && (
         <ResultView
-          subject={<MarkedText text={text.trim()} clues={result.clues} className={`checked-${kind}`} />}
-          result={result}
+          subject={<MarkedText text={text.trim()} clues={shown.clues} className={`checked-${kind}`} />}
+          result={shown}
           onAgain={onAsk}
           onDone={onHome}
         />

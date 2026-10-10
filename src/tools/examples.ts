@@ -12,6 +12,16 @@ export type Clue = { label: string; reason: string; highlight?: string }
 // when there are no clues. Never "safe": a check can miss things.
 export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[] }
 
+// The clues in the order their words come in `text` (top to bottom), so the
+// numbers marked in the text count up as you read; clues without words go last
+export function inTextOrder(result: CheckResult, text: string): CheckResult {
+  const at = (c: Clue) => {
+    const i = c.highlight ? text.indexOf(c.highlight) : -1
+    return i < 0 ? Infinity : i
+  }
+  return { ...result, clues: [...result.clues].sort((a, b) => at(a) - at(b)) }
+}
+
 // Check a picture: the "new number" scam from the game, with its "Spot the clues" red flags
 export const examplePicture = scenarios.find((s) => s.id === 'new-number')
 const pictureClues = examplePicture

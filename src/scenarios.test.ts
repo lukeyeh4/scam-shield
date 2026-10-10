@@ -135,6 +135,13 @@ it.each(playable)('%s: "Check with Scam Shield" finds clues', (_path, scenario) 
   expect(result.clues.length).toBeGreaterThan(0)
 })
 
+it.each(playable)('%s: "Check with Scam Shield" numbers clues in reading order', (_path, scenario) => {
+  const { text } = scenario.checkIt
+  if (!text) return
+  const at = tutorialCheck(scenario).result.clues.map((c) => (c.highlight ? text.indexOf(c.highlight) : Infinity))
+  expect(at).toEqual([...at].sort((a, b) => a - b))
+})
+
 it('gives every scenario its own id', () => {
   const ids = Object.values(files).map((s) => s.id)
   expect(new Set(ids).size).toBe(ids.length)

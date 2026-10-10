@@ -1,6 +1,6 @@
 import type { Mark } from '../mockups/marks'
 import type { RecapItem, Scenario } from '../types'
-import type { CheckResult } from './examples'
+import { type CheckResult, inTextOrder } from './examples'
 import { checkLink } from './linkCheck'
 
 // The scam's "Spot the clues" items that are on the scam screen itself
@@ -21,11 +21,11 @@ export function pictureCheck(scenario: Scenario): { result: CheckResult; marks: 
 
 // What "Check with Scam Shield" finds in a scenario's scam, with the tool it uses.
 // Links are really checked; messages and pictures use the scenario's clues, until the
-// AI checks them.
+// AI checks them. A link's or message's clues are numbered in the order they come in it.
 export function tutorialCheck(scenario: Scenario): { result: CheckResult; marks?: Mark[] } {
   const { tool, text = '' } = scenario.checkIt
   if (tool === 'picture') return pictureCheck(scenario)
-  if (tool === 'link') return { result: checkLink(text) ?? { risk: 'none', clues: [] } }
+  if (tool === 'link') return { result: inTextOrder(checkLink(text) ?? { risk: 'none', clues: [] }, text) }
   const clues = spotClues(scenario).filter((c) => c.highlight && text.includes(c.highlight))
-  return { result: { risk: clues.length ? 'high' : 'none', clues: clues.map(toClue) } }
+  return { result: inTextOrder({ risk: clues.length ? 'high' : 'none', clues: clues.map(toClue) }, text) }
 }
