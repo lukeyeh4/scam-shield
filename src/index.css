@@ -7,6 +7,11 @@
   --ink: #1d2433;
   --muted: #5b6475;
   --hairline: #e6e8ec;
+  /* The main colour: big buttons, the player's chat bubbles, progress */
+  --accent: #1d2433;
+  --accent-2: #34405a;
+  --accent-gradient: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  --on-accent: #ffffff;
   --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.05), 0 2px 8px rgb(16 24 40 / 0.05);
   --shadow-md: 0 2px 4px rgb(16 24 40 / 0.05), 0 10px 28px rgb(16 24 40 / 0.08);
   --radius: 20px;
@@ -342,8 +347,8 @@ button:active {
   width: 100%;
   min-height: 88px;
   border-radius: 28px;
-  background: linear-gradient(135deg, #1d2433 0%, #34405a 100%);
-  color: #fff;
+  background: var(--accent-gradient);
+  color: var(--on-accent);
   font-size: var(--text-heading);
   font-weight: 800;
   box-shadow: 0 4px 8px rgb(16 24 40 / 0.08), 0 18px 40px rgb(29 36 51 / 0.28);
@@ -762,8 +767,8 @@ button:active {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--surface-soft);
-  color: var(--muted);
+  background: #e5e5ea;
+  color: #8e8e93;
   font-weight: 600;
 }
 

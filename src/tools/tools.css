@@ -49,7 +49,7 @@
 }
 
 .tool-progress-bar .is-on {
-  background: var(--ink);
+  background: var(--accent);
 }
 
 .tool-step {
@@ -107,8 +107,8 @@
 }
 
 .tool-button-main {
-  background: linear-gradient(135deg, #1d2433 0%, #34405a 100%);
-  color: #fff;
+  background: var(--accent-gradient);
+  color: var(--on-accent);
   box-shadow: var(--shadow-md);
 }
 
@@ -209,7 +209,7 @@
   inset: 0;
   width: 40%;
   border-radius: inherit;
-  background: var(--ink);
+  background: var(--accent);
   animation: checking-sweep 1.4s ease-in-out infinite;
 }
 
@@ -303,6 +303,7 @@
   border-radius: 50%;
   background: #ffe066;
   box-shadow: 0 0 0 2px #f5b700;
+  color: #1d1d1f;
   font-weight: 800;
 }
 
@@ -436,7 +437,7 @@
   flex: none;
   width: 26px;
   height: 26px;
-  accent-color: var(--ink);
+  accent-color: var(--accent);
 }
 
 .settings-toggle {
@@ -456,7 +457,7 @@
   width: 60px;
   height: 36px;
   border-radius: 999px;
-  background: #c3c8d1;
+  background: color-mix(in srgb, var(--muted) 45%, var(--surface));
   transition: background-color 200ms var(--ease);
 }
 
@@ -473,7 +474,7 @@
 }
 
 .switch[aria-checked='true'] {
-  background: var(--ink);
+  background: var(--accent);
 }
 
 .switch[aria-checked='true'] .switch-knob {

@@ -4,8 +4,12 @@ import { resetBadges } from '../badges'
 import { scenarios } from '../scenarios'
 import type { ScenarioStart } from '../screens/ScenarioScreen'
 import type { Choice } from '../types'
-import { isFast, setFast } from './devSettings'
+import { getPalette, isFast, type Palette, PALETTES, setFast, setPalette } from './devSettings'
 import './devConsole.css'
+import './palettes.css'
+
+// The palette picked last time
+setPalette(getPalette())
 
 export type DevJump =
   | { to: 'menu' }
@@ -20,6 +24,7 @@ const CHOICES: Choice[] = ['do', 'ignore', 'tell']
 export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
   const [open, setOpen] = useState(false)
   const [fast, setFastState] = useState(isFast)
+  const [palette, setPaletteState] = useState(getPalette)
   const [index, setIndex] = useState(0)
   const [choice, setChoice] = useState<Choice>('do')
   const scenario = scenarios[index]
@@ -59,6 +64,24 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
       <label className="dev-row">
         <input type="checkbox" checked={fast} onChange={toggleFast} />
         Fast mode (skip waiting)
+      </label>
+
+      <label className="dev-row">
+        Colours
+        <select
+          value={palette}
+          onChange={(e) => {
+            setPalette(e.target.value as Palette)
+            setPaletteState(e.target.value as Palette)
+          }}
+        >
+          {PALETTES.map((p) => (
+            <option key={p} value={p}>
+              {p.charAt(0).toUpperCase() + p.slice(1)}
+              {p === 'cloud' ? ' (now)' : ''}
+            </option>
+          ))}
+        </select>
       </label>
 
       <div className="dev-row">

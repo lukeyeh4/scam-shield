@@ -87,8 +87,8 @@
 
 .ask-bubble-kid {
   border-bottom-right-radius: 8px;
-  background: linear-gradient(135deg, #1d2433 0%, #34405a 100%);
-  color: #fff;
+  background: var(--accent-gradient);
+  color: var(--on-accent);
   font-weight: 600;
   transform-origin: bottom right;
 }
@@ -205,8 +205,8 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: var(--ink);
-  color: #fff;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .ask-compose .ask-mic {

@@ -188,6 +188,7 @@ Run them with `npm test`.
 A testing panel that only appears with `npm run dev`. Click "Dev" in the bottom-right corner, or press the `` ` `` key. It can:
 
 - Turn on **fast mode**: Buddy's text appears at once and nothing waits, so you don't have to sit through each conversation. It stays on after a reload.
+- Try **colour palettes** (Colours): Cloud (now), Cream, Night, Sky, Mint, Lavender, Sunset, from `src/dev/palettes.css`. Once one is chosen, copy its colours into `:root` in `src/index.css`.
 - Jump to the menu, the end screen, or any scenario at any stage (the scam, the Do it page, the outcome for a chosen answer, the recap, or the summary card).
 
 It's left out of `npm run build`, but remove it before shipping anyway. Everything is marked `DEV CONSOLE`:

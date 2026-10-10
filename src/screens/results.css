@@ -29,13 +29,13 @@
 }
 
 .primary-button {
-  background: var(--ink);
-  color: var(--surface);
+  background: var(--accent-gradient);
+  color: var(--on-accent);
   box-shadow: var(--shadow-md);
 }
 
 .primary-button:hover {
-  background: #2c3547;
+  filter: brightness(1.1);
 }
 
 .secondary-button {
@@ -196,7 +196,7 @@
 }
 
 .stepper-step.is-done:not(:last-child)::after {
-  background: var(--ink);
+  background: var(--accent);
 }
 
 .stepper-dot {
@@ -214,8 +214,8 @@
 }
 
 .stepper-step.is-done .stepper-dot {
-  background: var(--ink);
-  color: var(--surface);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .stepper-step.is-current {
@@ -223,8 +223,8 @@
 }
 
 .stepper-step.is-current .stepper-dot {
-  background: var(--ink);
-  color: var(--surface);
+  background: var(--accent);
+  color: var(--on-accent);
   transform: scale(1.12);
 }
 
