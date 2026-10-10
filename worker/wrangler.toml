@@ -1,0 +1,20 @@
+name = "scam-shield-links"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://lukeyeh4.github.io"
+
+# Checks per minute for each person, since each AI check costs money
+[[ratelimits]]
+name = "LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 20
+  period = 60
+
+# The keys are secrets, never in this file:
+#   npx wrangler secret put SAFE_BROWSING_KEY
+#   npx wrangler secret put ANTHROPIC_API_KEY
+# For `npm run dev`, put it in worker/.dev.vars (ignored by git).

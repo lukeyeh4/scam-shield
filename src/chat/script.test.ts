@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { findLink, replyTo, STEPS, type StepId, TYPED_STEPS } from './script'
+import { BACK_AFTER, buddySays, findLink, replyTo, STEPS, type StepId, TYPED_STEPS } from './script'
 
 const ids = Object.keys(STEPS) as StepId[]
 
@@ -19,8 +19,22 @@ function reachable() {
 }
 
 describe('chat script', () => {
-  it('can reach every step from the start, or by typing', () => {
-    expect([...reachable(), ...TYPED_STEPS].sort()).toEqual([...ids].sort())
+  it('can reach every step from the start, by typing, or by coming back from a check', () => {
+    expect([...new Set([...reachable(), ...TYPED_STEPS, ...Object.values(BACK_AFTER)])].sort()).toEqual([...ids].sort())
+  })
+
+  it('sends a kid to a grown-up after every check, however Buddy says it', () => {
+    for (const id of Object.values(BACK_AFTER)) {
+      for (const lines of [STEPS[id].buddy, ...(STEPS[id].alternatives ?? [])]) expect(lines.join(' '), id).toContain('grown-up')
+    }
+  })
+
+  it("says it a different way each time, and only says 'Good thinking' the first time", () => {
+    for (const id of Object.values(BACK_AFTER)) {
+      const said = [0, 1, 2].map((turn) => buddySays(id, turn).join(' '))
+      expect(new Set(said).size, id).toBe(3)
+      expect(said.filter((s) => s.includes('Good thinking')), id).toHaveLength(1)
+    }
   })
 
   it.each([

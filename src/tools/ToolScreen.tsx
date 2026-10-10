@@ -10,8 +10,9 @@ type ToolScreenProps = {
   step?: number
   // The first step goes back to the menu; later steps go back a step
   onBack: () => void
-  // These screens are wireframes: a quiet note at the bottom says nothing really happens yet
-  note?: string
+  // These screens are wireframes: a quiet note at the bottom says nothing really happens
+  // yet (null: no note, for a tool that really works)
+  note?: string | null
   children: ReactNode
 }
 
@@ -44,7 +45,7 @@ export function ToolScreen({ title, steps, step = 0, onBack, note = 'Preview: no
         <div key={step} className="tool-step screen-enter">
           {children}
         </div>
-        <p className="preview-note">{note}</p>
+        {note && <p className="preview-note">{note}</p>}
       </main>
     </div>
   )

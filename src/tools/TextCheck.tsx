@@ -1,20 +1,23 @@
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useRef, useState } from 'react'
 import { ScanIcon } from '../icons'
 import type { CheckResult } from './examples'
 import { exampleMessage, messageResult } from './examples'
 import { checkLink } from './linkCheck'
+import { lookUpLink, withFacts } from './linkLookup'
 import { MarkedText, ResultView } from './Result'
 import { Checking, ToolScreen, type ToolNav } from './ToolScreen'
 
 // Check a link and Check a message work the same way: paste it in, then see the
 // result with the clues marked in the text. Links are really checked (linkCheck.ts,
-// on the device); messages are still a wireframe with an example.
+// on the device, then linkLookup.ts on our server while "Checking" shows); messages
+// are still a wireframe with an example.
 const KINDS = {
   link: {
     title: 'Check a link',
     heading: 'Paste the link',
     tip: "Don't tap the link. Press and hold it, then tap Copy.",
-    note: 'Checks the address on this device. Safety lists come later.',
+    // Links are really checked, so no preview note
+    note: null,
   },
   message: {
     title: 'Check a message',
@@ -24,7 +27,8 @@ const KINDS = {
   },
 }
 
-type Stage = 'paste' | 'checking' | 'result'
+// Checking turns into the result once it's ready (see showResult)
+type Stage = 'paste' | 'checking'
 
 type TextCheckProps = ToolNav & {
   kind: keyof typeof KINDS
@@ -38,10 +42,16 @@ export function TextCheck({ kind, initial = '', onHome, onAsk }: TextCheckProps)
   const [text, setText] = useState(kind === 'link' ? initial : exampleMessage)
   const [result, setResult] = useState<CheckResult>()
   const [notALink, setNotALink] = useState(false)
+  // The result shows once "Checking" has had its moment and the server has answered
+  const [waited, setWaited] = useState(false)
+  const [lookedUp, setLookedUp] = useState(true)
+  // Only the newest check's answer counts, if the player goes back and checks again
+  const latestCheck = useRef(0)
   const back = () => (stage === 'paste' ? onHome() : setStage('paste'))
 
   const check = (e: FormEvent) => {
     e.preventDefault()
+    setWaited(false)
     if (kind === 'message') {
       setResult(messageResult)
       return setStage('checking')
@@ -51,7 +61,15 @@ export function TextCheck({ kind, initial = '', onHome, onAsk }: TextCheckProps)
     if (!checked) return
     setResult(checked)
     setStage('checking')
+    const id = ++latestCheck.current
+    setLookedUp(false)
+    lookUpLink(checked.url).then((facts) => {
+      if (id !== latestCheck.current) return
+      setResult(withFacts(checked, facts))
+      setLookedUp(true)
+    })
   }
+  const showResult = stage === 'checking' && waited && lookedUp
 
   // The Paste button: reads what the player copied (the browser may ask first)
   const paste = async () => {
@@ -116,9 +134,11 @@ export function TextCheck({ kind, initial = '', onHome, onAsk }: TextCheckProps)
         </form>
       )}
 
-      {stage === 'checking' && <Checking onDone={() => setStage('result')} ms={kind === 'link' ? 1500 : 3000} />}
+      {stage === 'checking' && !showResult && (
+        <Checking onDone={() => setWaited(true)} ms={kind === 'link' ? 1500 : 3000} />
+      )}
 
-      {stage === 'result' && result && (
+      {showResult && result && (
         <ResultView
           subject={<MarkedText text={text.trim()} clues={result.clues} className={`checked-${kind}`} />}
           result={result}

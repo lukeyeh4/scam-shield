@@ -285,8 +285,12 @@
   gap: 20px;
 }
 
-/* How risky it looks, as one coloured heading */
+/* How risky it looks, as one softly coloured heading with its icon: red for a
+   scam, yellow for be careful, green for no clues */
 .result-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 14px 20px;
   border-radius: var(--radius);
   font-size: var(--text-heading);
@@ -294,19 +298,49 @@
   line-height: 1.2;
 }
 
+.result-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.result-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 2.4;
+}
+
 .risk-high {
-  background: #fde2e1;
-  color: #8a1c17;
+  background: var(--danger-bg);
+  box-shadow: inset 0 0 0 2px var(--danger-line);
+  color: var(--danger-ink);
 }
 
 .risk-medium {
-  background: #fff1c2;
-  color: #6b4e00;
+  background: var(--unsure-bg);
+  box-shadow: inset 0 0 0 2px var(--unsure-line);
+  color: var(--unsure-ink);
 }
 
 .risk-none {
-  background: var(--surface-soft);
-  color: var(--ink);
+  background: var(--good-bg);
+  box-shadow: inset 0 0 0 2px var(--good-line);
+  color: var(--good-ink);
+}
+
+/* What was checked gets a matching soft frame */
+.result-high .marked-text.checked-link {
+  box-shadow: inset 0 0 0 2px var(--danger-line);
+}
+
+.result-medium .marked-text.checked-link {
+  box-shadow: inset 0 0 0 2px var(--unsure-line);
+}
+
+.result-none .marked-text.checked-link {
+  box-shadow: inset 0 0 0 2px var(--good-line);
 }
 
 .result-clues {
@@ -338,6 +372,7 @@
   box-shadow: 0 0 0 2px #f5b700;
   color: #1d1d1f;
   font-weight: 800;
+  line-height: 1;
 }
 
 .result-clue span {
@@ -347,6 +382,40 @@
 
 .result-tell {
   font-weight: 700;
+}
+
+/* Facts in a link's favour, when there are no clues (never "safe") */
+.result-good h3 {
+  margin: 0 0 8px;
+  font-size: var(--text-body);
+  font-weight: 800;
+}
+
+.result-good ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result-good li {
+  position: relative;
+  padding-left: 28px;
+}
+
+/* A green tick, like the "No clues found" heading */
+.result-good li::before {
+  content: '';
+  position: absolute;
+  top: 0.35em;
+  left: 4px;
+  width: 7px;
+  height: 13px;
+  border: solid var(--good-ink);
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
 }
 
 /* A checked link or message, with each clue's words marked and numbered */
@@ -378,11 +447,13 @@
   color: #1d1d1f;
 }
 
+/* Round badges hold their number in the middle: line-height 1, so the tall
+   lines of the text around them can't push the number down */
 .result-mark-number {
   display: inline-grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: 1.6em;
+  height: 1.6em;
   margin-left: 4px;
   border-radius: 50%;
   background: #1d1d1f;
@@ -390,7 +461,8 @@
   font-family: system-ui, sans-serif;
   font-size: 0.7em;
   font-weight: 800;
-  vertical-align: 0.15em;
+  line-height: 1;
+  vertical-align: middle;
 }
 
 /* Grown-ups: the parent gate */

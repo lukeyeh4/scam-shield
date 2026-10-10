@@ -1,12 +1,15 @@
-import type { ReactNode } from 'react'
+import { type ReactNode, useEffect } from 'react'
+import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
+import { DangerIcon, GoodIcon, UnsureIcon } from '../icons'
 import type { CheckResult, Clue, Risk } from './examples'
 
-// How each risk level is shown. Never "safe": a check can miss things.
-const RISKS: Record<Risk, { title: string; tell: string }> = {
-  high: { title: 'This looks like a scam', tell: "Don't answer it or tap on it. Show a grown-up." },
-  medium: { title: 'Be careful', tell: "Don't answer it or tap on it. Show a grown-up." },
-  none: { title: 'No clues found', tell: 'Still not sure? Show a grown-up.' },
+// How each risk level is shown: soft red, yellow or green, each with its own icon
+// so colour isn't the only sign. Never "safe": a check can miss things.
+const RISKS: Record<Risk, { title: string; tell: string; icon: ReactNode }> = {
+  high: { title: 'This looks like a scam', tell: "Don't answer it or tap on it. Show a grown-up.", icon: <DangerIcon /> },
+  medium: { title: 'Be careful', tell: "Don't answer it or tap on it. Show a grown-up.", icon: <UnsureIcon /> },
+  none: { title: 'No clues found', tell: 'Still not sure? Show a grown-up.', icon: <GoodIcon /> },
 }
 
 type ResultViewProps = {
@@ -21,22 +24,37 @@ type ResultViewProps = {
 // numbered clues (matching the numbers on what was checked), and what to do next
 export function ResultView({ subject, result, onAgain, onDone }: ResultViewProps) {
   const risk = RISKS[result.risk]
+  // Back in the chat, Buddy talks about what this check found
+  useEffect(() => noteCheck(result.risk), [result.risk])
   return (
-    <section className="result" aria-labelledby="result-title">
+    <section className={`result result-${result.risk}`} aria-labelledby="result-title">
       <div className="result-subject">{subject}</div>
 
       <div className="result-panel">
         <h2 id="result-title" className={`result-title risk-${result.risk}`}>
+          <span className="result-icon">{risk.icon}</span>
           {risk.title}
         </h2>
-        <ol className="result-clues">
-          {result.clues.map((c) => (
-            <li key={c.label} className="result-clue">
-              <strong>{c.label}</strong>
-              <span>{c.reason}</span>
-            </li>
-          ))}
-        </ol>
+        {result.clues.length > 0 && (
+          <ol className="result-clues">
+            {result.clues.map((c) => (
+              <li key={c.label} className="result-clue">
+                <strong>{c.label}</strong>
+                <span>{c.reason}</span>
+              </li>
+            ))}
+          </ol>
+        )}
+        {result.risk === 'none' && result.good?.length ? (
+          <div className="result-good">
+            <h3>Good signs</h3>
+            <ul>
+              {result.good.map((g) => (
+                <li key={g}>{g}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         <p className="result-tell">{risk.tell}</p>
         <div className="tool-actions">
           <button className="tool-button tool-button-main" type="button" onClick={onAgain}>

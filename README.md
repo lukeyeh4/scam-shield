@@ -68,6 +68,20 @@ A friendly yellow shield with a face and little hands, who guides each scam in s
 - **No hints before the choice.** Kids find the clues themselves.
 - **Not a trusted adult.** It always sends kids to a real grown-up.
 - **Every line is scripted** in the scenario files. Nothing is generated.
+- **Read aloud:** a "Read aloud" switch in the top corner (off by default) has the device's own voice read Buddy's lines; each bubble waits until the voice has finished.
+- **A conversation that carries on:** in Ask Shield Buddy, leaving to check something and coming back continues the same chat. Buddy greets once, then reacts to what the check found, in a different way each time.
+
+## Check a link
+
+Kids paste a link (or a whole message with a link in it) and see whether it looks like a scam, with each clue marked in the link and explained in kid words: what the trick is, and what the real website looks like. Results are soft red ("This looks like a scam"), yellow ("Be careful") or green ("No clues found", with good signs). It never says "safe", and always ends with "show a grown-up".
+
+It checks in three layers, and never opens the link on the kid's device:
+
+1. **The address, on the device (instant):** the real website is found with the Public Suffix List; then it looks for brand copies (rob1ox, ronlox, letters from other alphabets, roblox.com.evil.net), a real address hidden after an @ or in the path, free website makers, short links, cheap endings, tempting words and http. Fan websites of games get a gentler clue than copies of accounts and money services like PayPal.
+2. **Facts from our small server** (a Cloudflare Worker): Google Safe Browsing, how new the website is, whether it exists, and where a short link really goes (that address gets every check too).
+3. **Claude reads the page** (Claude Haiku 5.5), only when nothing strong was found: fixed yes/no questions, like "Does it copy a brand?", "Does it ask for a password?", "Free prizes?", "Free paid sports or shows?", "Pop-up ads?". The AI never writes what kids read and can't say a website is fine.
+
+Tested against 140 real websites (no false alarms) and 40 live phishing links (39 caught or flagged).
 
 ## Look and feel
 
@@ -93,14 +107,16 @@ npm install
 npm run dev      # play it locally
 npm run build    # type-check and build static files for hosting
 npm run lint
-npm test         # check every scenario file and the red-flag highlighting
+npm test         # check every scenario file, the red-flag highlighting, the link checker and the chat script
 ```
+
+The link checker's server is in `worker/` (`npm install`, then `npm run dev` or `npm run deploy` there). Its keys (Google Safe Browsing, Claude) are secrets: locally in `worker/.dev.vars`, which git ignores, and on Cloudflare with `npx wrangler secret put`. Never put them in a committed file; this repo is public.
 
 While running `npm run dev`, a **Dev** button in the corner jumps to any screen, has a fast mode that skips Buddy's typing, and lets you try other colour palettes and fonts. It's left out of the build and must be removed before shipping (see `PROJECT.md`).
 
 ## How it's built
 
-React + TypeScript + Vite, as a web app for tablets. Every push to `main` rebuilds the game and puts it on GitHub Pages (`.github/workflows/deploy.yml`).
+React + TypeScript + Vite, as a web app for tablets. Every push to `main` rebuilds the game and puts it on GitHub Pages (`.github/workflows/deploy.yml`). The link checker's server is a Cloudflare Worker at scam-shield-links.lukeyeh4.workers.dev (its address is in `.env.production`); it keeps nothing it's sent, and allows 20 checks a minute per person.
 
 The game is **data-driven**: every scam uses the same screens, and each one is just a JSON file in `scenarios/` (format: `Scenario` in `src/types.ts`). A scenario picks a fake screen (`sms`, `search`, `shorts`, …), fills in its content, and lists Buddy's lines, the outcomes, and the red flags for the recap and Spot the clues.
 
@@ -112,6 +128,11 @@ src/screens/      menu, scam, outcome, Spot the clues, recap, end screen
 src/mockups/      fake iPhone and iPad screens: texts, Safari, Google, YouTube Shorts
 src/buddy/        Shield Buddy and its speech bubbles
 src/badges.ts     badges, saved on the device
+src/chat/         Ask Shield Buddy: the chat, its script, and the conversation so far
+src/tools/        the checkers: linkCheck.ts (the address), brands.ts (official websites),
+                  linkLookup.ts (the server's facts as clues), the result screen
+src/readAloud.ts  read-aloud with the device's voice
+worker/           the link checker's server: lookups, and Claude reading pages
 ```
 
 `PROJECT.md` tracks what's next. `CLAUDE.md` has the full details for working on the code.
@@ -119,4 +140,5 @@ src/badges.ts     badges, saved on the device
 ## Open questions
 
 - Keep real brands and people (Apple, Google, Roblox, YouTube, MrBeast) in scams 1–3, or switch to made-up names?
-- Read-aloud audio for younger readers (planned: Buddy's lines would be read aloud).
+- Read-aloud: Buddy's lines are read by the device's own voice for now, which varies by device. Switch to recorded or AI-made audio for one Buddy voice? Where should the switch go (it covers the home screen's gear on phones)?
+- Add VirusTotal (about 90 security companies' verdicts) to catch sites like vmsvedaweb.com that web filters block but Google doesn't list?
