@@ -56,7 +56,8 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
 - [ ] **Check a picture (flagship):** take a screenshot or photo, or pick one; the AI finds the points of concern and the result screen shows the picture with each one boxed and numbered, a list of short kid-friendly reasons to match, and an overall risk level. It must work for texts, game chats, ads, websites, pop-ups and emails.
   - [x] Result screen first, with made-up results (no AI yet): the picture, the reasons, the risk level, and "show a grown-up" (wireframe)
   - [ ] Numbers on the picture's marks to match the list (the link and message results already have them)
-  - [ ] Choosing a picture: camera, photo library, or (in the app) the share button
+  - [x] Choosing a picture (`src/tools/picturePicker.ts`): photo library, camera (touch devices only), or paste or drag one in on a computer; shrunk to 1568px and saved again as a JPEG, which removes hidden details like location; kind messages if it isn't a picture or can't be opened; device-specific "How do I take a screenshot?". Tested in Chrome (paste, drop, a broken file)
+  - [ ] In the app: swap `pickPicture` for the phone's picker (e.g. Capacitor Camera) and send shared pictures to `receivePicture`; test HEIC photos and the camera on iPad and Android
   - [ ] The AI on our own server: it returns each point of concern as a box on the image plus a reason; test it on the tutorial scenarios and many real and harmless screenshots
   - [ ] Accessibility: the reasons are a plain list that screen readers read in order, and tapping a reason highlights its box
 - [ ] **Link checker**, in layers so the result is based on facts, not guesses:

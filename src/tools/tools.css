@@ -212,6 +212,33 @@
   margin: 0 auto;
 }
 
+/* The kid's own picture: all of it showing, as big as fits */
+.tool-photo {
+  display: block;
+  max-width: 100%;
+  max-height: min(600px, 62vh);
+  margin: 0 auto;
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm), 0 0 0 1px var(--hairline);
+  background: #fff;
+}
+
+/* The picture checker takes pictures pasted or dragged anywhere on the page; while
+   one is dragged over, the step gets a dashed outline to show it can be dropped */
+.picture-drop {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  border-radius: 24px;
+  outline: 3px dashed transparent;
+  outline-offset: 8px;
+  transition: outline-color 150ms var(--ease);
+}
+
+.picture-drop.is-dragging {
+  outline-color: var(--accent);
+}
+
 /* While a check runs: Buddy, and a bar that sweeps across */
 .tool-checking {
   display: flex;
