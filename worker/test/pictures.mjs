@@ -54,7 +54,7 @@ for (const { name, facts, seconds } of results) {
   const signs = facts.signs.map((s) => `${s.sign} ("${s.words.slice(0, 50)}")`)
   console.log(`  got:    ${facts.kind}${facts.readable ? '' : ', NOT READABLE'}${facts.threatOrPhotos ? ', THREAT OR PHOTOS' : ''}`)
   for (const s of signs) console.log(`          - ${s}`)
-  if (facts.links.length) console.log(`          links: ${facts.links.join(', ')}`)
+  if (facts.links.length) console.log(`          links: ${facts.links.map((l) => l.address).join(', ')}`)
 }
 console.log(`\nAll done in ${((Date.now() - started) / 1000).toFixed(1)}s`)
 

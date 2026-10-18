@@ -3,6 +3,7 @@ import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
 import { CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
 import type { Box, CheckResult, Clue, Risk } from './examples'
+import { marksOf } from './pictureMarks'
 
 // How each risk level is shown: soft red, yellow or green, each with its own icon
 // so colour isn't the only sign, and what to do under the heading. Never "safe": a
@@ -17,16 +18,8 @@ const RISKS: Record<Risk, Look> = {
 const NOT_FOR_KIDS: Look = { title: "This website isn't for kids", tell: "Don't open it. Show a grown-up.", icon: <NoEntryIcon /> }
 // Someone is threatening the child or asking for photos: calm, no blame, and what
 // to do, before anything else (scripted, never from the AI)
-const URGENT: Look = {
-  title: 'Show a grown-up right now',
-  tell: "This isn't your fault, and you're not in trouble.",
-  icon: <GrownUpIcon />,
-}
-const URGENT_STEPS = [
-  "Don't answer, and don't send anything.",
-  "Don't delete it. A grown-up may need to see it.",
-  'Show a grown-up you trust right now, like a parent or teacher.',
-]
+const URGENT: Look = { title: 'Show a grown-up right now', tell: "It's not your fault.", icon: <GrownUpIcon /> }
+const URGENT_STEPS = ["Don't answer or send anything.", "Keep it. Don't delete it.", 'Show a grown-up you trust.']
 
 type ResultViewProps = {
   // What was checked: the picture, the link or the message, with the clues marked.
@@ -150,18 +143,6 @@ export function MarkedText({ text, clues, className = '' }: { text: string; clue
   )
 }
 
-// Boxes a little bigger than the words they mark, inside the picture (from 0 to
-// 1000), so the edges of the words aren't covered
-const PAD = { across: 12, down: 8 }
-function padded(box: Box) {
-  return {
-    left: Math.max(0, box.left - PAD.across),
-    top: Math.max(0, box.top - PAD.down),
-    right: Math.min(1000, box.right + PAD.across),
-    bottom: Math.min(1000, box.bottom + PAD.down),
-  }
-}
-
 // A picture with each clue's boxes drawn on it, numbered to match the list. When
 // a clue is picked in the list, its boxes stand out and the others fade. The boxes
 // are only decoration: the list says everything, in order, for screen readers.
@@ -183,22 +164,20 @@ export function MarkedPicture({ src, clues, picked = null }: { src: string; clue
         src={src}
         alt={marked ? `The picture you checked, with ${marked === 1 ? '1 clue' : `${marked} clues`} marked` : 'The picture you checked'}
       />
-      {clues.flatMap((c, i) =>
-        (c.boxes ?? []).map((box, j) => {
-          const { left, top, right, bottom } = padded(box)
-          const onRight = corner({ left, top, right, bottom })
-          return (
-            <span
-              key={`${i}-${j}`}
-              className={picked === i ? 'picture-box is-picked' : 'picture-box'}
-              style={{ left: `${left / 10}%`, top: `${top / 10}%`, width: `${(right - left) / 10}%`, height: `${(bottom - top) / 10}%` }}
-              aria-hidden="true"
-            >
-              <span className={onRight ? 'picture-box-number on-right' : 'picture-box-number'}>{i + 1}</span>
-            </span>
-          )
-        }),
-      )}
+      {marksOf(clues).map(({ box, clues: numbers }) => {
+        const { left, top, right, bottom } = box
+        const onRight = corner(box)
+        return (
+          <span
+            key={`${numbers.join('-')}-${left}-${top}`}
+            className={picked !== null && numbers.includes(picked) ? 'picture-box is-picked' : 'picture-box'}
+            style={{ left: `${left / 10}%`, top: `${top / 10}%`, width: `${(right - left) / 10}%`, height: `${(bottom - top) / 10}%` }}
+            aria-hidden="true"
+          >
+            <span className={onRight ? 'picture-box-number on-right' : 'picture-box-number'}>{numbers.map((n) => n + 1).join(' ')}</span>
+          </span>
+        )
+      })}
     </div>
   )
 }

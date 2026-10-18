@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { inPictureOrder } from './examples'
 import type { LinkFacts } from './linkLookup'
 import { pictureResult } from './pictureLookup'
+import { marksOf } from './pictureMarks'
 import { type PictureFacts, SIGNS, type Sign } from './pictureSigns'
 
 const box = { left: 100, top: 200, right: 900, bottom: 260 }
@@ -14,6 +15,7 @@ const facts = (more: Partial<PictureFacts> = {}): PictureFacts => ({
   ...more,
 })
 const sign = (s: Sign, words = 'some words') => ({ sign: s, words, box })
+const link = (address: string) => ({ address, box })
 // The link checker's server: no answer, so only the device's checks count
 const noServer = async () => null
 const labels = async (f: PictureFacts | null) => (await pictureResult(f, noServer)).clues.map((c) => c.label)
@@ -55,11 +57,10 @@ describe('pictureResult', () => {
   })
 
   it('checks the links in the picture with the link checker', async () => {
-    const result = await pictureResult(facts({ links: ['rbx-free-robux.xyz/claim'] }), noServer)
-    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'Pretending to be Roblox' }] })
-    expect(result.clues[0].reason).toMatch(/^The link rbx-free-robux\.xyz: /)
-    const odd = await pictureResult(facts({ links: ['games-unblocked-4u.top'] }), noServer)
-    expect(odd).toMatchObject({ risk: 'medium', clues: [{ label: 'An unusual ending' }] })
+    const result = await pictureResult(facts({ links: [link('rbx-free-robux.xyz/claim')] }), noServer)
+    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'A trick link', reason: 'Pretending to be Roblox: rbx-free-robux.xyz', boxes: [box] }] })
+    const odd = await pictureResult(facts({ links: [link('games-unblocked-4u.top')] }), noServer)
+    expect(odd).toMatchObject({ risk: 'medium', clues: [{ label: 'A link to be careful with', reason: 'An unusual ending: games-unblocked-4u.top' }] })
   })
 
   it("uses the link checker's server for links too", async () => {
@@ -71,16 +72,16 @@ describe('pictureResult', () => {
       exists: true,
       page: null,
     })
-    const result = await pictureResult(facts({ links: ['example-games.com'] }), listed)
-    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'On a list of dangerous websites' }] })
+    const result = await pictureResult(facts({ links: [link('example-games.com')] }), listed)
+    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'A trick link', reason: 'On a list of dangerous websites: example-games.com' }] })
   })
 
   it("says a link to a website that isn't for kids is that, not a scam", async () => {
-    expect(await pictureResult(facts({ links: ['rainbet.com'] }), noServer)).toMatchObject({ risk: 'high', notForKids: true })
+    expect(await pictureResult(facts({ links: [link('rainbet.com')] }), noServer)).toMatchObject({ risk: 'high', notForKids: true })
   })
 
   it('leaves out links to real websites with no clues, and text that is not a link', async () => {
-    expect(await pictureResult(facts({ links: ['roblox.com', 'hello'] }), noServer)).toMatchObject({ risk: 'none', clues: [] })
+    expect(await pictureResult(facts({ links: [link('roblox.com'), link('hello')] }), noServer)).toMatchObject({ risk: 'none', clues: [] })
   })
 
   it('marks threats and requests for photos as urgent', async () => {
@@ -88,7 +89,7 @@ describe('pictureResult', () => {
     expect(result).toMatchObject({ risk: 'high', urgent: true })
   })
 
-  it('numbers clues down the picture, with links (no boxes) last', async () => {
+  it('numbers clues down the picture, links included', async () => {
     const at = (top: number) => ({ left: 0, top, right: 100, bottom: top + 50 })
     const result = await pictureResult(
       facts({
@@ -96,10 +97,24 @@ describe('pictureResult', () => {
           { sign: 'rushes you', words: 'hurry', box: at(800) },
           { sign: 'free prize or free game money', words: 'free robux', box: at(100) },
         ],
-        links: ['roblox-login-help.com'],
+        links: [link('roblox-login-help.com')],
       }),
       noServer,
     )
-    expect(inPictureOrder(result).clues.map((c) => c.label)).toEqual(['Free prizes', 'Rushing you', 'Pretending to be Roblox'])
+    // (the link's box is at 200, between the two signs)
+    expect(inPictureOrder(result).clues.map((c) => c.label)).toEqual(['Free prizes', 'A trick link', 'Rushing you'])
+  })
+})
+
+describe('marks on the picture', () => {
+  const at = (left: number, top: number, right: number, bottom: number) => ({ left, top, right, bottom })
+  it('draws boxes that mostly overlap as one box with both numbers, and keeps others apart', () => {
+    const marks = marksOf([
+      { label: 'a', reason: '', boxes: [at(100, 300, 900, 360)] },
+      { label: 'b', reason: '', boxes: [at(500, 320, 900, 380)] },
+      { label: 'c', reason: '', boxes: [at(100, 700, 400, 740)] },
+      { label: 'd', reason: '' },
+    ])
+    expect(marks.map((m) => m.clues)).toEqual([[0, 1], [2]])
   })
 })

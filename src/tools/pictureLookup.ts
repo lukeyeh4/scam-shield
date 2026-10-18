@@ -13,64 +13,20 @@ import type { PictureFacts, Sign } from './pictureSigns'
 
 const SERVER: string | undefined = import.meta.env.VITE_LINK_SERVER
 
-// What each warning sign is called, and why it matters. Strong signs make it "This
-// looks like a scam"; the others "Be careful".
+// What each warning sign is called, and why it matters, in one short line. Strong
+// signs make it "This looks like a scam"; the others "Be careful".
 const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean }> = {
-  'asks for a password or login code': {
-    label: 'Asks for a password or code',
-    reason: 'Real companies and real friends never ask for your password or a code that was sent to you.',
-    strong: true,
-  },
-  'asks for money, gift cards or card details': {
-    label: 'Asks for money or gift cards',
-    reason: "Scammers ask for gift cards and card numbers, because once they're sent, the money is gone.",
-    strong: true,
-  },
-  'asks for personal details': {
-    label: 'Asks about you',
-    reason: 'It wants to know things like where you live, your school or your phone number. Keep those private.',
-    strong: true,
-  },
-  'asks for photos or videos of you': {
-    label: 'Asks for photos of you',
-    reason: "Never send photos or videos of yourself to someone who asks like this. It's not your fault. Show a grown-up.",
-    strong: true,
-  },
-  'free prize or free game money': {
-    label: 'Free prizes',
-    reason: 'Free Robux, prizes or money from someone you don’t know is one of the most common tricks.',
-    strong: true,
-  },
-  'pretends to be a company, game or famous person': {
-    label: 'Pretending to be someone',
-    reason: "It acts like it's from a company, a game or a famous person, but it might not be them at all.",
-    strong: true,
-  },
-  'pretends to be family or a friend': {
-    label: 'Maybe not who they say',
-    reason: "It says it's family or a friend, but something is different, like a new number or an odd request.",
-    strong: true,
-  },
-  'rushes you': {
-    label: 'Rushing you',
-    reason: "It wants you to hurry, so you don't stop and think.",
-    strong: false,
-  },
-  'threatens you': {
-    label: 'Trying to scare you',
-    reason: "It uses scary words to make you do something. It's not your fault. Show a grown-up.",
-    strong: true,
-  },
-  'asks you to move to another app or keep a secret': {
-    label: 'Keep a secret, or talk somewhere else',
-    reason: "It wants you to keep a secret or to talk in another app. People who are safe don't ask that.",
-    strong: true,
-  },
-  'wants you to download something': {
-    label: 'Wants you to download something',
-    reason: 'Downloads from messages like this can put bad apps on your device.',
-    strong: true,
-  },
+  'asks for a password or login code': { label: 'Asks for a password or code', reason: 'Real companies and friends never ask for these.', strong: true },
+  'asks for money, gift cards or card details': { label: 'Asks for money or gift cards', reason: 'Once you send it, the money is gone.', strong: true },
+  'asks for personal details': { label: 'Asks about you', reason: 'Keep where you live and your school private.', strong: true },
+  'asks for photos or videos of you': { label: 'Asks for photos of you', reason: 'Never send photos of yourself.', strong: true },
+  'free prize or free game money': { label: 'Free prizes', reason: 'Free stuff from strangers is a common trick.', strong: true },
+  'pretends to be a company, game or famous person': { label: 'Pretending to be someone', reason: 'It might not really be them.', strong: true },
+  'pretends to be family or a friend': { label: 'Maybe not who they say', reason: "Something's different, like a new number.", strong: true },
+  'rushes you': { label: 'Rushing you', reason: "Hurrying stops you from thinking.", strong: false },
+  'threatens you': { label: 'Trying to scare you', reason: "It's not your fault.", strong: true },
+  'asks you to move to another app or keep a secret': { label: 'Asks for a secret', reason: "Safe people don't ask you to keep secrets.", strong: true },
+  'wants you to download something': { label: 'Wants a download', reason: 'It could put a bad app on your device.', strong: true },
 }
 
 // The most links in a picture to look up (each one is a server check)
@@ -106,21 +62,11 @@ async function base64(blob: Blob) {
 // When the picture couldn't be checked or read: never "No clues found"
 const COULD_NOT_CHECK: CheckResult = {
   risk: 'medium',
-  clues: [
-    {
-      label: "Couldn't check it",
-      reason: "Scam Shield couldn't check this picture right now. Show it to a grown-up instead.",
-    },
-  ],
+  clues: [{ label: "Couldn't check it", reason: 'Show it to a grown-up instead.' }],
 }
 const COULD_NOT_READ: CheckResult = {
   risk: 'medium',
-  clues: [
-    {
-      label: 'Hard to read',
-      reason: "Scam Shield couldn't read this picture well. Try a clearer screenshot, or show it to a grown-up.",
-    },
-  ],
+  clues: [{ label: 'Hard to read', reason: 'Try a clearer screenshot, or show a grown-up.' }],
 }
 
 // Turns what the server saw into the result: one clue per warning sign (with a box
@@ -139,16 +85,25 @@ export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpL
   })
   let strong = [...bySign.keys()].some((sign) => SIGN_WORDS[sign].strong)
 
-  // Each link, checked like the link checker does (on the device, then the server)
+  // Each link, checked like the link checker does (on the device, then the
+  // server), as one short clue with a box around the address
   let notForKids = false
-  const links = facts.links.flatMap((link) => checkLink(link) ?? []).slice(0, MAX_LINKS)
-  const checked = await Promise.all(links.map(async (link) => withFacts(link, await lookUp(link.url))))
-  for (const link of checked) {
+  const links = facts.links.flatMap(({ address, box }) => {
+    const link = checkLink(address)
+    return link ? [{ link, box }] : []
+  })
+  const checked = await Promise.all(
+    links.slice(0, MAX_LINKS).map(async ({ link, box }) => ({ link: withFacts(link, await lookUp(link.url)), box })),
+  )
+  for (const { link, box } of checked) {
     if (!link.clues.length) continue
-    // Its most important clue, saying which link it's about
-    const [first] = link.clues
-    clues.push({ label: first.label, reason: `The link ${link.site}: ${first.reason}` })
-    if (link.risk === 'high' && !link.notForKids) strong = true
+    const scam = link.risk === 'high' && !link.notForKids
+    clues.push({
+      label: scam ? 'A trick link' : link.notForKids ? 'A link not for kids' : 'A link to be careful with',
+      reason: `${link.clues[0].label}: ${link.site}`,
+      boxes: [box],
+    })
+    strong ||= scam
     notForKids ||= Boolean(link.notForKids)
   }
 

@@ -30,8 +30,8 @@ export type PictureFacts = {
   kind: 'text message' | 'chat or game chat' | 'email' | 'website' | 'ad or pop-up' | 'social media post' | 'other'
   // Each warning sign, with the exact words and a box around them (0 to 1000)
   signs: { sign: Sign; words: string; box: Box }[]
-  // Web addresses written in the picture, as written
-  links: string[]
+  // Web addresses written in the picture, as written, with a box around each
+  links: { address: string; box: Box }[]
   // Someone threatens the child or asks for photos of them
   threatOrPhotos: boolean
 }

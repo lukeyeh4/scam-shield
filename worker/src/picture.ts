@@ -44,8 +44,13 @@ const Answers = z.object({
     )
     .describe('Each warning sign the picture shows, once per place it appears. Empty if there are none'),
   links: z
-    .array(z.string())
-    .describe('Every web address or link written in the picture, copied exactly as written (e.g. "rbx-free.xyz/claim")'),
+    .array(
+      z.object({
+        address: z.string().describe('Copied exactly as written (e.g. "rbx-free.xyz/claim")'),
+        box: Box.describe('A box tightly around the address, in pixels of this picture'),
+      }),
+    )
+    .describe('Every web address or link written in the picture'),
   threatOrPhotos: z
     .boolean()
     .describe(
@@ -118,7 +123,8 @@ export async function judgePicture(picture: Picture, apiKey: string, model = PIC
   const signs = answers.signs.flatMap(({ sign, words, box }) =>
     isSign(sign) ? [{ sign, words, box: scaled(box, picture.width, picture.height) }] : [],
   )
-  return { ...answers, signs }
+  const links = answers.links.map(({ address, box }) => ({ address, box: scaled(box, picture.width, picture.height) }))
+  return { ...answers, signs, links }
 }
 
 type Picture = { data: string; type: 'image/jpeg' | 'image/png'; width: number; height: number }
