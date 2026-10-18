@@ -14,7 +14,9 @@ export type Clue = { label: string; reason: string; highlight?: string; boxes?: 
 // when there are no clues. Never "safe": a check can miss things.
 // `notForKids`: high because the website isn't for kids (betting, adult, pirated
 // streams: tools/websiteKind.ts), not because it's a scam, so it gets its own heading
-export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[]; notForKids?: boolean }
+// `urgent`: someone is threatening the child or asking for photos of them: a calm
+// "Show a grown-up right now" instead of the usual heading (Result.tsx)
+export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[]; notForKids?: boolean; urgent?: boolean }
 
 // The clues in the order their words come in `text` (top to bottom), so the
 // numbers marked in the text count up as you read; clues without words go last

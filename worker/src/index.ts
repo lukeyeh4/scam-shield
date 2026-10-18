@@ -2,7 +2,7 @@ import { checkLink, SHORTENERS, siteOf } from '../../src/tools/linkCheck'
 import type { LinkFacts } from '../../src/tools/linkLookup'
 import { answerKid, readEntries } from './ask'
 import { judgeName, judgePage, readPage } from './page'
-import { judgePicture, readPicture } from './picture'
+import { countPicture, DAILY_PICTURES, judgePicture, picturesToday, readPicture } from './picture'
 import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, savedSpeech } from './speak'
 
 // The link checker's server (a Cloudflare Worker): looks a link up in places the
@@ -19,7 +19,7 @@ import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, save
 // POST /picture { image } → PictureFacts
 // POST /ask { entries } → BuddyAnswer
 // POST /speak { text } → MP3 audio
-// GET /usage → this month's speech characters, and the limit
+// GET /usage → this month's speech characters and today's pictures, and the limits
 
 type Env = {
   // Google Safe Browsing API key: `wrangler secret put SAFE_BROWSING_KEY` (or .dev.vars)
@@ -236,8 +236,15 @@ export default {
     // How much of this month's speech allowance is used (open it in a browser)
     if (request.method === 'GET' && path === '/usage') {
       if (!env.SPEECH) return json({ error: 'No speech storage' }, 503)
-      const characters = await charactersUsed(env.SPEECH)
-      return json({ month: new Date().toISOString().slice(0, 7), characters, limit: MONTHLY_LIMIT, left: Math.max(0, MONTHLY_LIMIT - characters) })
+      const [characters, pictures] = await Promise.all([charactersUsed(env.SPEECH), picturesToday(env.SPEECH)])
+      return json({
+        month: new Date().toISOString().slice(0, 7),
+        characters,
+        limit: MONTHLY_LIMIT,
+        left: Math.max(0, MONTHLY_LIMIT - characters),
+        picturesToday: pictures,
+        pictureLimit: DAILY_PICTURES,
+      })
     }
 
     if (request.method !== 'POST' || !['/link', '/picture', '/ask', '/speak'].includes(path)) return json({ error: 'Not found' }, 404)
@@ -264,11 +271,18 @@ export default {
       if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
       const picture = readPicture(await request.json().catch(() => null))
       if (!picture) return json({ error: 'Send { "image": "<base64 JPEG or PNG>" }' }, 400)
-      const facts = await judgePicture(picture, env.ANTHROPIC_API_KEY, env.PICTURE_MODEL).catch((e: unknown) => {
-        // The kind of error only (never what's in the picture), for `wrangler tail`
-        console.warn('picture: failed', e instanceof Error ? e.name : typeof e)
-        return null
-      })
+      if (env.SPEECH && (await picturesToday(env.SPEECH)) >= DAILY_PICTURES) return json({ error: 'Daily limit reached' }, 429)
+      // Once more if it fails (a slow answer, or one that didn't fit the questions);
+      // not if Claude declined (null)
+      const judge = () => judgePicture(picture, env.ANTHROPIC_API_KEY!, env.PICTURE_MODEL)
+      const facts = await judge()
+        .catch(judge)
+        .catch((e: unknown) => {
+          // The kind of error only (never what's in the picture), for `wrangler tail`
+          console.warn('picture: failed', e instanceof Error ? e.name : typeof e)
+          return null
+        })
+      if (facts && env.SPEECH) await countPicture(env.SPEECH)
       return facts ? json(facts) : json({ error: 'No answer' }, 502)
     }
 

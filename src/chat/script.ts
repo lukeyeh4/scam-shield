@@ -31,6 +31,7 @@ export type StepId =
   | 'backScam'
   | 'backCareful'
   | 'backNotForKids'
+  | 'backUrgent'
   | 'backClean'
 
 export type ChatIcon = 'picture' | 'link' | 'message' | 'question'
@@ -191,6 +192,21 @@ export const STEPS: Record<StepId, ChatStep> = {
     ],
     options: CHECKS,
   },
+  // Someone is threatening the child or asking for photos: calm, no blame, and a
+  // grown-up right now
+  backUrgent: {
+    mood: 'neutral',
+    buddy: [
+      "Good thinking to check that. It's not your fault, and you're not in trouble.",
+      'Please show a grown-up you trust right now, like a parent or teacher.',
+      'Want to check something else?',
+    ],
+    alternatives: [
+      ["Thank you for checking. You haven't done anything wrong.", 'Show it to a grown-up you trust right now.', 'Anything else to check?'],
+      ["You did the right thing by checking. It's not your fault.", 'Please tell a grown-up you trust right now.', 'What else should we check?'],
+    ],
+    options: CHECKS,
+  },
   backNotForKids: {
     mood: 'worried',
     buddy: ["Good thinking to check that! That website isn't for kids.", "Don't open it. Show a grown-up.", 'Want to check something else?'],
@@ -231,6 +247,7 @@ export function buddySays(id: StepId, turn = 0): string[] {
 export const BACK_AFTER: Record<CheckOutcome, StepId> = {
   high: 'backScam',
   notForKids: 'backNotForKids',
+  urgent: 'backUrgent',
   medium: 'backCareful',
   none: 'backClean',
 }

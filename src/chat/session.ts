@@ -13,8 +13,9 @@ export type Entry = { from: 'buddy'; text: string; mood: Mood } | { from: 'kid';
 export type Chat = { step: StepId; entries: Entry[]; typedLink?: string; backTurns: number }
 
 let saved: Chat | null = null
-// What a check found: its risk, or a website that isn't for kids (red, not a scam)
-export type CheckOutcome = Risk | 'notForKids'
+// What a check found: its risk, a website that isn't for kids (red, not a scam),
+// or someone threatening the child or asking for photos (urgent)
+export type CheckOutcome = Risk | 'notForKids' | 'urgent'
 
 // What the last check found, if there was one since the chat was left
 let lastCheck: CheckOutcome | null = null

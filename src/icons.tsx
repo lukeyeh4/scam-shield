@@ -142,6 +142,13 @@ export const GearIcon = (p: IconProps) => (
   </Icon>
 )
 
+export const ZoomIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-4-4M11 8v6M8 11h6" />
+  </Icon>
+)
+
 export const CloseIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M6 6l12 12M18 6 6 18" />

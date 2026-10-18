@@ -138,3 +138,20 @@ export function readPicture(body: unknown): Picture | null {
   if (!type || !size || size.width * size.height > MAX_PIXELS) return null
   return { data: image, type, ...size }
 }
+
+// The most pictures checked in a day (UTC), for everyone together, so misuse can't
+// run up the bill: about a cent each on Sonnet, so at most about $3 a day. Counted
+// in the Worker's storage (the SPEECH namespace, under "pictures:<day>"). Kids
+// over the limit see "Couldn't check it ... show it to a grown-up".
+export const DAILY_PICTURES = 300
+
+type Counter = { get(key: string): Promise<string | null>; put(key: string, value: string): Promise<void> }
+const dayKey = (now: Date) => `pictures:${now.toISOString().slice(0, 10)}`
+
+export async function picturesToday(kv: Counter, now = new Date()) {
+  return Number((await kv.get(dayKey(now))) ?? 0)
+}
+
+export async function countPicture(kv: Counter, now = new Date()) {
+  await kv.put(dayKey(now), String((await picturesToday(kv, now)) + 1))
+}

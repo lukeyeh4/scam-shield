@@ -1,8 +1,8 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
 import { useSetUp } from '../setup'
-import { inPictureOrder } from './examples'
-import { lookUpPicture, type PictureCheck as PictureResult, pictureResult } from './pictureLookup'
+import { type CheckResult, inPictureOrder } from './examples'
+import { lookUpPicture, pictureResult } from './pictureLookup'
 import {
   canTakePhoto,
   forgetPicture,
@@ -13,7 +13,7 @@ import {
   preparePicture,
   takeReceivedPicture,
 } from './picturePicker'
-import { MarkedPicture, ResultView } from './Result'
+import { ResultView, ZoomablePicture } from './Result'
 import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 
 type Stage = 'choose' | 'check' | 'checking'
@@ -45,7 +45,7 @@ const imageIn = (files: FileList | null | undefined) => [...(files ?? [])].find(
 export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   const setUp = useSetUp()
   const [stage, setStage] = useState<Stage>('choose')
-  const [result, setResult] = useState<PictureResult | null>(null)
+  const [result, setResult] = useState<CheckResult | null>(null)
   // The result shows once "Checking" has had its moment and the server has answered
   const [waited, setWaited] = useState(false)
   // Only the newest check's answer counts, if the player goes back and checks again
@@ -203,7 +203,7 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
           <ResultView
             subject={(picked) => (
               <div className="tool-picture">
-                <MarkedPicture src={picture.url} clues={shown.clues} picked={picked} />
+                <ZoomablePicture src={picture.url} clues={shown.clues} picked={picked} />
               </div>
             )}
             result={shown}

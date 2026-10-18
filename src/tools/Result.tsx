@@ -1,7 +1,7 @@
-import { type ReactNode, useEffect, useState } from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
-import { DangerIcon, GoodIcon, NoEntryIcon, UnsureIcon } from '../icons'
+import { CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
 import type { Box, CheckResult, Clue, Risk } from './examples'
 
 // How each risk level is shown: soft red, yellow or green, each with its own icon
@@ -15,6 +15,18 @@ const RISKS: Record<Risk, Look> = {
 }
 // Red too, but not a scam: betting, adult or pirated streaming websites
 const NOT_FOR_KIDS: Look = { title: "This website isn't for kids", tell: "Don't open it. Show a grown-up.", icon: <NoEntryIcon /> }
+// Someone is threatening the child or asking for photos: calm, no blame, and what
+// to do, before anything else (scripted, never from the AI)
+const URGENT: Look = {
+  title: 'Show a grown-up right now',
+  tell: "This isn't your fault, and you're not in trouble.",
+  icon: <GrownUpIcon />,
+}
+const URGENT_STEPS = [
+  "Don't answer, and don't send anything.",
+  "Don't delete it. A grown-up may need to see it.",
+  'Show a grown-up you trust right now, like a parent or teacher.',
+]
 
 type ResultViewProps = {
   // What was checked: the picture, the link or the message, with the clues marked.
@@ -33,14 +45,14 @@ type ResultViewProps = {
 // do, the clues (one card each, numbered to match the marks), good signs when
 // there are no clues, then the buttons
 export function ResultView({ subject, result, onAgain, onDone, actions }: ResultViewProps) {
-  const risk = result.notForKids ? NOT_FOR_KIDS : RISKS[result.risk]
+  const risk = result.urgent ? URGENT : result.notForKids ? NOT_FOR_KIDS : RISKS[result.risk]
   // A clue tapped in the list, to show its boxes on the picture (tap again for all)
   const [picked, setPicked] = useState<number | null>(null)
   const practice = actions !== undefined
   // Back in the chat, Buddy talks about what this check found
   useEffect(() => {
-    if (!practice) noteCheck(result.notForKids ? 'notForKids' : result.risk)
-  }, [practice, result.risk, result.notForKids])
+    if (!practice) noteCheck(result.urgent ? 'urgent' : result.notForKids ? 'notForKids' : result.risk)
+  }, [practice, result.risk, result.notForKids, result.urgent])
   return (
     <section className={`result result-${result.risk}`} aria-labelledby="result-title">
       <div className="result-subject">
@@ -58,6 +70,14 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
             <p className="result-tell">{risk.tell}</p>
           </div>
         </div>
+
+        {result.urgent && (
+          <ol className="result-urgent" aria-label="What to do">
+            {URGENT_STEPS.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        )}
 
         {result.clues.length > 0 && (
           <ol className="result-clues" aria-label="Clues">
@@ -179,6 +199,31 @@ export function MarkedPicture({ src, clues, picked = null }: { src: string; clue
           )
         }),
       )}
+    </div>
+  )
+}
+
+// The picture with its boxes, and a button (or a tap on the picture) to see it
+// big: full screen, with the same boxes, to look closely at small writing.
+export function ZoomablePicture({ src, clues, picked = null }: { src: string; clues: Clue[]; picked?: number | null }) {
+  const dialog = useRef<HTMLDialogElement>(null)
+  const open = () => dialog.current?.showModal()
+  const close = () => dialog.current?.close()
+  return (
+    <div className="zoomable">
+      <button className="zoomable-picture" type="button" onClick={open} aria-label="Make the picture bigger">
+        <MarkedPicture src={src} clues={clues} picked={picked} />
+      </button>
+      <button className="zoom-button" type="button" onClick={open} aria-label="Make the picture bigger">
+        <ZoomIcon />
+      </button>
+      {/* Tapping outside the picture closes it too; Esc closes it (the dialog does that) */}
+      <dialog ref={dialog} className="picture-zoom" aria-label="The picture, bigger" onClick={(e) => e.target === e.currentTarget && close()}>
+        <button className="zoom-close" type="button" onClick={close} aria-label="Close the big picture" autoFocus>
+          <CloseIcon />
+        </button>
+        <MarkedPicture src={src} clues={clues} picked={picked} />
+      </dialog>
     </div>
   )
 }

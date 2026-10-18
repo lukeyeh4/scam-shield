@@ -76,11 +76,6 @@ const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean 
 // The most links in a picture to look up (each one is a server check)
 const MAX_LINKS = 3
 
-// What the result is, and the picture's own facts behind it
-export type PictureCheck = CheckResult & {
-  // Someone is threatening the child or asking for photos (step 4: its own path)
-  urgent?: boolean
-}
 
 // Sends the picture to be checked; null if the server can't answer (no server, no
 // setup, too slow, or the AI couldn't answer)
@@ -109,7 +104,7 @@ async function base64(blob: Blob) {
 }
 
 // When the picture couldn't be checked or read: never "No clues found"
-const COULD_NOT_CHECK: PictureCheck = {
+const COULD_NOT_CHECK: CheckResult = {
   risk: 'medium',
   clues: [
     {
@@ -118,7 +113,7 @@ const COULD_NOT_CHECK: PictureCheck = {
     },
   ],
 }
-const COULD_NOT_READ: PictureCheck = {
+const COULD_NOT_READ: CheckResult = {
   risk: 'medium',
   clues: [
     {
@@ -131,7 +126,7 @@ const COULD_NOT_READ: PictureCheck = {
 // Turns what the server saw into the result: one clue per warning sign (with a box
 // for every place it appears), then what the link checker says about any links in
 // the picture. `lookUp` is the link checker's server check (a stand-in in tests).
-export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpLink): Promise<PictureCheck> {
+export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpLink): Promise<CheckResult> {
   if (!facts) return COULD_NOT_CHECK
   if (!facts.readable) return COULD_NOT_READ
 

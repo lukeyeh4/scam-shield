@@ -264,6 +264,78 @@
   right: -11px;
 }
 
+/* The picture on the result, with a round magnifier button on its corner */
+.zoomable {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.zoomable-picture {
+  display: block;
+  padding: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.zoom-button,
+.zoom-close {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-md), inset 0 0 0 1px var(--hairline);
+  color: var(--ink);
+}
+
+.zoom-button {
+  right: -10px;
+  bottom: -10px;
+}
+
+.zoom-button svg,
+.zoom-close svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2.4;
+}
+
+/* The picture, big: the whole screen, scrolling if it's taller than the screen */
+.picture-zoom {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  margin: 0;
+  padding: 64px 16px 24px;
+  border: none;
+  background: var(--bg);
+  overflow-y: auto;
+}
+
+.picture-zoom::backdrop {
+  background: rgb(0 0 0 / 0.5);
+}
+
+.picture-zoom .marked-picture {
+  width: min(100%, 900px);
+}
+
+.picture-zoom .tool-photo {
+  width: 100%;
+  max-height: none;
+}
+
+.zoom-close {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 1;
+}
+
 /* A clue picked in the list: its boxes stand out, the others fade */
 .marked-picture.has-picked .picture-box {
   opacity: 0.25;
@@ -511,6 +583,20 @@
   box-shadow:
     var(--shadow-sm),
     inset 0 0 0 2px #f5b700;
+}
+
+/* Threats and requests for photos: what to do, in big calm steps, before the clues */
+.result-urgent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 16px 18px 16px 40px;
+  border-radius: 20px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 /* Facts in a link's favour, when there are no clues (never "safe") */
