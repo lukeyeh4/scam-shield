@@ -52,6 +52,9 @@ export type ChatStep = {
   options: ChatOption[]
   // Points at the box for typing or talking to Buddy, below the chat
   pointAtBox?: boolean
+  // A small × beside the answers, for picking the wrong thing: says "Something
+  // else" and goes to this step
+  undo?: StepId
 }
 
 // The things to check, offered at the start and after "I'm not sure"
@@ -74,21 +77,25 @@ export const STEPS: Record<StepId, ChatStep> = {
     options: CHECKS,
   },
 
-  // Each kind of thing has its own checker: one line, then one button to open it
+  // Each kind of thing has its own checker: one line, then one button to open it,
+  // and a × to pick something else
   picture: {
     mood: 'curious',
     buddy: ['Send me a screenshot or a photo of it.'],
     options: [{ label: 'Check a picture', icon: 'picture', leave: 'picture' }],
+    undo: 'again',
   },
   link: {
     mood: 'curious',
     buddy: ["Let's check where that link really goes."],
     options: [{ label: 'Check a link', icon: 'link', leave: 'link' }],
+    undo: 'again',
   },
   message: {
     mood: 'curious',
     buddy: ["Let's look at that message for clues."],
     options: [{ label: 'Check a message', icon: 'message', leave: 'message' }],
+    undo: 'again',
   },
 
   // Not sure what it is: ask a grown-up, or ask Buddy by typing or talking

@@ -3,7 +3,7 @@ import { IMAGES } from '../buddy/moods'
 import { useDots } from '../buddy/useDots'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
 import { isFast } from '../dev/devSettings'
-import { CameraIcon, LinkIcon, MessageIcon, MicIcon, QuestionIcon, SendIcon } from '../icons'
+import { CameraIcon, CloseIcon, LinkIcon, MessageIcon, MicIcon, QuestionIcon, SendIcon } from '../icons'
 import { canReadAloud } from '../readAloud'
 import { OptionCard, type Tone } from '../screens/OptionCard'
 import { useSetUp } from '../setup'
@@ -341,7 +341,12 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
 
       <div className="ask-dock">
         {ready && (
-          <div key={shown} className="ask-options" role="group" aria-label="Your answer">
+          <div
+            key={shown}
+            className={STEPS[step].options.length === 1 ? 'ask-options is-single' : 'ask-options'}
+            role="group"
+            aria-label="Your answer"
+          >
             {STEPS[step].options.map((option) => {
               const look = option.icon && ICONS[option.icon]
               return (
@@ -354,6 +359,12 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
                 />
               )
             })}
+            {/* Picked the wrong thing: go back and pick again */}
+            {STEPS[step].undo && (
+              <button className="ask-undo" type="button" aria-label="Pick something else" onClick={() => say('Something else', STEPS[step].undo!)}>
+                <CloseIcon />
+              </button>
+            )}
           </div>
         )}
 

@@ -146,10 +146,41 @@
 }
 
 /* A single answer sits in the middle at its own size */
-.ask-options .option-card:only-child {
+.ask-options.is-single .option-card {
   flex: 0 1 auto;
   width: auto;
   min-width: 260px;
+}
+
+/* The × beside an answer, for picking the wrong thing: a small round card in the
+   same style, quieter than the answer */
+.ask-undo {
+  display: grid;
+  flex: none;
+  place-items: center;
+  align-self: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--hairline);
+  color: var(--muted);
+  transition:
+    transform 200ms var(--ease),
+    color 200ms var(--ease);
+}
+
+.ask-undo svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.4;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ask-undo:hover {
+    transform: translateY(-2px);
+    color: var(--ink);
+  }
 }
 
 .ask-compose {

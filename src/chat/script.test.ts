@@ -23,6 +23,16 @@ describe('chat script', () => {
     expect([...new Set([...reachable(), ...TYPED_STEPS, ...Object.values(BACK_AFTER)])].sort()).toEqual([...ids].sort())
   })
 
+  it('lets a kid go back after picking a checker by mistake', () => {
+    for (const id of ['picture', 'link', 'message'] as const) {
+      expect(STEPS[id].undo, id).toBe('again')
+    }
+    for (const id of ids) {
+      const undo = STEPS[id].undo
+      if (undo) expect(STEPS[undo].options.length, id).toBeGreaterThan(1)
+    }
+  })
+
   it('sends a kid to a grown-up after every check, however Buddy says it', () => {
     for (const id of Object.values(BACK_AFTER)) {
       for (const lines of [STEPS[id].buddy, ...(STEPS[id].alternatives ?? [])]) expect(lines.join(' '), id).toContain('grown-up')
