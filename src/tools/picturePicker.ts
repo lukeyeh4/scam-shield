@@ -33,6 +33,10 @@ export type PictureProblem = 'notAPicture' | 'unreadable' | 'tooBig'
 // The longest side we send, in pixels: big enough to read the small print on a
 // screenshot, the size Claude reads best
 export const LONGEST_SIDE = 1568
+// And at most this many pixels in all: bigger pictures are shrunk by the AI's
+// service before it looks, so the boxes it draws wouldn't match (the Worker turns
+// them away: worker/src/picture.ts). A phone screenshot fits as it is.
+export const MAX_PIXELS = 1_150_000
 // Pictures bigger than this aren't opened at all
 const MAX_BYTES = 40 * 1024 * 1024
 
@@ -76,10 +80,11 @@ export function takeReceivedPicture() {
   return picture
 }
 
-// The size that fits within `longest` pixels on its longest side, never bigger
+// The size that fits within `longest` pixels on its longest side and MAX_PIXELS
+// in all, never bigger
 export function fitWithin(width: number, height: number, longest = LONGEST_SIDE) {
-  const scale = Math.min(1, longest / Math.max(width, height))
-  return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) }
+  const scale = Math.min(1, longest / Math.max(width, height), Math.sqrt(MAX_PIXELS / (width * height)))
+  return { width: Math.max(1, Math.floor(width * scale)), height: Math.max(1, Math.floor(height * scale)) }
 }
 
 // Shrinks the picture and saves it again as a JPEG (which leaves out its hidden

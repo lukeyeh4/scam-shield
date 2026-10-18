@@ -1,12 +1,14 @@
-import { scenarios } from '../scenarios'
-
 // What every check returns, whichever tool made it: how risky it looks, and the
-// clues, each with a short name, a reason in kid words, and (for text) the exact
-// words to highlight. Links are really checked (linkCheck.ts); pictures and
-// messages still show the made-up examples below.
+// clues, each with a short name, a reason in kid words, and the exact words to
+// highlight (text) or the boxes to draw (pictures). Links (linkCheck.ts) and
+// pictures (pictureLookup.ts) are really checked; messages still show the made-up
+// example below.
 export type Risk = 'high' | 'medium' | 'none'
 
-export type Clue = { label: string; reason: string; highlight?: string }
+// A box on a picture, from 0 to 1000 across and down
+export type Box = { left: number; top: number; right: number; bottom: number }
+
+export type Clue = { label: string; reason: string; highlight?: string; boxes?: Box[] }
 
 // `good`: facts in its favour (e.g. "This is the real Roblox website"), shown only
 // when there are no clues. Never "safe": a check can miss things.
@@ -23,18 +25,6 @@ export function inTextOrder(result: CheckResult, text: string): CheckResult {
   }
   return { ...result, clues: [...result.clues].sort((a, b) => at(a) - at(b)) }
 }
-
-// Check a picture: the "new number" scam from the game, with its "Spot the clues" red flags
-export const examplePicture = scenarios.find((s) => s.id === 'new-number')
-const pictureClues = examplePicture
-  ? [examplePicture.recap.stop, ...examplePicture.recap.check].filter((c) => c.spot && c.screen !== 'doIt')
-  : []
-export const pictureResult: CheckResult = {
-  risk: 'high',
-  clues: pictureClues.map((c) => ({ label: c.spot!, reason: c.text, highlight: c.highlight })),
-}
-// Which parts of the picture to mark (they match `pictureResult.clues`, in order)
-export const pictureMarks = pictureClues.map((c) => ({ target: c.target, highlight: c.highlight }))
 
 // Check a message
 export const exampleMessage = 'omg is this you in this video?? 😂 bit.ly/3xVid'

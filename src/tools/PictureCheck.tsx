@@ -1,8 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
-import { Mockup } from '../mockups/Mockup'
 import { useSetUp } from '../setup'
-import { examplePicture, pictureMarks, pictureResult } from './examples'
+import { lookUpPicture, type PictureCheck as PictureResult, pictureResult } from './pictureLookup'
 import {
   canTakePhoto,
   forgetPicture,
@@ -16,8 +15,8 @@ import {
 import { ResultView } from './Result'
 import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 
-type Stage = 'choose' | 'check' | 'checking' | 'result'
-const STEP: Record<Stage, number> = { choose: 0, check: 1, checking: 1, result: 2 }
+type Stage = 'choose' | 'check' | 'checking'
+const STEP: Record<Stage, number> = { choose: 0, check: 1, checking: 2 }
 
 // What to say when a picture can't be used
 const PROBLEMS: Record<PictureProblem, string> = {
@@ -40,18 +39,23 @@ const imageIn = (files: FileList | null | undefined) => [...(files ?? [])].find(
 // one in; in the app, share one to Scam Shield: picturePicker.ts), make sure it's
 // the right one, then see the result. Pictures will be sent to be checked, so a
 // grown-up has to finish setup first.
-// The picture is really chosen and prepared; the check itself is still a wireframe
-// (the result is the example).
+// The picture is sent to our server, which has Claude look for warning signs
+// (pictureLookup.ts).
 export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   const setUp = useSetUp()
   const [stage, setStage] = useState<Stage>('choose')
+  const [result, setResult] = useState<PictureResult | null>(null)
+  // The result shows once "Checking" has had its moment and the server has answered
+  const [waited, setWaited] = useState(false)
+  // Only the newest check's answer counts, if the player goes back and checks again
+  const latestCheck = useRef(0)
   const [picture, setPicture] = useState<PreparedPicture | null>(null)
   // A picture shared to the app (or handed over from elsewhere) opens straight away
   const [received] = useState(() => (setUp ? takeReceivedPicture() : null))
   const [problem, setProblem] = useState<PictureProblem | null>(null)
   const [preparing, setPreparing] = useState(received !== null)
   const [dragging, setDragging] = useState(false)
-  const back = () => (stage === 'choose' ? onHome() : setStage(stage === 'result' ? 'check' : 'choose'))
+  const back = () => (stage === 'choose' ? onHome() : setStage(stage === 'checking' ? 'check' : 'choose'))
 
   // Shows a picture once it's ready (or why it can't be used)
   const show = (prepared: PreparedPicture | PictureProblem) => {
@@ -111,10 +115,26 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
     }
   }, [])
 
+  // Sends the picture, and turns the answer into the result
+  const check = () => {
+    if (!picture) return
+    const id = ++latestCheck.current
+    setResult(null)
+    setWaited(false)
+    setStage('checking')
+    void lookUpPicture(picture)
+      .then(pictureResult)
+      .then((checked) => {
+        if (id === latestCheck.current) setResult(checked)
+      })
+  }
+  const showResult = stage === 'checking' && waited && result !== null
+
   if (!setUp) return <SetupFirst title="Check a picture" what="pictures" onHome={onHome} onSetUp={onSetUp} />
 
   return (
-    <ToolScreen title="Check a picture" steps={stage === 'result' ? undefined : 3} step={STEP[stage]} onBack={back}>
+    // (Pictures are really checked, so no preview note)
+    <ToolScreen title="Check a picture" steps={showResult ? undefined : 3} step={STEP[stage]} onBack={back} note={null}>
       <div className={dragging ? 'picture-drop is-dragging' : 'picture-drop'}>
         {stage === 'choose' && (
           <div className="tool-column">
@@ -157,7 +177,7 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
             <div className="tool-column">
               <h2 className="tool-heading">Is this the right picture?</h2>
               <div className="tool-actions">
-                <button className="tool-button tool-button-main" type="button" onClick={() => setStage('checking')}>
+                <button className="tool-button tool-button-main" type="button" onClick={check}>
                   <ScanIcon />
                   Check it
                 </button>
@@ -174,17 +194,16 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
           </div>
         )}
 
-        {stage === 'checking' && <Checking onDone={() => setStage('result')} />}
+        {stage === 'checking' && !showResult && <Checking onDone={() => setWaited(true)} ms={1500} />}
 
-        {/* Still the example result: the real check comes next (step 2 in PROJECT.md) */}
-        {stage === 'result' && examplePicture && (
+        {showResult && picture && (
           <ResultView
             subject={
               <div className="tool-picture">
-                <Mockup screen={examplePicture} marks={pictureMarks.map((m) => ({ ...m, state: 'seen' }))} animate={false} />
+                <img className="tool-photo" src={picture.url} alt="The picture you checked" />
               </div>
             }
-            result={pictureResult}
+            result={result}
             onAgain={onAsk}
             onDone={onHome}
           />
