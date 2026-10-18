@@ -12,6 +12,7 @@ export const SIGNS = [
   'asks for photos or videos of you',
   'free prize or free game money',
   'sad story to get you to buy or give money',
+  'product that may not look like the photo',
   'pretends to be a company, game or famous person',
   'pretends to be family or a friend',
   'rushes you',

@@ -53,6 +53,18 @@ const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean;
     strong: false,
     why: ['Sad stories make us want to help. That shows you are kind!', 'But scammers use them to make people buy without thinking.', 'Ask a grown-up before buying anything.'],
   },
+  // Only "Be careful": we can't prove a photo is made with AI, only that what
+  // arrives may look very different (even from a real shop like Amazon)
+  'product that may not look like the photo': {
+    label: "Might not look like that",
+    reason: 'What arrives may look very different.',
+    strong: false,
+    why: [
+      'Some product photos are made with AI or changed to look amazing.',
+      'What comes in the post can look nothing like the picture, even from a real shop.',
+      'Ask a grown-up before buying.',
+    ],
+  },
   'pretends to be a company, game or famous person': {
     label: 'Pretending to be someone',
     reason: 'It might not really be them.',

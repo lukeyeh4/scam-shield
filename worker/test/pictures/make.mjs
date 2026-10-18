@@ -103,6 +103,12 @@ const PICTURES = {
     <p style="margin-top:10px">"I couldn't believe how kind everyone was," he said. The bakery opens again on Saturday.</p></div>`),
 
   // Normal pictures that mustn't be flagged
+  normalShop: page(`<div style="padding:54px 16px 10px;border-bottom:1px solid #ddd;color:#666;font-size:13px">amazon.com</div>
+    <div style="padding:16px"><div style="height:300px;border-radius:12px;background:#f4f4f4;display:grid;place-items:center;font-size:140px">☕</div>
+    <div style="margin-top:14px;font-size:18px">Plain White Ceramic Coffee Mug, 12 oz, Dishwasher Safe</div>
+    <div style="margin-top:6px;color:#666;font-size:14px">★★★★☆ 2,315 ratings</div>
+    <div style="margin-top:10px;font-size:26px;font-weight:700">$8.99</div>
+    <div style="margin-top:12px;padding:12px;border-radius:20px;background:#ffd814;text-align:center;font-weight:600">Add to Cart</div></div>`),
   familyChat: texts('Mum ❤️', 'iMessage', `
     <div class="time">Today 16:05</div>
     <div class="in">Hi love, dinner is at 6 tonight. Can you finish your homework before then?</div>

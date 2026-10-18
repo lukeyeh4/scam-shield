@@ -637,7 +637,9 @@ button.picture-box {
   margin: -10px -8px 1em;
 }
 
+/* All of Buddy's few bubbles show (no scrolling or fading, as in the chat) */
 .result-why .buddy-messages {
+  max-height: none;
   padding-top: 0.5em;
   mask-image: none;
 }

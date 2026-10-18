@@ -27,6 +27,7 @@ const EXPECT = {
   sympathyVideo: 'be careful or scam: sad story to buy, rushes you (only 15 left), link in bio',
   sympathyComment: 'be careful or scam: sad story to buy, move to another app/secret? (comment to get link), rushes you',
   sadNewsNoAsk: 'nothing: a sad story with nothing to buy',
+  normalShop: 'nothing: an ordinary product at an ordinary price',
   familyChat: 'nothing',
   friendGameChat: 'nothing',
   schoolEmail: 'nothing',
