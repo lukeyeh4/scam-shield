@@ -143,11 +143,27 @@ const COULD_NOT_READ: CheckResult = {
   clues: [{ label: 'Hard to read', reason: 'Try a clearer screenshot, or show a grown-up.' }],
 }
 
+// Claude wouldn't look at the picture: it may show something that isn't OK for
+// kids, so a grown-up should see it now (and the picture is blurred)
+const DECLINED: CheckResult = {
+  risk: 'high',
+  urgent: true,
+  hidePicture: true,
+  clues: [
+    {
+      label: 'Something not OK for kids',
+      reason: "Some pictures aren't OK for kids to see.",
+      why: ["Some pictures aren't OK for kids to see.", "You haven't done anything wrong.", 'Show a grown-up you trust right away.'],
+    },
+  ],
+}
+
 // Turns what the server saw into the result: one clue per warning sign (with a box
 // for every place it appears), then what the link checker says about any links in
 // the picture. `lookUp` is the link checker's server check (a stand-in in tests).
 export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpLink): Promise<CheckResult> {
   if (!facts) return COULD_NOT_CHECK
+  if (facts.declined) return DECLINED
   if (!facts.readable) return COULD_NOT_READ
 
   // One clue per sign, in the order they first appear

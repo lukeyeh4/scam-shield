@@ -2,7 +2,7 @@ import { checkLink, SHORTENERS, siteOf } from '../../src/tools/linkCheck'
 import type { LinkFacts } from '../../src/tools/linkLookup'
 import { answerKid, readEntries } from './ask'
 import { judgeName, judgePage, readPage } from './page'
-import { countPicture, DAILY_PICTURES, judgePicture, picturesToday, readPicture } from './picture'
+import { countPicture, DAILY_PICTURES, judgePicture, PICTURES_PER_PERSON, picturesToday, readPicture, roomForPicture } from './picture'
 import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, savedSpeech } from './speak'
 
 // The link checker's server (a Cloudflare Worker): looks a link up in places the
@@ -34,6 +34,9 @@ type Env = {
   GOOGLE_TTS_KEY?: string
   // Another model for checking pictures, to compare (picture.ts; only set locally)
   PICTURE_MODEL?: string
+  // Other daily limits for pictures (picture.ts; only set locally, for test runs)
+  PICTURES_PER_DAY?: string
+  PICTURES_PER_PERSON?: string
   // Buddy's saved audio and this month's character count (wrangler.toml, speak.ts)
   SPEECH?: Parameters<typeof savedSpeech>[1]
 }
@@ -271,9 +274,9 @@ export default {
       if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
       const picture = readPicture(await request.json().catch(() => null))
       if (!picture) return json({ error: 'Send { "image": "<base64 JPEG or PNG>" }' }, 400)
-      if (env.SPEECH && (await picturesToday(env.SPEECH)) >= DAILY_PICTURES) return json({ error: 'Daily limit reached' }, 429)
-      // Once more if it fails (a slow answer, or one that didn't fit the questions);
-      // not if Claude declined (null)
+      const limits = { all: Number(env.PICTURES_PER_DAY ?? DAILY_PICTURES), each: Number(env.PICTURES_PER_PERSON ?? PICTURES_PER_PERSON) }
+      if (env.SPEECH && !(await roomForPicture(env.SPEECH, who, limits))) return json({ error: 'Daily limit reached' }, 429)
+      // Once more if it fails (a slow answer, or one that didn't fit the questions)
       const judge = () => judgePicture(picture, env.ANTHROPIC_API_KEY!, env.PICTURE_MODEL)
       const facts = await judge()
         .catch(judge)
@@ -282,7 +285,7 @@ export default {
           console.warn('picture: failed', e instanceof Error ? e.name : typeof e)
           return null
         })
-      if (facts && env.SPEECH) await countPicture(env.SPEECH)
+      if (facts && env.SPEECH) await countPicture(env.SPEECH, who)
       return facts ? json(facts) : json({ error: 'No answer' }, 502)
     }
 

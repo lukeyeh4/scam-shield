@@ -96,6 +96,11 @@ describe('pictureResult', () => {
     expect(await pictureResult(facts({ links: [link('roblox.com'), link('hello')] }), noServer)).toMatchObject({ risk: 'none', clues: [] })
   })
 
+  it("treats a picture Claude wouldn't look at as urgent, and hides it", async () => {
+    const result = await pictureResult(facts({ declined: true, threatOrPhotos: true }), noServer)
+    expect(result).toMatchObject({ risk: 'high', urgent: true, hidePicture: true, clues: [{ label: 'Something not OK for kids' }] })
+  })
+
   it('marks threats and requests for photos as urgent', async () => {
     const result = await pictureResult(facts({ threatOrPhotos: true, signs: [sign('asks for photos or videos of you')] }), noServer)
     expect(result).toMatchObject({ risk: 'high', urgent: true })

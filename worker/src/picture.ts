@@ -99,6 +99,11 @@ export function pictureSize(bytes: Uint8Array): { width: number; height: number 
 
 // Asks Claude about one picture. Null if it can't answer (it refused, or it
 // timed out): the app then asks the kid to show a grown-up.
+// What the app gets when Claude won't look at a picture: kids may be sent things
+// that aren't OK for them to see, and a grown-up should look, so the app treats
+// it like a threat ("Show a grown-up right now"), not like an error
+const DECLINED: PictureFacts = { readable: true, kind: 'other', signs: [], links: [], threatOrPhotos: true, declined: true }
+
 export async function judgePicture(picture: Picture, apiKey: string, model = PICTURE_MODEL): Promise<PictureFacts | null> {
   const client = new Anthropic({ apiKey, timeout: 25000, maxRetries: 1 })
   const response = await client.messages.parse({
@@ -116,10 +121,14 @@ export async function judgePicture(picture: Picture, apiKey: string, model = PIC
       },
     ],
   })
+  // Why there's no answer (never what's in the picture), for `wrangler tail`
+  if (response.stop_reason === 'refusal') {
+    console.warn('picture: declined', response.stop_details?.category ?? '')
+    return DECLINED
+  }
   const answers = response.parsed_output
-  if (response.stop_reason === 'refusal' || !answers) {
-    // Why there's no answer (never what's in the picture), for `wrangler tail`
-    console.warn('picture: no answer', response.stop_reason, response.stop_details?.category ?? '')
+  if (!answers) {
+    console.warn('picture: no answer', response.stop_reason)
     return null
   }
   const signs = answers.signs.flatMap(({ sign, words, box }) =>
@@ -152,14 +161,42 @@ export function readPicture(body: unknown): Picture | null {
 // in the Worker's storage (the SPEECH namespace, under "pictures:<day>"). Kids
 // over the limit see "Couldn't check it ... show it to a grown-up".
 export const DAILY_PICTURES = 300
+// And for each person (well, each internet address: a family or a school may share
+// one, so it's generous), so one person can't use up everyone's checks
+export const PICTURES_PER_PERSON = 40
 
-type Counter = { get(key: string): Promise<string | null>; put(key: string, value: string): Promise<void> }
-const dayKey = (now: Date) => `pictures:${now.toISOString().slice(0, 10)}`
+type Counter = {
+  get(key: string): Promise<string | null>
+  put(key: string, value: string, options?: { expirationTtl?: number }): Promise<void>
+}
+const today = (now: Date) => now.toISOString().slice(0, 10)
+const TWO_DAYS = 2 * 24 * 60 * 60
 
-export async function picturesToday(kv: Counter, now = new Date()) {
-  return Number((await kv.get(dayKey(now))) ?? 0)
+// A person's counter for today, under a code made from their address and the day
+// (so the address itself is never stored, and the code changes every day)
+async function personKey(who: string, now: Date) {
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${today(now)}:${who}`))
+  const code = [...new Uint8Array(hash).slice(0, 12)].map((b) => b.toString(16).padStart(2, '0')).join('')
+  return `pictures:${today(now)}:${code}`
 }
 
-export async function countPicture(kv: Counter, now = new Date()) {
-  await kv.put(dayKey(now), String((await picturesToday(kv, now)) + 1))
+export async function picturesToday(kv: Counter, now = new Date()) {
+  return Number((await kv.get(`pictures:${today(now)}`)) ?? 0)
+}
+
+// Whether there's room for one more picture today, for everyone and for this person
+export async function roomForPicture(kv: Counter, who: string, limits: { all: number; each: number }, now = new Date()) {
+  const [all, mine] = await Promise.all([picturesToday(kv, now), kv.get(await personKey(who, now))])
+  return all < limits.all && Number(mine ?? 0) < limits.each
+}
+
+// Counts a checked picture (the counters are thrown away after two days). Close
+// enough: two at the same moment can count as one.
+export async function countPicture(kv: Counter, who: string, now = new Date()) {
+  const key = await personKey(who, now)
+  const [all, mine] = await Promise.all([picturesToday(kv, now), kv.get(key)])
+  await Promise.all([
+    kv.put(`pictures:${today(now)}`, String(all + 1), { expirationTtl: TWO_DAYS }),
+    kv.put(key, String(Number(mine ?? 0) + 1), { expirationTtl: TWO_DAYS }),
+  ])
 }

@@ -36,4 +36,7 @@ export type PictureFacts = {
   links: { address: string; box: Box }[]
   // Someone threatens the child or asks for photos of them
   threatOrPhotos: boolean
+  // Claude wouldn't look at the picture (its safety rules), so it may show
+  // something that isn't OK for kids: the app says "Show a grown-up right now"
+  declined?: boolean
 }

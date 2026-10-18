@@ -19,7 +19,8 @@ export type Clue = { label: string; reason: string; highlight?: string; boxes?: 
 // streams: tools/websiteKind.ts), not because it's a scam, so it gets its own heading
 // `urgent`: someone is threatening the child or asking for photos of them: a calm
 // "Show a grown-up right now" instead of the usual heading (Result.tsx)
-export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[]; notForKids?: boolean; urgent?: boolean }
+// `hidePicture`: the picture may not be OK to look at again, so the result blurs it
+export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[]; notForKids?: boolean; urgent?: boolean; hidePicture?: boolean }
 
 // The clues in the order their words come in `text` (top to bottom), so the
 // numbers marked in the text count up as you read; clues without words go last

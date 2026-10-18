@@ -203,7 +203,12 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
           <ResultView
             subject={(picked) => (
               <div className="tool-picture">
-                <ZoomablePicture src={picture.url} clues={shown.clues} picked={picked} />
+                {/* A picture that may not be OK to look at is blurred, with no boxes */}
+                {shown.hidePicture ? (
+                  <img className="tool-photo is-hidden" src={picture.url} alt="Your picture, hidden" />
+                ) : (
+                  <ZoomablePicture src={picture.url} clues={shown.clues} picked={picked} />
+                )}
               </div>
             )}
             result={shown}

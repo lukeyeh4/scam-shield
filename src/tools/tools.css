@@ -364,6 +364,12 @@ button.picture-box {
     0 0 0 9px #ffe06666;
 }
 
+/* A picture that may not be OK to look at again: blurred past recognising */
+.tool-photo.is-hidden {
+  filter: blur(28px);
+  clip-path: inset(0 round 16px);
+}
+
 /* The picture checker takes pictures pasted or dragged anywhere on the page; while
    one is dragged over, the step gets a dashed outline to show it can be dropped */
 .picture-drop {

@@ -70,6 +70,8 @@ The game becomes the **tutorial** for a bigger Scam Shield app: a set of tools k
   - [ ] Test on many real and harmless screenshots, and the tutorial scenarios' screens
   - [x] Accessibility: the reasons are a plain list that screen readers read in order (the boxes are hidden from them), and tapping a reason highlights its box and fades the others (tap again for all)
   - [x] Links read in the picture get a box too, and one short clue ("A trick link: Pretending to be Roblox: rbx-free-robux.xyz")
+  - [x] A picture Claude won't look at (its safety rules: kids may be sent things that aren't OK for them) gets "Show a grown-up right now" with the picture blurred, not "Couldn't check it" (2026-10-18). Not tested with a real refusal (seen with a stand-in answer)
+  - [x] Each person (internet address, under a code that changes daily, so no address is kept) can check 40 pictures a day, besides the 300 for everyone, so one person can't use them all up. A family or school sharing an address shares the 40
   - [x] Step 4 (2026-10-18): threats and requests for photos get "Show a grown-up right now / This isn't your fault, and you're not in trouble" with three scripted steps, before the clues, and Buddy says the same in the chat; a daily cap of 300 picture checks for everyone (about $3 a day on Sonnet; `GET /usage` shows today's count); one more try when the AI's answer fails
   - [x] A magnifier on the picture (and tapping the picture) opens it full screen with the same boxes, for small writing
   - [x] Boxes that mostly overlap (signs on the same lines) are drawn as one box with all their numbers ("3 4 5"), so numbers no longer land mid-line (`pictureMarks.ts`)
