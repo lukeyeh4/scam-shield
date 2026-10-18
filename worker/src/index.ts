@@ -2,6 +2,7 @@ import { checkLink, SHORTENERS, siteOf } from '../../src/tools/linkCheck'
 import type { LinkFacts } from '../../src/tools/linkLookup'
 import { answerKid, readEntries } from './ask'
 import { judgeName, judgePage, readPage } from './page'
+import { judgePicture, readPicture } from './picture'
 import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, savedSpeech } from './speak'
 
 // The link checker's server (a Cloudflare Worker): looks a link up in places the
@@ -12,7 +13,10 @@ import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, save
 // It also answers questions kids ask Shield Buddy in the chat (ask.ts), and gives
 // Buddy its voice (speak.ts).
 //
+// It also checks pictures kids take (picture.ts).
+//
 // POST /link { url } → LinkFacts
+// POST /picture { image } → PictureFacts
 // POST /ask { entries } → BuddyAnswer
 // POST /speak { text } → MP3 audio
 // GET /usage → this month's speech characters, and the limit
@@ -28,6 +32,8 @@ type Env = {
   LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> }
   // Google Cloud Text-to-Speech key, for Buddy's voice: `wrangler secret put GOOGLE_TTS_KEY`
   GOOGLE_TTS_KEY?: string
+  // Another model for checking pictures, to compare (picture.ts; only set locally)
+  PICTURE_MODEL?: string
   // Buddy's saved audio and this month's character count (wrangler.toml, speak.ts)
   SPEECH?: Parameters<typeof savedSpeech>[1]
 }
@@ -234,7 +240,7 @@ export default {
       return json({ month: new Date().toISOString().slice(0, 7), characters, limit: MONTHLY_LIMIT, left: Math.max(0, MONTHLY_LIMIT - characters) })
     }
 
-    if (request.method !== 'POST' || !['/link', '/ask', '/speak'].includes(path)) return json({ error: 'Not found' }, 404)
+    if (request.method !== 'POST' || !['/link', '/picture', '/ask', '/speak'].includes(path)) return json({ error: 'Not found' }, 404)
     if (!cors['access-control-allow-origin']) return json({ error: 'Not allowed' }, 403)
     const who = request.headers.get('cf-connecting-ip') ?? 'unknown'
     const limited = async () => env.LIMITER && !(await env.LIMITER.limit({ key: who })).success
@@ -253,6 +259,18 @@ export default {
     }
 
     if (await limited()) return json({ error: 'Too many checks' }, 429)
+
+    if (path === '/picture') {
+      if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
+      const picture = readPicture(await request.json().catch(() => null))
+      if (!picture) return json({ error: 'Send { "image": "<base64 JPEG or PNG>" }' }, 400)
+      const facts = await judgePicture(picture, env.ANTHROPIC_API_KEY, env.PICTURE_MODEL).catch((e: unknown) => {
+        // The kind of error only (never what's in the picture), for `wrangler tail`
+        console.warn('picture: failed', e instanceof Error ? e.name : typeof e)
+        return null
+      })
+      return facts ? json(facts) : json({ error: 'No answer' }, 502)
+    }
 
     if (path === '/ask') {
       if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)

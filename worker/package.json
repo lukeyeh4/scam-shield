@@ -6,7 +6,8 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "test-pages": "wrangler dev test/pages.ts --port 8799",
-    "test-questions": "wrangler dev test/questions.ts --port 8798"
+    "test-questions": "wrangler dev test/questions.ts --port 8798",
+    "test-pictures": "node test/pictures.mjs"
   },
   "devDependencies": {
     "wrangler": "4.149.0"
