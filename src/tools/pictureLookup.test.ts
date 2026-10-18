@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { inPictureOrder } from './examples'
 import type { LinkFacts } from './linkLookup'
-import { pictureResult } from './pictureLookup'
+import { contextFor, pictureResult } from './pictureLookup'
 import { marksOf } from './pictureMarks'
 import { type PictureFacts, SIGNS, type Sign } from './pictureSigns'
 
@@ -133,5 +133,21 @@ describe('marks on the picture', () => {
       { label: 'd', reason: '' },
     ])
     expect(marks.map((m) => m.clues)).toEqual([[0, 1], [2]])
+  })
+})
+
+describe('where the picture is from', () => {
+  it('sends the place and what the kid typed', () => {
+    expect(contextFor("Someone I don't know", '')).toMatchObject({ context: "From: Someone I don't know", personal: false, upset: false })
+    expect(contextFor('Something else', 'it popped up in my game')).toMatchObject({ context: 'it popped up in my game' })
+    expect(contextFor(null, '')).toMatchObject({ context: undefined })
+  })
+
+  it('never sends personal details', () => {
+    expect(contextFor('A friend', 'my name is Sam and I live at 12 Oak Road')).toMatchObject({ context: 'From: A friend', personal: true })
+  })
+
+  it('notices something upsetting', () => {
+    expect(contextFor('Something else', 'he said he would blackmail me')).toMatchObject({ upset: true })
   })
 })

@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
 import { useSetUp } from '../setup'
 import { type CheckResult, inPictureOrder } from './examples'
-import { lookUpPicture, pictureResult } from './pictureLookup'
+import { contextFor, lookUpPicture, type Place, PLACES, pictureResult } from './pictureLookup'
 import {
   canTakePhoto,
   forgetPicture,
@@ -50,6 +50,10 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   const [waited, setWaited] = useState(false)
   // Only the newest check's answer counts, if the player goes back and checks again
   const latestCheck = useRef(0)
+  // Where the kid says the picture came from (optional), and what they typed
+  const [place, setPlace] = useState<Place | null>(null)
+  const [typed, setTyped] = useState('')
+  const about = contextFor(place, typed)
   const [picture, setPicture] = useState<PreparedPicture | null>(null)
   // A picture shared to the app (or handed over from elsewhere) opens straight away
   const [received] = useState(() => (setUp ? takeReceivedPicture() : null))
@@ -123,8 +127,11 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
     setResult(null)
     setWaited(false)
     setStage('checking')
-    void lookUpPicture(picture)
+    const { context, upset } = about
+    void lookUpPicture(picture, context)
       .then(pictureResult)
+      // Something upsetting typed about it: a grown-up right now, whatever's in it
+      .then((checked) => (upset ? { ...checked, risk: 'high' as const, urgent: true } : checked))
       .then((checked) => {
         if (id === latestCheck.current) setResult(checked)
       })
@@ -186,12 +193,44 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
             </div>
             <div className="tool-column">
               <h2 className="tool-heading">Is this the right picture?</h2>
+              {/* Where it came from helps the check (optional) */}
+              <fieldset className="picture-place">
+                <legend>Where is it from? You can skip this.</legend>
+                <div className="picture-place-options">
+                  {PLACES.map((p) => (
+                    <button key={p} className="chip" type="button" aria-pressed={place === p} onClick={() => setPlace(place === p ? null : p)}>
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                {place === 'Something else' && (
+                  <>
+                    <label className="sr-only" htmlFor="picture-note">
+                      Tell me about it
+                    </label>
+                    <input
+                      id="picture-note"
+                      className="tool-input picture-note"
+                      type="text"
+                      maxLength={200}
+                      placeholder="Tell me about it"
+                      value={typed}
+                      onChange={(e) => setTyped(e.target.value)}
+                    />
+                    {about.personal && (
+                      <p className="tool-problem" role="alert">
+                        Keep names, addresses and numbers private. I won't send what you typed.
+                      </p>
+                    )}
+                  </>
+                )}
+              </fieldset>
               <div className="tool-actions">
                 <button className="tool-button tool-button-main" type="button" onClick={check}>
                   <ScanIcon />
                   Check it
                 </button>
-                <button className="tool-text-button" type="button" disabled={preparing} onClick={() => choose('library')}>
+                <button className="tool-button" type="button" disabled={preparing} onClick={() => choose('library')}>
                   Choose another
                 </button>
               </div>

@@ -16,7 +16,7 @@ import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, save
 // It also checks pictures kids take (picture.ts).
 //
 // POST /link { url } → LinkFacts
-// POST /picture { image } → PictureFacts
+// POST /picture { image, context? } → PictureFacts
 // POST /ask { entries } → BuddyAnswer
 // POST /speak { text } → MP3 audio
 // GET /usage → this month's speech characters and today's pictures, and the limits
@@ -273,7 +273,7 @@ export default {
     if (path === '/picture') {
       if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
       const picture = readPicture(await request.json().catch(() => null))
-      if (!picture) return json({ error: 'Send { "image": "<base64 JPEG or PNG>" }' }, 400)
+      if (!picture) return json({ error: 'Send { "image": "<base64 JPEG or PNG>", "context"?: "..." }' }, 400)
       const limits = { all: Number(env.PICTURES_PER_DAY ?? DAILY_PICTURES), each: Number(env.PICTURES_PER_PERSON ?? PICTURES_PER_PERSON) }
       if (env.SPEECH && !(await roomForPicture(env.SPEECH, who, limits))) return json({ error: 'Daily limit reached' }, 429)
       // Once more if it fails (a slow answer, or one that didn't fit the questions)

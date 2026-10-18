@@ -364,6 +364,49 @@ button.picture-box {
     0 0 0 9px #ffe06666;
 }
 
+/* Where the picture is from: small chips to tap (one at a time), then a box
+   for "Something else" */
+.picture-place {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.picture-place legend {
+  margin-bottom: 10px;
+  padding: 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.picture-place-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.chip[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.picture-note {
+  width: 100%;
+}
+
 /* A picture that may not be OK to look at again: blurred past recognising */
 .tool-photo.is-hidden {
   filter: blur(28px);

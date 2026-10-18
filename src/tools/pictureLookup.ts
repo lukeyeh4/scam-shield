@@ -1,3 +1,4 @@
+import { hasPersonalDetails, soundsUpset } from '../chat/askRules'
 import { isSetUp } from '../setup'
 import type { Box, CheckResult, Clue } from './examples'
 import { checkLink } from './linkCheck'
@@ -107,15 +108,29 @@ const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean;
 const MAX_LINKS = 3
 
 
+// Where a kid can say the picture came from, before checking it (optional)
+export const PLACES = ["Someone I don't know", 'A friend', 'A game', 'An ad or video', 'Something else'] as const
+export type Place = (typeof PLACES)[number]
+
+// What's sent with the picture about where it came from. What the kid typed is
+// only sent if it has no personal details (like the chat: askRules.ts); if it
+// sounds upsetting, the result says "Show a grown-up right now".
+export function contextFor(place: Place | null, typed: string) {
+  const note = typed.trim()
+  const personal = hasPersonalDetails(note)
+  const parts = [place && place !== 'Something else' ? `From: ${place}` : '', personal ? '' : note].filter(Boolean)
+  return { context: parts.join('. ') || undefined, personal, upset: soundsUpset(note) }
+}
+
 // Sends the picture to be checked; null if the server can't answer (no server, no
 // setup, too slow, or the AI couldn't answer)
-export async function lookUpPicture(picture: PreparedPicture): Promise<PictureFacts | null> {
+export async function lookUpPicture(picture: PreparedPicture, context?: string): Promise<PictureFacts | null> {
   if (!SERVER || !isSetUp()) return null
   try {
     const res = await fetch(`${SERVER}/picture`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ image: await base64(picture.blob) }),
+      body: JSON.stringify({ image: await base64(picture.blob), context }),
       // Looking at a picture takes a few seconds
       signal: AbortSignal.timeout(30000),
     })
