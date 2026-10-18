@@ -115,7 +115,7 @@ function Gate({ onOpen }: { onOpen: () => void }) {
         </>
       ) : (
         <form className="gate-sum" onSubmit={submitSum}>
-          {forgot && <p className="tool-text">This removes the PIN and turns the checks off. You can set them up again.</p>}
+          {forgot && <p className="tool-text">This removes your PIN and turns off the checks. You can turn them back on afterwards.</p>}
           <label className="gate-question" htmlFor="gate-answer">
             {question.text}
           </label>
@@ -151,65 +151,70 @@ function Settings({ onDone }: { onDone: () => void }) {
   return (
     <div className="settings">
       <Section title="Checks">
-        <Toggle on={agreed} onChange={setSetUp} label="Let my child use the checks">
+        <Toggle on={agreed} onChange={setSetUp} label="Turn on picture, message and link checks">
           {agreed
-            ? 'Pictures, messages and links are sent to our server and checked by AI. Scam Shield keeps nothing.'
-            : 'Off: nothing is sent anywhere. Links are only checked on this device, and pictures and messages stay locked.'}
+            ? 'Your child can check pictures, messages and links. They are sent to our server and checked by AI. We do not keep them.'
+            : 'Nothing is sent anywhere. Links get a basic check on this device only. Picture and message checks are locked.'}
         </Toggle>
         <More summary="What is sent, and where">
           <ul className="settings-list">
             <li>
-              <strong>Pictures</strong> go to our server and are checked by AI (Claude, by Anthropic).
+              <strong>Pictures</strong> are checked by AI. We use Claude, made by Anthropic.
             </li>
             <li>
-              <strong>Messages</strong> have phone numbers, emails, codes and addresses blanked out on this device first,
-              then are checked the same way. Names can't always be caught.
+              <strong>Messages</strong> are checked the same way. Phone numbers, emails, codes and addresses are removed
+              first. Names may still be sent.
             </li>
             <li>
-              <strong>Links</strong> are checked against Google Safe Browsing, public website records and family-safe
-              filters, and AI may read the page.
+              <strong>Links</strong> are checked against Google Safe Browsing and other safety lists. AI may also read the
+              website.
             </li>
             <li>
-              <strong>Questions to Shield Buddy</strong> and <strong>speech</strong>, only if you turn them on below.
+              <strong>Questions and speech</strong> are only sent if you turn them on below.
             </li>
             <li>
-              <strong>Read aloud</strong> (the speaker in the corner) turns Shield Buddy's own lines, never anything your
-              child types, into speech with Google. It works without this switch.
+              <strong>Read aloud</strong> uses Google to speak Shield Buddy's own lines. It never sends anything your child
+              types.
             </li>
           </ul>
+          <p>Anthropic deletes everything within 30 days. It does not use it to train AI.</p>
+          <p>Each home can check up to 40 pictures and 100 messages a day.</p>
+          <p>AI can make mistakes. That is why Scam Shield always tells your child to show a grown-up.</p>
           <p>
-            Anthropic deletes what it's sent within 30 days and doesn't train on it. See{' '}
+            Read the privacy policies of{' '}
             <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noreferrer">
-              Anthropic's privacy policy
+              Anthropic
             </a>{' '}
             and{' '}
             <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
-              Google's
+              Google
             </a>
-            . Each home can check 40 pictures and 100 messages a day. AI can make mistakes, so Scam Shield always tells
-            your child to show a grown-up.
+            .
           </p>
         </More>
       </Section>
 
       <Section title="Shield Buddy">
         <Toggle on={questions && agreed} disabled={!agreed} onChange={setQuestionsAllowed} label="Answer my child's questions">
-          Typed questions are answered by AI, only about scams and staying safe, always pointing to a grown-up.
+          Your child can type questions about scams and staying safe online. AI answers them and always suggests asking a
+          grown-up. When this is off, Shield Buddy asks your child to show you instead.
         </Toggle>
         {canTalk ? (
           <Toggle on={voice && agreed} disabled={!agreed} onChange={setTalkingAllowed} label="Let my child ask out loud">
-            Uses your browser's speech service (Google in Chrome, Apple in Safari). No recordings are kept.
+            Your child can speak a question instead of typing it. Your browser turns the words into text. No recordings
+            are kept.
           </Toggle>
         ) : (
-          <p className="settings-off">Asking out loud needs Chrome or Safari.</p>
+          <p className="settings-off">Asking out loud works in Chrome and Safari.</p>
         )}
-        {!agreed && <p className="settings-off">Turn on the checks first.</p>}
+        {!agreed && <p className="settings-off">Turn on the checks above to use these.</p>}
       </Section>
 
       <Section title="Results">
-        <Toggle on={sayKind} onChange={setSayWebsiteKind} label="Say what kind of website it is">
-          Off: betting, adult and pirated streaming sites just say "not for kids", so they don't spark curiosity. Scam
-          warnings always explain the trick.
+        <Toggle on={sayKind} onChange={setSayWebsiteKind} label="Name the type of unsafe website">
+          Some links go to betting, adult or pirated streaming websites. By default Scam Shield only says the website is
+          not for kids. Turn this on to also name the type. It is off so children do not get curious. Scam warnings
+          always explain the trick.
         </Toggle>
       </Section>
 
@@ -217,8 +222,8 @@ function Settings({ onDone }: { onDone: () => void }) {
 
       <Section title="Family code word">
         <p>
-          Choose a secret word together. If someone says they're you, your child can ask for it. Keep it in your heads:
-          don't write it in messages, or here.
+          Choose a secret word with your child. If someone claims to be you, your child can ask for the word. Keep it
+          private. Do not write it in messages or in this app.
         </p>
       </Section>
 
@@ -250,7 +255,7 @@ function PinSection() {
   const digits = (value: string) => value.replace(/\D/g, '').slice(0, PIN_LENGTH)
   return (
     <Section title="Grown-up PIN">
-      <p>{set ? 'These settings are locked with your PIN.' : `Set a ${PIN_LENGTH}-digit PIN so only you can open these settings.`}</p>
+      <p>{set ? 'These settings are locked with your PIN.' : `Set a ${PIN_LENGTH}-digit PIN so only you can open these settings. Without one, a maths question protects them.`}</p>
       {editing ? (
         <form className="pin-form" onSubmit={save}>
           <label>
