@@ -46,7 +46,11 @@ const Answers = z.object({
   links: z
     .array(
       z.object({
-        address: z.string().describe('Copied exactly as written (e.g. "rbx-free.xyz/claim")'),
+        address: z
+          .string()
+          .describe(
+            'Copied letter by letter exactly as written (e.g. "rbx-free.xyz/claim"). Never correct it: scam addresses use look-alike letters on purpose (dlscord, rnicrosoft, g00gle, paypa1), so keep them as they are',
+          ),
         box: Box.describe('A box tightly around the address, in pixels of this picture'),
       }),
     )

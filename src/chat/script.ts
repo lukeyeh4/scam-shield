@@ -69,7 +69,9 @@ const CHECKS: ChatOption[] = [
 export const STEPS: Record<StepId, ChatStep> = {
   start: {
     mood: 'happy',
-    buddy: ["Hi! I'm Shield Buddy.", 'What do you want to check?'],
+    // (Kids must be told they're talking to an AI, not a person: Anthropic's rules
+    // for apps used by minors)
+    buddy: ["Hi! I'm Shield Buddy, a computer helper, not a real person.", 'What do you want to check?'],
     options: CHECKS,
   },
   again: {

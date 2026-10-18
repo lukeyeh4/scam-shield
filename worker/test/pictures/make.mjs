@@ -82,6 +82,13 @@ const PICTURES = {
     <div style="padding:10px 16px;display:flex;gap:10px"><div class="av" style="background:#090"></div><div>
     <div style="font-size:13px;color:#606060">@gamerkid22 · 1 hour ago</div><div>this video was so funny 😂</div></div></div>`),
 
+  // Look-alike letters in addresses: these must be copied exactly, not corrected
+  lookalikeLinks: texts('+1 (555) 014-7781', 'Text Message', `
+    <div class="time">Today 08:12</div>
+    <div class="in">Microsoft: your account will be closed today. Verify now at rnicrosoft-account.com/verify</div>
+    <div class="in">PayPal: you received $250! Claim it at paypa1-claims.com</div>
+    <div class="in">You won a Google prize 🎉 g00gle-rewards.net</div>`),
+
   // Short videos with a sad story to get people to buy (often made with AI)
   sympathyVideo: page(`<div style="height:844px;position:relative;background:linear-gradient(160deg,#6b5b4b,#2f2721);color:#fff">
     <div style="position:absolute;top:150px;left:0;right:0;text-align:center;font-size:120px">👴🪵</div>

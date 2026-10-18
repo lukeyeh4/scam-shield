@@ -136,8 +136,15 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   if (!setUp) return <SetupFirst title="Check a picture" what="pictures" onHome={onHome} onSetUp={onSetUp} />
 
   return (
-    // (Pictures are really checked, so no preview note)
-    <ToolScreen title="Check a picture" steps={showResult ? undefined : 3} step={STEP[stage]} onBack={back} note={null}>
+    // (The note under a result says an AI checked it: kids must be told, by
+    // Anthropic's rules for apps used by minors)
+    <ToolScreen
+      title="Check a picture"
+      steps={showResult ? undefined : 3}
+      step={STEP[stage]}
+      onBack={back}
+      note={showResult ? 'Checked by AI, a computer program. It can make mistakes.' : null}
+    >
       <div className={dragging ? 'picture-drop is-dragging' : 'picture-drop'}>
         {stage === 'choose' && (
           <div className="tool-column">
