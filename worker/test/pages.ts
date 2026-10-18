@@ -92,7 +92,26 @@ const PAGES: Record<string, TestPage> = {
     popupAds: ['adsterra'],
     expect: 'be careful: free streams and tricky ads',
   },
+  ageGate: {
+    url: 'https://www.hotclips-tube.com/',
+    title: 'Warning: adults only',
+    text: 'This website contains age-restricted materials. By entering, you confirm that you are at least 18 years of age. I am 18 or older - Enter. I am under 18 - Exit.',
+    expect: 'not for kids: an age gate',
+  },
+  predictionMarket: {
+    url: 'https://www.event-markets.com/',
+    title: 'Trade on the outcome of events',
+    text: 'Will it rain in New York tomorrow? Yes 62c / No 38c. Who will win the Super Bowl? Buy shares, cash out when you are right. Deposit with card to start trading.',
+    cardBoxes: 1,
+    expect: 'be careful: betting (a prediction market), card',
+  },
   // Safe pages that could fool it
+  kidsHealth: {
+    url: 'https://kidshealth.org/en/kids/puberty.html',
+    title: 'Everything you wanted to know about puberty (for kids)',
+    text: 'Puberty is when your body starts changing from a kid into a grown-up. You will grow taller, and your body will change shape. Talk to a parent or your doctor if you have questions.',
+    expect: 'safe: health for kids is not adult content',
+  },
   sportsNews: {
     url: 'https://www.espn.com/',
     title: 'ESPN - Serving Sports Fans. Anytime. Anywhere.',

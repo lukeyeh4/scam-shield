@@ -56,8 +56,24 @@ const ADULT_SITES = new Set([
   'pornhub.com', 'xvideos.com', 'xnxx.com', 'xhamster.com', 'redtube.com', 'youporn.com', 'tube8.com', 'spankbang.com',
   'eporner.com', 'beeg.com', 'motherless.com', 'brazzers.com', 'onlyfans.com', 'fansly.com', 'chaturbate.com',
   'stripchat.com', 'livejasmin.com', 'bongacams.com', 'cam4.com', 'rule34.xxx', 'nhentai.net', 'e-hentai.org',
+  'youjizz.com', 'tnaflix.com', 'drtuber.com', 'hclips.com', 'txxx.com', 'nuvid.com', '4tube.com', 'fuq.com',
+  'thumbzilla.com', 'lobstertube.com', 'erome.com', 'thothub.to', 'f95zone.to', 'hanime.tv', 'gelbooru.com',
+  'donmai.us', 'sankakucomplex.com', 'camsoda.com', 'myfreecams.com', 'manyvids.com', 'clips4sale.com',
+  'naughtyamerica.com', 'realitykings.com', 'bangbros.com', 'imagefap.com', 'literotica.com', 'fapello.com',
 ])
 const ADULT_ENDINGS = new Set(['xxx', 'porn', 'sex', 'adult'])
+// Words in a website's name that only adult websites use (porntrex.com,
+// hentaihaven.xxx, freesexvideos.org), once real words, names and places that
+// contain them are taken out (essex, unisex, expertsexchange, ...). Not on
+// government, school or health websites (sexualhealth.nhs.uk, sexed.org).
+const ADULT_WORDS = ['porn', 'xxx', 'sex', 'hentai', 'nsfw', 'nude', 'milf', 'xvideo', 'xnxx', 'xhamster', 'camgirl', 'erotic', 'fetish', 'bdsm', 'onlyfan', 'rule34']
+const INNOCENT = /essex|sussex|wessex|middlesex|unisex|sextant|sexton|sextet|expertsexchange|sexed|sexualhealth|sexeducation|xxxtentacion|milford|milfoil/g
+const SERIOUS_SITE = /\.(gov|edu|mil)(\.[a-z]{2})?$|\.(gov|ac|nhs)\.uk$|^nhs\.uk$|\.k12\.[a-z]{2}\.us$/
+// (lookalike numbers too, like p0rn: see `plain` below)
+const hasAdultWord = (labels: string, site: string) => {
+  const plainLabels = plain(skeleton(labels).replace(INNOCENT, ''))
+  return !SERIOUS_SITE.test(site) && ADULT_WORDS.some((w) => plainLabels.includes(plain(w)))
+}
 
 // Words scam links use to tempt kids, after the website's name (like /free-robux)
 const BAIT_WORDS = ['free', 'giveaway', 'claim', 'prize', 'winner', 'gift', 'reward', 'robux', 'vbucks', 'verify', 'unlock']
@@ -352,7 +368,8 @@ function checkOne(typed: string): LinkCheck | null {
     })
   }
 
-  if (ADULT_SITES.has(site) || ADULT_ENDINGS.has(ending)) {
+  // (the website's name and any parts before it, not the ending or the path)
+  if (ADULT_SITES.has(site) || ADULT_ENDINGS.has(ending) || (!isIp && !official && hasAdultWord(`${address.subdomain}.${address.name}`, site))) {
     others.push({
       label: 'Not for kids',
       reason: "This website has things that aren't meant for kids. Don't open it. Show a grown-up.",

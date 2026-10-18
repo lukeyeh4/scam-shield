@@ -137,8 +137,14 @@ const Answers = z.object({
   rushesYou: z
     .boolean()
     .describe('Fake urgency to make the visitor act before thinking: countdowns to claim something, "only 3 left", "your account will be deleted". Not an ordinary fundraising appeal'),
-  gambling: z.boolean().describe('Betting, cases, spins or games of chance for money or items'),
-  adult: z.boolean().describe('Content not suitable for children aged 8 to 12'),
+  gambling: z
+    .boolean()
+    .describe('Betting, cases, spins or games of chance for money or items, including sports betting, crypto casinos and prediction markets (betting on events)'),
+  adult: z
+    .boolean()
+    .describe(
+      'Content not suitable for children aged 8 to 12: pornography, nudity, sexual content, adult cams, dating or hookups, or graphic violence. Also true when the page is an age gate or warning for adults ("18+", "I am over 18", "adults only", "enter / leave"), since what lies behind it is adult. When the title, text or address suggests adult content, answer true',
+    ),
 })
 
 const SYSTEM = `You check web pages for a safety app used by children aged 8 to 12.

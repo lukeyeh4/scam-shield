@@ -305,6 +305,20 @@ describe('checkLink', () => {
     expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'Not for kids' }] })
   })
 
+  it.each(['porntrex.com', 'freesexvideos.org', 'hentaihaven.xxx', 'nsfw-pics.net', 'm.xhamsterlive.com', 'p0rnsite.com'])(
+    'spots adult words in a website name: %s',
+    (link) => {
+      expect(labels(link)).toContain('Not for kids')
+    },
+  )
+
+  it.each(['essex.ac.uk', 'unisexsalon.com', 'expertsexchange.com', 'sexualhealth.nhs.uk', 'sexed.org', 'sextant.com', 'analytics.google.com', 'xxxtentacion.com', 'milford.k12.ma.us', 'milfordct.gov'])(
+    "doesn't call a real website with those letters in it not for kids: %s",
+    (link) => {
+      expect(labels(link)).not.toContain('Not for kids')
+    },
+  )
+
   it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com', 'kalshi.com'])('says be careful about a betting website: %s', (link) => {
     expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'A betting website' }] })
   })
