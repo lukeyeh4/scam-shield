@@ -108,9 +108,9 @@ describe('withFacts', () => {
     expect(hack).toMatchObject({ risk: 'high', clues: [{ label: 'Wants you to download something' }] })
   })
 
-  it('says be careful about free streaming websites and tricky ads', () => {
+  it('says free streaming websites are not for kids, and warns about tricky ads', () => {
     const streams = withFacts(check('example-games.com'), facts('example-games.com', { page: page({ freeStreams: true, trickyAds: true }) }), NOW)
-    expect(streams).toMatchObject({ risk: 'medium', clues: [{ label: 'Free shows or sports without paying' }, { label: 'Tricky ads' }] })
+    expect(streams).toMatchObject({ risk: 'high', notForKids: true, clues: [{ label: 'Free shows or sports without paying' }, { label: 'Tricky ads' }] })
   })
 
   it("doesn't count a donation banner on its own", () => {
@@ -126,7 +126,7 @@ describe('withFacts', () => {
 
   it('warns about betting websites, and gives no good signs then', () => {
     const result = withFacts(check('example-games.com'), facts('example-games.com', { page: page({ gambling: true }) }), NOW)
-    expect(result).toMatchObject({ risk: 'medium', clues: [{ label: 'A betting website' }] })
+    expect(result).toMatchObject({ risk: 'high', notForKids: true, clues: [{ label: 'A betting website' }] })
   })
 
   it('names a betting website only once when the device knew it already', () => {
@@ -136,7 +136,7 @@ describe('withFacts', () => {
 
   it('says not for kids when the family filter blocks a website, once', () => {
     const result = withFacts(check('example-games.com'), facts('example-games.com', { adult: true }), NOW)
-    expect(result).toMatchObject({ risk: 'medium', clues: [{ label: 'Not for kids' }] })
+    expect(result).toMatchObject({ risk: 'high', notForKids: true, clues: [{ label: 'Not for kids' }] })
     const known = withFacts(check('pornhub.com'), facts('pornhub.com', { adult: true, page: page({ adult: true }) }), NOW)
     expect(labels(known)).toEqual(['Not for kids'])
   })
@@ -150,6 +150,11 @@ describe('withFacts', () => {
   it('says what Claude knows about a website whose page was blocked, instead of only that it was blocked', () => {
     const result = withFacts(check('example-games.com'), facts('example-games.com', { pageBlocked: true, page: page({ adult: true }) }), NOW)
     expect(labels(result)).toEqual(['Not for kids'])
+  })
+
+  it('calls it a scam, not only not for kids, when a betting website is also on a dangerous list', () => {
+    const result = withFacts(check('rainbet.com'), facts('rainbet.com', { dangerous: true }), NOW)
+    expect(result).toMatchObject({ risk: 'high', notForKids: false })
   })
 
   it("says be careful when the website wouldn't let us look at its page", () => {

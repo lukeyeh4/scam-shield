@@ -290,9 +290,8 @@
   }
 }
 
-/* The result: what was checked (in its own card) beside how risky it looks, the
-   clues (one card each), good signs and what to do. Each part has its own box,
-   so nothing runs together. */
+/* The result: what was checked (in its own card) beside how risky it looks and
+   what to do, the clues (one card each) and good signs. */
 .result {
   display: grid;
   grid-template-columns: minmax(0, 380px) minmax(0, 460px);
@@ -335,7 +334,7 @@
 }
 
 /* How risky it looks: soft red, yellow or green, with its icon, the heading, and
-   how many clues were found */
+   what to do (always show a grown-up) */
 .result-banner {
   display: flex;
   align-items: center;
@@ -364,10 +363,10 @@
   line-height: 1.2;
 }
 
-.result-found {
-  margin-top: 2px;
+.result-tell {
+  margin-top: 4px;
   font-weight: 700;
-  opacity: 0.85;
+  line-height: 1.35;
 }
 
 .risk-high {
@@ -474,39 +473,6 @@
   border: solid var(--good-ink);
   border-width: 0 3px 3px 0;
   transform: rotate(45deg);
-}
-
-/* What to do next: always show a grown-up */
-.result-tell {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  border-radius: 20px;
-  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
-}
-
-.result-tell-icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-.result-tell-icon svg {
-  width: 26px;
-  height: 26px;
-}
-
-.result-tell p {
-  margin-top: 2px;
-  font-weight: 700;
-  line-height: 1.35;
 }
 
 .result-panel .tool-actions {

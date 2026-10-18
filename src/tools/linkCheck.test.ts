@@ -302,7 +302,7 @@ describe('checkLink', () => {
   })
 
   it.each(['pornhub.com', 'https://www.xvideos.com/video123', 'onlyfans.com', 'anything.xxx', 'example.porn'])('says an adult website is not for kids: %s', (link) => {
-    expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'Not for kids' }] })
+    expect(checkLink(link)).toMatchObject({ risk: 'high', notForKids: true, clues: [{ label: 'Not for kids' }] })
   })
 
   it.each(['porntrex.com', 'freesexvideos.org', 'hentaihaven.xxx', 'nsfw-pics.net', 'm.xhamsterlive.com', 'p0rnsite.com'])(
@@ -319,7 +319,11 @@ describe('checkLink', () => {
     },
   )
 
-  it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com', 'kalshi.com', 'polymarket.us', 'stake.bet', 'luckycasino.net'])('says be careful about a betting website: %s', (link) => {
-    expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'A betting website' }] })
+  it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com', 'kalshi.com', 'polymarket.us', 'stake.bet', 'luckycasino.net'])('says a betting website is not for kids: %s', (link) => {
+    expect(checkLink(link)).toMatchObject({ risk: 'high', notForKids: true, clues: [{ label: 'A betting website' }] })
+  })
+
+  it('calls a betting website that also pretends to be a brand a scam', () => {
+    expect(checkLink('roblox-login-casino.com')).toMatchObject({ risk: 'high', notForKids: false })
   })
 })

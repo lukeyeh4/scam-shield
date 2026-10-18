@@ -29,6 +29,14 @@ export const DangerIcon = (p: IconProps) => (
   </Icon>
 )
 
+// "No entry": a website that isn't for kids
+export const NoEntryIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M5.6 5.6 18.4 18.4" />
+  </Icon>
+)
+
 export const UnsureIcon = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="12" cy="12" r="9" />

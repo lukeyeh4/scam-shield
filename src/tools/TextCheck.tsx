@@ -96,7 +96,7 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
   }
 
   return (
-    <ToolScreen title={k.title} steps={2} step={stage === 'paste' ? 0 : 1} onBack={back} note={note}>
+    <ToolScreen title={k.title} steps={showResult ? undefined : 2} step={stage === 'paste' ? 0 : 1} onBack={back} note={note}>
       {stage === 'paste' && (
         <form className="tool-column" onSubmit={check}>
           <h2 className="tool-heading" id="paste-heading">

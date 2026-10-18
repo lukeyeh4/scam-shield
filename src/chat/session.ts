@@ -13,8 +13,11 @@ export type Entry = { from: 'buddy'; text: string; mood: Mood } | { from: 'kid';
 export type Chat = { step: StepId; entries: Entry[]; typedLink?: string; backTurns: number }
 
 let saved: Chat | null = null
+// What a check found: its risk, or a website that isn't for kids (red, not a scam)
+export type CheckOutcome = Risk | 'notForKids'
+
 // What the last check found, if there was one since the chat was left
-let lastCheck: Risk | null = null
+let lastCheck: CheckOutcome | null = null
 
 export const savedChat = () => saved
 export const saveChat = (chat: Chat) => {
@@ -22,8 +25,8 @@ export const saveChat = (chat: Chat) => {
 }
 
 // Called when a check's result shows, so Buddy can talk about it back in the chat
-export const noteCheck = (risk: Risk) => {
-  lastCheck = risk
+export const noteCheck = (outcome: CheckOutcome) => {
+  lastCheck = outcome
 }
 export const checkSinceChat = () => lastCheck
 export const forgetCheck = () => {

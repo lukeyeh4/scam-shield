@@ -10,7 +10,9 @@ export type Clue = { label: string; reason: string; highlight?: string }
 
 // `good`: facts in its favour (e.g. "This is the real Roblox website"), shown only
 // when there are no clues. Never "safe": a check can miss things.
-export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[] }
+// `notForKids`: high because the website isn't for kids (betting, adult, pirated
+// streams: tools/websiteKind.ts), not because it's a scam, so it gets its own heading
+export type CheckResult = { risk: Risk; clues: Clue[]; good?: string[]; notForKids?: boolean }
 
 // The clues in the order their words come in `text` (top to bottom), so the
 // numbers marked in the text count up as you read; clues without words go last

@@ -1,4 +1,4 @@
-import type { Risk } from '../tools/examples'
+import type { CheckOutcome } from './session'
 import type { Mood } from '../types'
 import { checkLink } from '../tools/linkCheck'
 import type { BuddyAnswer } from './askBuddy'
@@ -30,6 +30,7 @@ export type StepId =
   | 'upset'
   | 'backScam'
   | 'backCareful'
+  | 'backNotForKids'
   | 'backClean'
 
 export type ChatIcon = 'picture' | 'link' | 'message' | 'question'
@@ -183,6 +184,15 @@ export const STEPS: Record<StepId, ChatStep> = {
     ],
     options: CHECKS,
   },
+  backNotForKids: {
+    mood: 'worried',
+    buddy: ["Good thinking to check that! That website isn't for kids.", "Don't open it. Show a grown-up.", 'Want to check something else?'],
+    alternatives: [
+      ["That website is made for grown-ups, not kids.", 'Leave it closed and tell a grown-up.', 'Anything else to check?'],
+      ["That one isn't a place for kids.", "Don't open it. Show it to a grown-up.", 'What else should we check?'],
+    ],
+    options: CHECKS,
+  },
   backCareful: {
     mood: 'thinking',
     buddy: ['Good thinking to check that! Some things looked odd.', 'Ask a grown-up before you tap it.', 'Want to check something else?'],
@@ -211,7 +221,12 @@ export function buddySays(id: StepId, turn = 0): string[] {
 }
 
 // What Buddy says on coming back to the chat after a check, by what it found
-export const BACK_AFTER: Record<Risk, StepId> = { high: 'backScam', medium: 'backCareful', none: 'backClean' }
+export const BACK_AFTER: Record<CheckOutcome, StepId> = {
+  high: 'backScam',
+  notForKids: 'backNotForKids',
+  medium: 'backCareful',
+  none: 'backClean',
+}
 
 // Steps reached by typing instead of tapping an answer
 export const TYPED_STEPS: StepId[] = [

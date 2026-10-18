@@ -1,16 +1,20 @@
 import { type ReactNode, useEffect } from 'react'
 import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
-import { DangerIcon, GoodIcon, GrownUpIcon, UnsureIcon } from '../icons'
+import { DangerIcon, GoodIcon, NoEntryIcon, UnsureIcon } from '../icons'
 import type { CheckResult, Clue, Risk } from './examples'
 
 // How each risk level is shown: soft red, yellow or green, each with its own icon
-// so colour isn't the only sign. Never "safe": a check can miss things.
-const RISKS: Record<Risk, { title: string; tell: string; icon: ReactNode }> = {
+// so colour isn't the only sign, and what to do under the heading. Never "safe": a
+// check can miss things.
+type Look = { title: string; tell: string; icon: ReactNode }
+const RISKS: Record<Risk, Look> = {
   high: { title: 'This looks like a scam', tell: "Don't answer it or tap on it. Show a grown-up.", icon: <DangerIcon /> },
   medium: { title: 'Be careful', tell: "Don't answer it or tap on it. Show a grown-up.", icon: <UnsureIcon /> },
   none: { title: 'No clues found', tell: 'Still not sure? Show a grown-up.', icon: <GoodIcon /> },
 }
+// Red too, but not a scam: betting, adult or pirated streaming websites
+const NOT_FOR_KIDS: Look = { title: "This website isn't for kids", tell: "Don't open it. Show a grown-up.", icon: <NoEntryIcon /> }
 
 type ResultViewProps = {
   // What was checked: the picture, the link or the message, with the clues marked
@@ -23,20 +27,16 @@ type ResultViewProps = {
   actions?: ReactNode
 }
 
-// The line under the risk heading
-const found = (count: number) =>
-  count === 0 ? "Scam Shield didn't spot any clues." : `Scam Shield found ${count} ${count === 1 ? 'clue' : 'clues'}.`
-
-// The result of any check, each part in its own box: what was checked beside how
-// risky it looks, the clues (one card each, numbered to match the marks), good
-// signs when there are no clues, and what to do next
+// The result of any check: what was checked beside how risky it looks and what to
+// do, the clues (one card each, numbered to match the marks), good signs when
+// there are no clues, then the buttons
 export function ResultView({ subject, result, onAgain, onDone, actions }: ResultViewProps) {
-  const risk = RISKS[result.risk]
+  const risk = result.notForKids ? NOT_FOR_KIDS : RISKS[result.risk]
   const practice = actions !== undefined
   // Back in the chat, Buddy talks about what this check found
   useEffect(() => {
-    if (!practice) noteCheck(result.risk)
-  }, [practice, result.risk])
+    if (!practice) noteCheck(result.notForKids ? 'notForKids' : result.risk)
+  }, [practice, result.risk, result.notForKids])
   return (
     <section className={`result result-${result.risk}`} aria-labelledby="result-title">
       <div className="result-subject">
@@ -51,7 +51,7 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
             <h2 id="result-title" className="result-title">
               {risk.title}
             </h2>
-            <p className="result-found">{found(result.clues.length)}</p>
+            <p className="result-tell">{risk.tell}</p>
           </div>
         </div>
 
@@ -77,23 +77,13 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
           </div>
         ) : null}
 
-        <div className="result-tell">
-          <span className="result-tell-icon">
-            <GrownUpIcon />
-          </span>
-          <div>
-            <h3 className="result-label">What to do</h3>
-            <p>{risk.tell}</p>
-          </div>
-        </div>
-
         <div className="tool-actions">
           {actions ?? (
             <>
               <button className="tool-button tool-button-main" type="button" onClick={onAgain}>
                 Check something else
               </button>
-              <button className="tool-text-button" type="button" onClick={onDone}>
+              <button className="tool-button" type="button" onClick={onDone}>
                 I'm done
               </button>
             </>

@@ -2,6 +2,7 @@ import { isSetUp } from '../setup'
 import type { Clue } from './examples'
 import { brandNamed } from './brands'
 import { checkLink, type LinkCheck, onFreeHost } from './linkCheck'
+import { isWebsiteKind } from './websiteKind'
 
 // The link checker's second layer: asks our small server (`worker/`) what it can
 // find out about a link (Google's list of dangerous websites, how new the website
@@ -260,7 +261,7 @@ export function withFacts(check: LinkCheck, facts: LinkFacts | null, now = Date.
   if (facts.adult && !clues.some((c) => c.label === 'Not for kids')) {
     others.push({
       label: 'Not for kids',
-      reason: "This website has things that aren't meant for kids. Don't open it. Show a grown-up.",
+      reason: "This website has things that aren't meant for kids.",
     })
   }
 
@@ -282,8 +283,14 @@ export function withFacts(check: LinkCheck, facts: LinkFacts | null, now = Date.
     if (years >= 1) good.push(`This website has been around for ${years === 1 ? '1 year' : `${years} years`}.`)
   }
 
-  const risks = [deviceRisk, final?.risk, strong.length ? 'high' : others.length ? 'medium' : 'none']
-  const risk = risks.includes('high') ? 'high' : risks.includes('medium') ? 'medium' : 'none'
+  // A scam: strong clues here, or from the device or where a short link goes (not
+  // counting websites that are only red for not being for kids)
+  const scam = strong.length > 0 || (deviceRisk === 'high' && !check.notForKids) || (final?.risk === 'high' && !final.notForKids)
+  const allClues = [...strong, ...clues, ...others]
+  // A website that isn't for kids is red too, with its own heading unless it's also a scam
+  const notForKids = !scam && allClues.some(isWebsiteKind)
+  const risks = [deviceRisk, final?.risk, others.length ? 'medium' : 'none']
+  const risk = scam || notForKids ? 'high' : risks.includes('medium') || risks.includes('high') ? 'medium' : 'none'
   // Strong clues first, like the device's own
-  return { ...check, risk, clues: [...strong, ...clues, ...others], good }
+  return { ...check, risk, clues: allClues, good, notForKids }
 }

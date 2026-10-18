@@ -10,21 +10,24 @@ const sayKind = storedSwitch('scam-shield-say-website-kind', false)
 export const setSayWebsiteKind = sayKind.set
 export const useSayWebsiteKind = sayKind.use
 
-// Clues that say what kind of website it is (linkCheck.ts, linkLookup.ts)
+// Clues that say what kind of website it is (linkCheck.ts, linkLookup.ts). Any
+// of them makes the result red, with the heading "This website isn't for kids"
+// unless it's a scam as well (Result.tsx)
 const KIND_LABELS = new Set(['A betting website', 'Free shows or sports without paying', 'Not for kids'])
+export const isWebsiteKind = (clue: Clue) => KIND_LABELS.has(clue.label)
 
 export const NOT_FOR_KIDS: Clue = {
   label: 'Not for kids',
-  reason: "This website isn't made for kids. Don't open it. Show a grown-up.",
+  reason: 'This website is made for grown-ups, not for kids.',
 }
 
 // The same result, with every kind-of-website clue turned into one "Not for kids"
 // (in the first one's place, keeping its highlight)
 export function withoutWebsiteKind(result: CheckResult): CheckResult {
-  const first = result.clues.findIndex((c) => KIND_LABELS.has(c.label))
+  const first = result.clues.findIndex(isWebsiteKind)
   if (first < 0) return result
   const clues = result.clues.flatMap((c, i) =>
-    !KIND_LABELS.has(c.label) ? [c] : i === first ? [{ ...NOT_FOR_KIDS, highlight: c.highlight }] : [],
+    !isWebsiteKind(c) ? [c] : i === first ? [{ ...NOT_FOR_KIDS, highlight: c.highlight }] : [],
   )
   return { ...result, clues }
 }

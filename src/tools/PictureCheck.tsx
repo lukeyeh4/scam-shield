@@ -114,7 +114,7 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   if (!setUp) return <SetupFirst title="Check a picture" what="pictures" onHome={onHome} onSetUp={onSetUp} />
 
   return (
-    <ToolScreen title="Check a picture" steps={3} step={STEP[stage]} onBack={back}>
+    <ToolScreen title="Check a picture" steps={stage === 'result' ? undefined : 3} step={STEP[stage]} onBack={back}>
       <div className={dragging ? 'picture-drop is-dragging' : 'picture-drop'}>
         {stage === 'choose' && (
           <div className="tool-column">

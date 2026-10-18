@@ -2,6 +2,7 @@ import { parse } from 'tldts'
 import { type Brand, BRANDS, EVERYDAY_WORDS, NEAR_BRAND_WORDS, officialBrand } from './brands'
 import type { CheckResult, Clue } from './examples'
 import { decodePunycode, mixesAlphabets, skeleton } from './lookalikes'
+import { isWebsiteKind } from './websiteKind'
 
 // Checks a link on the device, from the address alone: nothing is opened or sent
 // anywhere, and it's instant. Every clue is a fact about the address (pretending
@@ -380,7 +381,7 @@ function checkOne(typed: string): LinkCheck | null {
   if (ADULT_SITES.has(site) || ADULT_ENDINGS.has(ending) || (!isIp && !official && hasAdultWord(`${address.subdomain}.${address.name}`, site))) {
     others.push({
       label: 'Not for kids',
-      reason: "This website has things that aren't meant for kids. Don't open it. Show a grown-up.",
+      reason: "This website has things that aren't meant for kids.",
       highlight: inText(typed, typedHost),
     })
   }
@@ -453,7 +454,10 @@ function checkOne(typed: string): LinkCheck | null {
 
   const clues = [...strong, ...others]
   const good = official ? [`This is the real ${official.name} website.`] : []
-  return { risk: strong.length ? 'high' : others.length ? 'medium' : 'none', clues, good, site, url: url.href }
+  // A website that isn't for kids is red too, with its own heading unless it's also a scam
+  const notForKids = !strong.length && clues.some(isWebsiteKind)
+  const risk = strong.length || notForKids ? 'high' : others.length ? 'medium' : 'none'
+  return { risk, clues, good, notForKids, site, url: url.href }
 }
 
 // Brackets and punctuation around a link in a sentence: (roblox.com), "bit.ly/x".
