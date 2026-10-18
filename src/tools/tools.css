@@ -223,6 +223,60 @@
   background: #fff;
 }
 
+/* The kid's picture with each clue's boxes drawn on it (MarkedPicture): the boxes
+   are placed in % of the picture, so the frame is exactly the picture's size */
+.marked-picture {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+/* The same yellow as the marked words on a link or message */
+.picture-box {
+  position: absolute;
+  border-radius: 6px;
+  background: #ffe06640;
+  box-shadow: 0 0 0 3px #f5b700;
+  transition:
+    opacity 200ms var(--ease),
+    box-shadow 200ms var(--ease);
+}
+
+/* The clue's number, on the box's top-left corner */
+.picture-box-number {
+  position: absolute;
+  top: -11px;
+  left: -11px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #1d1d1f;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.picture-box-number.on-right {
+  left: auto;
+  right: -11px;
+}
+
+/* A clue picked in the list: its boxes stand out, the others fade */
+.marked-picture.has-picked .picture-box {
+  opacity: 0.25;
+}
+
+.marked-picture.has-picked .picture-box.is-picked {
+  opacity: 1;
+  background: #ffe06666;
+  box-shadow:
+    0 0 0 4px #f5b700,
+    0 0 0 9px #ffe06666;
+}
+
 /* The picture checker takes pictures pasted or dragged anywhere on the page; while
    one is dragged over, the step gets a dashed outline to show it can be dropped */
 .picture-drop {
@@ -435,6 +489,28 @@
   color: var(--muted);
   font-size: var(--text-small);
   line-height: 1.45;
+}
+
+/* A clue with boxes on a picture is a button: tap it to show just its boxes */
+.result-clue-button {
+  display: grid;
+  row-gap: 2px;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.result-clue:has(.result-clue-button) {
+  transition: box-shadow 200ms var(--ease);
+}
+
+.result-clue.is-picked {
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 0 0 2px #f5b700;
 }
 
 /* Facts in a link's favour, when there are no clues (never "safe") */

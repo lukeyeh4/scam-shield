@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { inPictureOrder } from './examples'
 import type { LinkFacts } from './linkLookup'
 import { pictureResult } from './pictureLookup'
 import { type PictureFacts, SIGNS, type Sign } from './pictureSigns'
@@ -85,5 +86,20 @@ describe('pictureResult', () => {
   it('marks threats and requests for photos as urgent', async () => {
     const result = await pictureResult(facts({ threatOrPhotos: true, signs: [sign('asks for photos or videos of you')] }), noServer)
     expect(result).toMatchObject({ risk: 'high', urgent: true })
+  })
+
+  it('numbers clues down the picture, with links (no boxes) last', async () => {
+    const at = (top: number) => ({ left: 0, top, right: 100, bottom: top + 50 })
+    const result = await pictureResult(
+      facts({
+        signs: [
+          { sign: 'rushes you', words: 'hurry', box: at(800) },
+          { sign: 'free prize or free game money', words: 'free robux', box: at(100) },
+        ],
+        links: ['roblox-login-help.com'],
+      }),
+      noServer,
+    )
+    expect(inPictureOrder(result).clues.map((c) => c.label)).toEqual(['Free prizes', 'Rushing you', 'Pretending to be Roblox'])
   })
 })

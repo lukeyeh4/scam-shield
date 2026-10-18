@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
 import { useSetUp } from '../setup'
+import { inPictureOrder } from './examples'
 import { lookUpPicture, type PictureCheck as PictureResult, pictureResult } from './pictureLookup'
 import {
   canTakePhoto,
@@ -12,7 +13,7 @@ import {
   preparePicture,
   takeReceivedPicture,
 } from './picturePicker'
-import { ResultView } from './Result'
+import { MarkedPicture, ResultView } from './Result'
 import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 
 type Stage = 'choose' | 'check' | 'checking'
@@ -129,6 +130,8 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
       })
   }
   const showResult = stage === 'checking' && waited && result !== null
+  // Numbered in the order they come down the picture
+  const shown = result && inPictureOrder(result)
 
   if (!setUp) return <SetupFirst title="Check a picture" what="pictures" onHome={onHome} onSetUp={onSetUp} />
 
@@ -196,14 +199,14 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
 
         {stage === 'checking' && !showResult && <Checking onDone={() => setWaited(true)} ms={1500} />}
 
-        {showResult && picture && (
+        {showResult && picture && shown && (
           <ResultView
-            subject={
+            subject={(picked) => (
               <div className="tool-picture">
-                <img className="tool-photo" src={picture.url} alt="The picture you checked" />
+                <MarkedPicture src={picture.url} clues={shown.clues} picked={picked} />
               </div>
-            }
-            result={result}
+            )}
+            result={shown}
             onAgain={onAsk}
             onDone={onHome}
           />

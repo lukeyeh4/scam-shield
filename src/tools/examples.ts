@@ -26,6 +26,13 @@ export function inTextOrder(result: CheckResult, text: string): CheckResult {
   return { ...result, clues: [...result.clues].sort((a, b) => at(a) - at(b)) }
 }
 
+// The clues in the order their first boxes come down a picture, so the numbers
+// count down it as you read; clues without boxes (links in it) go last
+export function inPictureOrder(result: CheckResult): CheckResult {
+  const at = (c: Clue) => (c.boxes?.length ? Math.min(...c.boxes.map((b) => b.top)) : Infinity)
+  return { ...result, clues: [...result.clues].sort((a, b) => at(a) - at(b)) }
+}
+
 // Check a message
 export const exampleMessage = 'omg is this you in this video?? 😂 bit.ly/3xVid'
 export const messageResult: CheckResult = {
