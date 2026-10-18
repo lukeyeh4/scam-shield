@@ -2,7 +2,9 @@ import { checkLink, SHORTENERS, siteOf } from '../../src/tools/linkCheck'
 import type { LinkFacts } from '../../src/tools/linkLookup'
 import { answerKid, readEntries } from './ask'
 import { judgeName, judgePage, readPage } from './page'
-import { countPicture, DAILY_PICTURES, judgePicture, PICTURES_PER_PERSON, picturesToday, readPicture, roomForPicture } from './picture'
+import { checkedToday, type Checked, countCheck, LIMITS, roomFor } from './limits'
+import { judgeMessage, readMessage } from './message'
+import { judgePicture, readPicture } from './picture'
 import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, savedSpeech } from './speak'
 
 // The link checker's server (a Cloudflare Worker): looks a link up in places the
@@ -13,13 +15,14 @@ import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, save
 // It also answers questions kids ask Shield Buddy in the chat (ask.ts), and gives
 // Buddy its voice (speak.ts).
 //
-// It also checks pictures kids take (picture.ts).
+// It also checks pictures kids take (picture.ts) and messages they paste (message.ts).
 //
 // POST /link { url } → LinkFacts
 // POST /picture { image, context? } → PictureFacts
+// POST /message { text, context? } → MessageFacts
 // POST /ask { entries } → BuddyAnswer
 // POST /speak { text } → MP3 audio
-// GET /usage → this month's speech characters and today's pictures, and the limits
+// GET /usage → this month's speech characters, today's pictures and messages, and the limits
 
 type Env = {
   // Google Safe Browsing API key: `wrangler secret put SAFE_BROWSING_KEY` (or .dev.vars)
@@ -34,9 +37,11 @@ type Env = {
   GOOGLE_TTS_KEY?: string
   // Another model for checking pictures, to compare (picture.ts; only set locally)
   PICTURE_MODEL?: string
-  // Other daily limits for pictures (picture.ts; only set locally, for test runs)
+  // Other daily limits (limits.ts; only set locally, for test runs)
   PICTURES_PER_DAY?: string
   PICTURES_PER_PERSON?: string
+  MESSAGES_PER_DAY?: string
+  MESSAGES_PER_PERSON?: string
   // Buddy's saved audio and this month's character count (wrangler.toml, speak.ts)
   SPEECH?: Parameters<typeof savedSpeech>[1]
 }
@@ -239,18 +244,24 @@ export default {
     // How much of this month's speech allowance is used (open it in a browser)
     if (request.method === 'GET' && path === '/usage') {
       if (!env.SPEECH) return json({ error: 'No speech storage' }, 503)
-      const [characters, pictures] = await Promise.all([charactersUsed(env.SPEECH), picturesToday(env.SPEECH)])
+      const [characters, pictures, messages] = await Promise.all([
+        charactersUsed(env.SPEECH),
+        checkedToday(env.SPEECH, 'pictures'),
+        checkedToday(env.SPEECH, 'messages'),
+      ])
       return json({
         month: new Date().toISOString().slice(0, 7),
         characters,
         limit: MONTHLY_LIMIT,
         left: Math.max(0, MONTHLY_LIMIT - characters),
         picturesToday: pictures,
-        pictureLimit: DAILY_PICTURES,
+        pictureLimit: LIMITS.pictures.all,
+        messagesToday: messages,
+        messageLimit: LIMITS.messages.all,
       })
     }
 
-    if (request.method !== 'POST' || !['/link', '/picture', '/ask', '/speak'].includes(path)) return json({ error: 'Not found' }, 404)
+    if (request.method !== 'POST' || !['/link', '/picture', '/message', '/ask', '/speak'].includes(path)) return json({ error: 'Not found' }, 404)
     if (!cors['access-control-allow-origin']) return json({ error: 'Not allowed' }, 403)
     const who = request.headers.get('cf-connecting-ip') ?? 'unknown'
     const limited = async () => env.LIMITER && !(await env.LIMITER.limit({ key: who })).success
@@ -270,23 +281,39 @@ export default {
 
     if (await limited()) return json({ error: 'Too many checks' }, 429)
 
+    // Pictures and messages: within today's limits, once more if an answer fails
+    // (slow, or not fitting the questions), and counted when answered
+    const limitsFor = (what: Checked, all?: string, each?: string) => ({
+      all: Number(all ?? LIMITS[what].all),
+      each: Number(each ?? LIMITS[what].each),
+    })
+    const checkWithin = async <T,>(what: Checked, limits: { all: number; each: number }, judge: () => Promise<T | null>) => {
+      if (env.SPEECH && !(await roomFor(env.SPEECH, what, who, limits))) return json({ error: 'Daily limit reached' }, 429)
+      const facts = await judge()
+        .catch(judge)
+        .catch((e: unknown) => {
+          // The kind of error only (never what was sent), for `wrangler tail`
+          console.warn(`${what}: failed`, e instanceof Error ? e.name : typeof e)
+          return null
+        })
+      if (facts && env.SPEECH) await countCheck(env.SPEECH, what, who)
+      return facts ? json(facts) : json({ error: 'No answer' }, 502)
+    }
+
     if (path === '/picture') {
       if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
       const picture = readPicture(await request.json().catch(() => null))
       if (!picture) return json({ error: 'Send { "image": "<base64 JPEG or PNG>", "context"?: "..." }' }, 400)
-      const limits = { all: Number(env.PICTURES_PER_DAY ?? DAILY_PICTURES), each: Number(env.PICTURES_PER_PERSON ?? PICTURES_PER_PERSON) }
-      if (env.SPEECH && !(await roomForPicture(env.SPEECH, who, limits))) return json({ error: 'Daily limit reached' }, 429)
-      // Once more if it fails (a slow answer, or one that didn't fit the questions)
-      const judge = () => judgePicture(picture, env.ANTHROPIC_API_KEY!, env.PICTURE_MODEL)
-      const facts = await judge()
-        .catch(judge)
-        .catch((e: unknown) => {
-          // The kind of error only (never what's in the picture), for `wrangler tail`
-          console.warn('picture: failed', e instanceof Error ? e.name : typeof e)
-          return null
-        })
-      if (facts && env.SPEECH) await countPicture(env.SPEECH, who)
-      return facts ? json(facts) : json({ error: 'No answer' }, 502)
+      const limits = limitsFor('pictures', env.PICTURES_PER_DAY, env.PICTURES_PER_PERSON)
+      return checkWithin('pictures', limits, () => judgePicture(picture, env.ANTHROPIC_API_KEY!, env.PICTURE_MODEL))
+    }
+
+    if (path === '/message') {
+      if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
+      const message = readMessage(await request.json().catch(() => null))
+      if (!message) return json({ error: 'Send { "text": "...", "context"?: "..." }' }, 400)
+      const limits = limitsFor('messages', env.MESSAGES_PER_DAY, env.MESSAGES_PER_PERSON)
+      return checkWithin('messages', limits, () => judgeMessage(message, env.ANTHROPIC_API_KEY!, env.PICTURE_MODEL))
     }
 
     if (path === '/ask') {

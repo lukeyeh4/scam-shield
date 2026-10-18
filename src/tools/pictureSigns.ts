@@ -1,8 +1,8 @@
 import type { Box } from './examples'
 
-// What the picture check's server (worker/src/picture.ts) can say about a
-// picture, shared by the app and the Worker. The app has the kid words for each
-// sign (pictureLookup.ts).
+// What the server can say about a picture (worker/src/picture.ts) or a message
+// (worker/src/message.ts), shared by the app and the Worker. The app has the kid
+// words for each sign (pictureLookup.ts).
 
 // The warning signs Claude can name
 export const SIGNS = [
@@ -38,5 +38,17 @@ export type PictureFacts = {
   threatOrPhotos: boolean
   // Claude wouldn't look at the picture (its safety rules), so it may show
   // something that isn't OK for kids: the app says "Show a grown-up right now"
+  declined?: boolean
+}
+
+// What the server answers about a message: the same signs, with the exact words
+// that show each (to highlight) instead of boxes
+export type MessageFacts = {
+  kind: 'text message' | 'chat or game chat' | 'email' | 'social media post' | 'other'
+  signs: { sign: Sign; words: string }[]
+  // Web addresses in the message, as written
+  links: string[]
+  threatOrPhotos: boolean
+  // Claude wouldn't read it (see PictureFacts)
   declined?: boolean
 }
