@@ -82,6 +82,26 @@ const PICTURES = {
     <div style="padding:10px 16px;display:flex;gap:10px"><div class="av" style="background:#090"></div><div>
     <div style="font-size:13px;color:#606060">@gamerkid22 · 1 hour ago</div><div>this video was so funny 😂</div></div></div>`),
 
+  // Short videos with a sad story to get people to buy (often made with AI)
+  sympathyVideo: page(`<div style="height:844px;position:relative;background:linear-gradient(160deg,#6b5b4b,#2f2721);color:#fff">
+    <div style="position:absolute;top:150px;left:0;right:0;text-align:center;font-size:120px">👴🪵</div>
+    <div style="position:absolute;top:330px;left:24px;right:24px;text-align:center;font-weight:800;font-size:22px;text-shadow:0 2px 6px #000">My grandpa is 82 and carves these toys by hand. Nobody came to his shop today 😢</div>
+    <div style="position:absolute;bottom:90px;left:16px;right:80px">
+    <div style="font-weight:700">@grandpa.woodshop.official2</div>
+    <div style="margin-top:6px;font-size:15px">Please help him 🙏 Buy one before they're gone, only 15 left! Link in bio 👆 #smallbusiness #grandpa</div></div>
+    <div style="position:absolute;right:14px;bottom:200px;text-align:center;font-size:13px">❤️<br>182K<br><br>💬<br>9,431<br><br>↗️<br>Share</div>
+  </div>`, '#2f2721'),
+  sympathyComment: page(`<div style="padding:54px 16px 10px;font-weight:700">Comments 3.4K</div>
+    <div style="padding:10px 16px;display:flex;gap:10px"><div class="av" style="background:#b5651d"></div><div>
+    <div style="font-size:13px;color:#606060">@grandma.knits.love · creator</div>
+    <div>Thank you all ❤️ My grandma is alone this winter and knitting is all she has. Comment HELP and I'll send you the link to buy her blankets. Only 20 left!</div></div></div>
+    <div style="padding:10px 16px;display:flex;gap:10px"><div class="av" style="background:#090"></div><div>
+    <div style="font-size:13px;color:#606060">@sunny_days · 1 hour ago</div><div>HELP 🥺</div></div></div>`),
+  sadNewsNoAsk: page(`<div style="padding:54px 16px 12px;border-bottom:1px solid #ddd;font-weight:700">Kids News</div>
+    <div style="padding:16px"><div style="font-size:20px;font-weight:700">Neighbours help Mr Lee rebuild his bakery after a storm</div>
+    <p style="margin-top:10px">When a storm damaged Mr Lee's bakery last month, he was very sad. But his neighbours came together to fix the roof and paint the walls.</p>
+    <p style="margin-top:10px">"I couldn't believe how kind everyone was," he said. The bakery opens again on Saturday.</p></div>`),
+
   // Normal pictures that mustn't be flagged
   familyChat: texts('Mum ❤️', 'iMessage', `
     <div class="time">Today 16:05</div>

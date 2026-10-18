@@ -11,6 +11,7 @@ export const SIGNS = [
   'asks for personal details',
   'asks for photos or videos of you',
   'free prize or free game money',
+  'sad story to get you to buy or give money',
   'pretends to be a company, game or famous person',
   'pretends to be family or a friend',
   'rushes you',
@@ -27,7 +28,7 @@ export const isSign = (sign: string): sign is Sign => (SIGNS as readonly string[
 export type PictureFacts = {
   // Clear enough to read what it says
   readable: boolean
-  kind: 'text message' | 'chat or game chat' | 'email' | 'website' | 'ad or pop-up' | 'social media post' | 'other'
+  kind: 'text message' | 'chat or game chat' | 'email' | 'website' | 'ad or pop-up' | 'social media post' | 'video' | 'other'
   // Each warning sign, with the exact words and a box around them (0 to 1000)
   signs: { sign: Sign; words: string; box: Box }[]
   // Web addresses written in the picture, as written, with a box around each

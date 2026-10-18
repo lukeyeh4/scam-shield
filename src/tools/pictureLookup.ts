@@ -21,6 +21,9 @@ const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean 
   'asks for personal details': { label: 'Asks about you', reason: 'Keep where you live and your school private.', strong: true },
   'asks for photos or videos of you': { label: 'Asks for photos of you', reason: 'Never send photos of yourself.', strong: true },
   'free prize or free game money': { label: 'Free prizes', reason: 'Free stuff from strangers is a common trick.', strong: true },
+  // Only "Be careful" on its own: real people share sad stories too. With a push to
+  // pay (money, rushing, a trick link) the other signs make it red.
+  'sad story to get you to buy or give money': { label: 'A sad story to make you pay', reason: 'Sad stories are used to make you buy fast.', strong: false },
   'pretends to be a company, game or famous person': { label: 'Pretending to be someone', reason: 'It might not really be them.', strong: true },
   'pretends to be family or a friend': { label: 'Maybe not who they say', reason: "Something's different, like a new number.", strong: true },
   'rushes you': { label: 'Rushing you', reason: "Hurrying stops you from thinking.", strong: false },
