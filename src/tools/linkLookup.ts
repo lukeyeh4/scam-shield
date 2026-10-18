@@ -31,6 +31,9 @@ export type LinkFacts = {
   exists: boolean | null
   // What Claude saw on the page (worker/src/page.ts); null if it wasn't read
   page: PageFacts | null
+  // The website wouldn't let the server read its page (it turns away anything
+  // that isn't a person's browser), so nobody could check what's on it
+  pageBlocked?: boolean
 }
 
 export type PageFacts = {
@@ -233,12 +236,20 @@ export function withFacts(check: LinkCheck, facts: LinkFacts | null, now = Date.
         reason: 'This website has pop-up ads or fake buttons. Tapping them can take you to scams or bad downloads.',
       })
     }
-    if (page.gambling) {
+    // (unless the device already knew it's a betting website)
+    if (page.gambling && !clues.some((c) => c.label === 'A betting website')) {
       others.push({ label: 'A betting website', reason: "This page is about betting money or items. It isn't meant for kids." })
     }
     if (page.adult) {
       others.push({ label: 'Not for kids', reason: "This page has things that aren't meant for kids." })
     }
+  }
+
+  if (facts.pageBlocked) {
+    others.push({
+      label: "Couldn't look inside",
+      reason: "This website wouldn't let us look at its page, so we can't tell what's on it. Show a grown-up before you open it.",
+    })
   }
 
   // Good signs, for when there are no clues

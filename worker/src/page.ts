@@ -37,9 +37,18 @@ type Page = {
   popupAds: string[]
 }
 
-// Fetches the page without running any of its code, and keeps the parts worth judging
-export async function readPage(url: string, headers: Record<string, string>): Promise<Page | null> {
+// Answers websites give when they turn away anything that isn't a person's
+// browser (bot protection, like Cloudflare's "checking your browser" page)
+const BLOCKED = new Set([401, 403, 429, 503])
+
+// Fetches the page without running any of its code, and keeps the parts worth
+// judging. 'blocked' if the website wouldn't let us read it.
+export async function readPage(url: string, headers: Record<string, string>): Promise<Page | 'blocked' | null> {
   const res = await fetch(url, { headers: { ...headers, accept: 'text/html' }, signal: AbortSignal.timeout(4000) })
+  if (BLOCKED.has(res.status)) {
+    await res.body?.cancel()
+    return 'blocked'
+  }
   if (!res.ok || !res.headers.get('content-type')?.includes('text/html')) {
     await res.body?.cancel()
     return null

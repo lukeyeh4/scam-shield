@@ -39,6 +39,16 @@ const FREE_HOSTS = new Set([
   'myshopify.com', 'azurewebsites.net', 'ngrok-free.app', 'ngrok.io', 'backblazeb2.com', 'appspot.com',
 ])
 
+// Betting websites kids meet: crypto casinos, Robux and skin gambling, and the
+// casinos and sports betting they see ads for. Many block the server from reading
+// their page, so they're known here. Not a scam, but not for kids: only "Be careful".
+const GAMBLING_SITES = new Set([
+  'rainbet.com', 'stake.com', 'stake.us', 'roobet.com', 'rollbit.com', 'gamdom.com', 'duelbits.com', 'shuffle.com',
+  'bc.game', 'bloxflip.com', 'rbxflip.com', 'csgoroll.com', 'csgoempire.com', 'hellcase.com', 'key-drop.com', 'clash.gg',
+  'chumbacasino.com', 'luckylandslots.com', 'pulsz.com', 'mcluck.com', 'wowvegas.com', 'draftkings.com', 'fanduel.com',
+  'pokerstars.com',
+])
+
 // Words scam links use to tempt kids, after the website's name (like /free-robux)
 const BAIT_WORDS = ['free', 'giveaway', 'claim', 'prize', 'winner', 'gift', 'reward', 'robux', 'vbucks', 'verify', 'unlock']
 // The same, inside the website's name itself (like rbxgiveaway.com). Not "free" or
@@ -321,6 +331,14 @@ function checkOne(typed: string): LinkCheck | null {
       label: 'Made with a free website maker',
       reason: `This website is made on ${ending}, where anyone can make a website for free in minutes without saying who they are. Scammers use them a lot.`,
       highlight: inText(typed, ending),
+    })
+  }
+
+  if (GAMBLING_SITES.has(site)) {
+    others.push({
+      label: 'A betting website',
+      reason: `${site} is a website for betting money or items. It isn't meant for kids.`,
+      highlight: inText(typed, typedHost),
     })
   }
 

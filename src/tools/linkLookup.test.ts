@@ -125,8 +125,18 @@ describe('withFacts', () => {
   })
 
   it('warns about betting websites, and gives no good signs then', () => {
-    const result = withFacts(check('bloxflip.com'), facts('bloxflip.com', { page: page({ gambling: true }) }), NOW)
+    const result = withFacts(check('example-games.com'), facts('example-games.com', { page: page({ gambling: true }) }), NOW)
     expect(result).toMatchObject({ risk: 'medium', clues: [{ label: 'A betting website' }] })
+  })
+
+  it('names a betting website only once when the device knew it already', () => {
+    const result = withFacts(check('bloxflip.com'), facts('bloxflip.com', { page: page({ gambling: true }) }), NOW)
+    expect(labels(result)).toEqual(['A betting website'])
+  })
+
+  it("says be careful when the website wouldn't let us look at its page", () => {
+    const result = withFacts(check('example-games.com'), facts('example-games.com', { pageBlocked: true }), NOW)
+    expect(result).toMatchObject({ risk: 'medium', clues: [{ label: "Couldn't look inside" }] })
   })
 
   it('treats a short link to a website with no clues as no clue, and says where it goes', () => {

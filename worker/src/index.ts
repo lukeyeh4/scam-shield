@@ -158,19 +158,21 @@ async function lookUp(url: string, env: Env): Promise<LinkFacts> {
   const facts: LinkFacts = { finalUrl, shortenerWarns: warns, listed, created: made, exists: found, page: null }
 
   // Nothing strong found so far (only small clues, like a free website maker or
-  // http), and not a real brand's own website: read the page
+  // http), and not a real brand's own website or a known betting website: read the page
   const device = checkLink(finalUrl)
   const nothingFound =
     device !== null &&
     device.risk !== 'high' &&
     !device.good?.length &&
+    !device.clues.some((c) => c.label === 'A betting website') &&
     !listed.length &&
     !warns &&
     found !== false &&
     !(made && Date.now() - Date.parse(made) < 180 * DAY)
   if (nothingFound && env.ANTHROPIC_API_KEY) {
     const page = await settle(readPage(finalUrl, headers), null)
-    if (page && (page.text || page.passwordBoxes || page.cardBoxes)) {
+    if (page === 'blocked') facts.pageBlocked = true
+    else if (page && (page.text || page.passwordBoxes || page.cardBoxes)) {
       facts.page = await settle(judgePage(page, env.ANTHROPIC_API_KEY), null)
     }
   }

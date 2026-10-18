@@ -300,4 +300,8 @@ describe('checkLink', () => {
   it('catches bait words inside the website name', () => {
     expect(checkLink('rbxgiveaway.com')).toMatchObject({ risk: 'medium', clues: [{ label: 'Words that tempt you', highlight: 'giveaway' }] })
   })
+
+  it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com'])('says be careful about a betting website: %s', (link) => {
+    expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'A betting website' }] })
+  })
 })
