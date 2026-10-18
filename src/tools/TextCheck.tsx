@@ -1,7 +1,11 @@
 import { type FormEvent, useRef, useState } from 'react'
 import { ScanIcon } from '../icons'
 import type { CheckResult } from './examples'
-import { exampleMessage, inTextOrder, messageResult } from './examples'
+import { inTextOrder } from './examples'
+import { blankOut, lookUpMessage, MAX_MESSAGE, messageResult } from './messageLookup'
+import { contextFor, type Place } from './pictureLookup'
+import { PlacePicker } from './PlacePicker'
+import { askAbout } from '../chat/session'
 import { checkLink } from './linkCheck'
 import { lookUpLink, withFacts } from './linkLookup'
 import { MarkedText, ResultView } from './Result'
@@ -10,9 +14,11 @@ import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 import { useSayWebsiteKind, withoutWebsiteKind } from './websiteKind'
 
 // Check a link and Check a message work the same way: paste it in, then see the
-// result with the clues marked in the text. Links are really checked (linkCheck.ts,
-// on the device, then linkLookup.ts on our server while "Checking" shows); messages
-// are still a wireframe with an example.
+// result with the clues marked in the text. Links are checked on the device
+// (linkCheck.ts), then on our server while "Checking" shows (linkLookup.ts).
+// Messages have their personal details blanked out, then go to our server, where
+// Claude finds the warning signs (messageLookup.ts); the kid can say where the
+// message is from first.
 const KINDS = {
   link: {
     title: 'Check a link',
@@ -25,7 +31,7 @@ const KINDS = {
     title: 'Check a message',
     heading: 'Paste the message',
     tip: 'Press and hold the message, then tap Copy.',
-    note: undefined,
+    note: null,
   },
 }
 
@@ -43,7 +49,13 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
   const setUp = useSetUp()
   const sayKind = useSayWebsiteKind()
   const [stage, setStage] = useState<Stage>('paste')
-  const [text, setText] = useState(kind === 'link' ? initial : exampleMessage)
+  const [text, setText] = useState(kind === 'link' ? initial : '')
+  // A message as sent and shown in the result: personal details blanked out
+  const [checkedText, setCheckedText] = useState('')
+  // Where the kid says a message came from (optional), and what they typed
+  const [place, setPlace] = useState<Place | null>(null)
+  const [typed, setTyped] = useState('')
+  const about = contextFor(place, typed)
   const [result, setResult] = useState<CheckResult>()
   const [notALink, setNotALink] = useState(false)
   // The result shows once "Checking" has had its moment and the server has answered
@@ -57,8 +69,23 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
     e.preventDefault()
     setWaited(false)
     if (kind === 'message') {
-      setResult(messageResult)
-      return setStage('checking')
+      const message = blankOut(text.trim().slice(0, MAX_MESSAGE))
+      setCheckedText(message)
+      setResult(undefined)
+      setStage('checking')
+      const id = ++latestCheck.current
+      setLookedUp(false)
+      const { context, upset } = about
+      void lookUpMessage(message, context)
+        .then((facts) => messageResult(facts, message))
+        // Something upsetting typed about it: a grown-up right now, whatever's in it
+        .then((checked) => (upset ? { ...checked, risk: 'high' as const, urgent: true } : checked))
+        .then((checked) => {
+          if (id !== latestCheck.current) return
+          setResult(checked)
+          setLookedUp(true)
+        })
+      return
     }
     const checked = checkLink(text)
     setNotALink(!checked)
@@ -76,11 +103,19 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
   const showResult = stage === 'checking' && waited && lookedUp
   // Numbered in the order they come in the text. Unless a grown-up chose otherwise,
   // only "Not for kids", not what kind of website it is (websiteKind.ts)
-  const shown = result && inTextOrder(sayKind ? result : withoutWebsiteKind(result), text.trim())
+  const shownText = kind === 'message' ? checkedText : text.trim()
+  const shown = result && inTextOrder(sayKind ? result : withoutWebsiteKind(result), shownText)
   // Messages will be sent to be checked, so a grown-up has to finish setup first.
   // Links are checked on the device until then, with a note saying so.
   if (kind === 'message' && !setUp) return <SetupFirst title={k.title} what="messages" onHome={onHome} onSetUp={onSetUp} />
-  const note = kind === 'link' && !setUp ? 'Quick check only. Ask a grown-up to set up full checks.' : k.note
+  // A message's result says an AI checked it (kids must be told: Anthropic's rules
+  // for apps used by minors)
+  const note =
+    kind === 'link' && !setUp
+      ? 'Quick check only. Ask a grown-up to set up full checks.'
+      : kind === 'message' && showResult
+        ? 'Checked by AI, a computer program. It can make mistakes.'
+        : k.note
 
   // The Paste button: reads what the player copied (the browser may ask first)
   const paste = async () => {
@@ -127,7 +162,23 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
               </button>
             </div>
           ) : (
-            <textarea className="tool-input" value={text} rows={3} readOnly aria-labelledby="paste-heading" />
+            <>
+              <div className="tool-input-row">
+                <textarea
+                  className="tool-input"
+                  value={text}
+                  rows={4}
+                  maxLength={MAX_MESSAGE}
+                  placeholder="Paste or type the message"
+                  onChange={(e) => setText(e.target.value)}
+                  aria-labelledby="paste-heading"
+                />
+                <button className="tool-paste" type="button" onClick={paste}>
+                  Paste
+                </button>
+              </div>
+              <PlacePicker place={place} onPlace={setPlace} typed={typed} onTyped={setTyped} personal={about.personal} />
+            </>
           )}
           {notALink ? (
             <p className="tool-problem" id="not-a-link" role="alert">
@@ -151,10 +202,18 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
 
       {showResult && shown && (
         <ResultView
-          subject={<MarkedText text={text.trim()} clues={shown.clues} className={`checked-${kind}`} />}
+          subject={<MarkedText text={shownText} clues={shown.clues} className={`checked-${kind}`} />}
           result={shown}
           onAgain={onAsk}
           onDone={onHome}
+          onAskAbout={
+            kind === 'message'
+              ? () => {
+                  askAbout(shown.clues.map((c) => c.label))
+                  onAsk()
+                }
+              : undefined
+          }
         />
       )}
     </ToolScreen>

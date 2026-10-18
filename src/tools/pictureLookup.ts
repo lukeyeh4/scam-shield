@@ -149,7 +149,7 @@ async function base64(blob: Blob) {
 }
 
 // When the picture couldn't be checked or read: never "No clues found"
-const COULD_NOT_CHECK: CheckResult = {
+export const COULD_NOT_CHECK: CheckResult = {
   risk: 'medium',
   clues: [{ label: "Couldn't check it", reason: 'Show it to a grown-up instead.' }],
 }
@@ -160,7 +160,7 @@ const COULD_NOT_READ: CheckResult = {
 
 // Claude wouldn't look at the picture: it may show something that isn't OK for
 // kids, so a grown-up should see it now (and the picture is blurred)
-const DECLINED: CheckResult = {
+export const DECLINED: CheckResult = {
   risk: 'high',
   urgent: true,
   hidePicture: true,
@@ -176,31 +176,21 @@ const DECLINED: CheckResult = {
 // Turns what the server saw into the result: one clue per warning sign (with a box
 // for every place it appears), then what the link checker says about any links in
 // the picture. `lookUp` is the link checker's server check (a stand-in in tests).
-export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpLink): Promise<CheckResult> {
-  if (!facts) return COULD_NOT_CHECK
-  if (facts.declined) return DECLINED
-  if (!facts.readable) return COULD_NOT_READ
-
-  // One clue per sign, in the order they first appear
-  const bySign = new Map<Sign, Box[]>()
-  for (const { sign, box } of facts.signs) bySign.set(sign, [...(bySign.get(sign) ?? []), box])
-  const clues: Clue[] = [...bySign].map(([sign, boxes]) => {
-    const { label, reason, why } = SIGN_WORDS[sign]
-    return { label, reason, why, boxes }
-  })
-  let strong = [...bySign.keys()].some((sign) => SIGN_WORDS[sign].strong)
-
-  // Each link, checked like the link checker does (on the device, then the
-  // server), as one short clue with a box around the address
+// The clues for the links in a picture or message: each checked like the link
+// checker does (on the device, then the server), as one short clue marked with a
+// box (pictures) or by its address in the text (messages)
+export async function linkClues(links: { address: string; box?: Box }[], lookUp = lookUpLink) {
+  const clues: Clue[] = []
+  let strong = false
   let notForKids = false
-  const links = facts.links.flatMap(({ address, box }) => {
+  const found = links.flatMap(({ address, box }) => {
     const link = checkLink(address)
-    return link ? [{ link, box }] : []
+    return link ? [{ link, address, box }] : []
   })
   const checked = await Promise.all(
-    links.slice(0, MAX_LINKS).map(async ({ link, box }) => ({ link: withFacts(link, await lookUp(link.url)), box })),
+    found.slice(0, MAX_LINKS).map(async ({ link, address, box }) => ({ link: withFacts(link, await lookUp(link.url)), address, box })),
   )
-  for (const { link, box } of checked) {
+  for (const { link, address, box } of checked) {
     if (!link.clues.length) continue
     const scam = link.risk === 'high' && !link.notForKids
     clues.push({
@@ -211,12 +201,37 @@ export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpL
         : link.notForKids
           ? [`That link goes to ${link.site}, a website made for grown-ups.`, "Don't open it. Show a grown-up."]
           : ['Something about that link looks odd.', link.clues[0].reason, 'Ask a grown-up before you tap it.'],
-      boxes: [box],
+      ...(box ? { boxes: [box] } : { highlight: address }),
     })
     strong ||= scam
     notForKids ||= Boolean(link.notForKids)
   }
+  return { clues, strong, notForKids }
+}
 
-  const risk = strong || notForKids ? 'high' : clues.length ? 'medium' : 'none'
-  return { risk, clues, notForKids: notForKids && !strong, urgent: facts.threatOrPhotos }
+// The clue for a warning sign, in kid words, marked by `mark` (boxes or words)
+export function signClue(sign: Sign, mark: Pick<Clue, 'boxes' | 'highlight'>): Clue {
+  const { label, reason, why } = SIGN_WORDS[sign]
+  return { label, reason, why, ...mark }
+}
+
+// The result from the signs and the links' clues: red for strong signs or links (or
+// a website not for kids), yellow for others, and urgent for threats
+export function resultFrom(signs: { sign: Sign; clue: Clue }[], links: Awaited<ReturnType<typeof linkClues>>, urgent: boolean): CheckResult {
+  const strong = signs.some(({ sign }) => SIGN_WORDS[sign].strong) || links.strong
+  const clues = [...signs.map(({ clue }) => clue), ...links.clues]
+  const risk = strong || links.notForKids ? 'high' : clues.length ? 'medium' : 'none'
+  return { risk, clues, notForKids: links.notForKids && !strong, urgent }
+}
+
+export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpLink): Promise<CheckResult> {
+  if (!facts) return COULD_NOT_CHECK
+  if (facts.declined) return DECLINED
+  if (!facts.readable) return COULD_NOT_READ
+
+  // One clue per sign, in the order they first appear, with a box for each place
+  const bySign = new Map<Sign, Box[]>()
+  for (const { sign, box } of facts.signs) bySign.set(sign, [...(bySign.get(sign) ?? []), box])
+  const signs = [...bySign].map(([sign, boxes]) => ({ sign, clue: signClue(sign, { boxes }) }))
+  return resultFrom(signs, await linkClues(facts.links, lookUp), facts.threatOrPhotos)
 }

@@ -3,7 +3,8 @@ import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
 import { askAbout } from '../chat/session'
 import { useSetUp } from '../setup'
 import { type CheckResult, inPictureOrder } from './examples'
-import { contextFor, lookUpPicture, type Place, PLACES, pictureResult } from './pictureLookup'
+import { contextFor, lookUpPicture, type Place, pictureResult } from './pictureLookup'
+import { PlacePicker } from './PlacePicker'
 import {
   canTakePhoto,
   forgetPicture,
@@ -195,37 +196,7 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
             <div className="tool-column">
               <h2 className="tool-heading">Is this the right picture?</h2>
               {/* Where it came from helps the check (optional) */}
-              <fieldset className="picture-place">
-                <legend>Where is it from? You can skip this.</legend>
-                <div className="picture-place-options">
-                  {PLACES.map((p) => (
-                    <button key={p} className="chip" type="button" aria-pressed={place === p} onClick={() => setPlace(place === p ? null : p)}>
-                      {p}
-                    </button>
-                  ))}
-                </div>
-                {place === 'Something else' && (
-                  <>
-                    <label className="sr-only" htmlFor="picture-note">
-                      Tell me about it
-                    </label>
-                    <input
-                      id="picture-note"
-                      className="tool-input picture-note"
-                      type="text"
-                      maxLength={200}
-                      placeholder="Tell me about it"
-                      value={typed}
-                      onChange={(e) => setTyped(e.target.value)}
-                    />
-                    {about.personal && (
-                      <p className="tool-problem" role="alert">
-                        Keep names, addresses and numbers private. I won't send what you typed.
-                      </p>
-                    )}
-                  </>
-                )}
-              </fieldset>
+              <PlacePicker place={place} onPlace={setPlace} typed={typed} onTyped={setTyped} personal={about.personal} />
               <div className="tool-actions">
                 <button className="tool-button tool-button-main" type="button" onClick={check}>
                   <ScanIcon />
