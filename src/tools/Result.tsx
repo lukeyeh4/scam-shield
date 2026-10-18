@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
-import { CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
+import { ChevronIcon, CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
 import type { Box, CheckResult, Clue, Risk } from './examples'
 import { marksOf } from './pictureMarks'
 
@@ -39,7 +39,8 @@ type ResultViewProps = {
 // there are no clues, then the buttons
 export function ResultView({ subject, result, onAgain, onDone, actions }: ResultViewProps) {
   const risk = result.urgent ? URGENT : result.notForKids ? NOT_FOR_KIDS : RISKS[result.risk]
-  // A clue tapped in the list, to show its boxes on the picture (tap again for all)
+  // A clue tapped in the list: its reason shows, and its boxes on a picture stand
+  // out (tap again to close)
   const [picked, setPicked] = useState<number | null>(null)
   const practice = actions !== undefined
   // Back in the chat, Buddy talks about what this check found
@@ -74,22 +75,17 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
 
         {result.clues.length > 0 && (
           <ol className="result-clues" aria-label="Clues">
-            {result.clues.map((c, i) =>
-              // A clue with boxes on a picture can be tapped to show just its boxes
-              c.boxes?.length ? (
-                <li key={c.label} className={picked === i ? 'result-clue is-picked' : 'result-clue'}>
-                  <button className="result-clue-button" type="button" aria-pressed={picked === i} onClick={() => setPicked(picked === i ? null : i)}>
-                    <strong>{c.label}</strong>
-                    <span>{c.reason}</span>
-                  </button>
-                </li>
-              ) : (
-                <li key={c.label} className="result-clue">
+            {result.clues.map((c, i) => (
+              // Just the clue's name; tapping it opens why (and makes its boxes on
+              // a picture stand out)
+              <li key={c.label} className={picked === i ? 'result-clue is-open' : 'result-clue'}>
+                <button className="result-clue-button" type="button" aria-expanded={picked === i} onClick={() => setPicked(picked === i ? null : i)}>
                   <strong>{c.label}</strong>
-                  <span>{c.reason}</span>
-                </li>
-              ),
-            )}
+                  <ChevronIcon className="result-clue-arrow" />
+                </button>
+                {picked === i && <p className="result-clue-reason">{c.reason}</p>}
+              </li>
+            ))}
           </ol>
         )}
 
@@ -146,7 +142,11 @@ export function MarkedText({ text, clues, className = '' }: { text: string; clue
 // A picture with each clue's boxes drawn on it, numbered to match the list. When
 // a clue is picked in the list, its boxes stand out and the others fade. The boxes
 // are only decoration: the list says everything, in order, for screen readers.
-export function MarkedPicture({ src, clues, picked = null }: { src: string; clues: Clue[]; picked?: number | null }) {
+// `picked`: the clue (or clues) whose boxes stand out. `onPick`: boxes become
+// buttons that say which clues they mark (in the big picture).
+type MarkedPictureProps = { src: string; clues: Clue[]; picked?: number | number[] | null; onPick?: (clues: number[]) => void }
+export function MarkedPicture({ src, clues, picked = null, onPick }: MarkedPictureProps) {
+  const standOut = picked === null ? [] : Array.isArray(picked) ? picked : [picked]
   const marked = clues.filter((c) => c.boxes?.length).length
   // Each number sits on its box's top-left corner, or the top-right one if another
   // number is already there (boxes on lines next to each other)
@@ -158,7 +158,7 @@ export function MarkedPicture({ src, clues, picked = null }: { src: string; clue
     return right
   }
   return (
-    <div className={picked === null ? 'marked-picture' : 'marked-picture has-picked'}>
+    <div className={standOut.length ? 'marked-picture has-picked' : 'marked-picture'}>
       <img
         className="tool-photo"
         src={src}
@@ -167,14 +167,33 @@ export function MarkedPicture({ src, clues, picked = null }: { src: string; clue
       {marksOf(clues).map(({ box, clues: numbers }) => {
         const { left, top, right, bottom } = box
         const onRight = corner(box)
-        return (
-          <span
-            key={`${numbers.join('-')}-${left}-${top}`}
-            className={picked !== null && numbers.includes(picked) ? 'picture-box is-picked' : 'picture-box'}
-            style={{ left: `${left / 10}%`, top: `${top / 10}%`, width: `${(right - left) / 10}%`, height: `${(bottom - top) / 10}%` }}
-            aria-hidden="true"
+        const className = numbers.some((n) => standOut.includes(n)) ? 'picture-box is-picked' : 'picture-box'
+        const style = { left: `${left / 10}%`, top: `${top / 10}%`, width: `${(right - left) / 10}%`, height: `${(bottom - top) / 10}%` }
+        // One circle per clue, side by side, when a box marks more than one
+        const circles = (
+          <span className={onRight ? 'picture-box-numbers on-right' : 'picture-box-numbers'}>
+            {numbers.map((n) => (
+              <span key={n} className="picture-box-number">
+                {n + 1}
+              </span>
+            ))}
+          </span>
+        )
+        const key = `${numbers.join('-')}-${left}-${top}`
+        return onPick ? (
+          <button
+            key={key}
+            className={className}
+            style={style}
+            type="button"
+            aria-label={`Clue ${numbers.map((n) => n + 1).join(' and ')}: ${numbers.map((n) => clues[n].label).join(', ')}`}
+            onClick={() => onPick(numbers)}
           >
-            <span className={onRight ? 'picture-box-number on-right' : 'picture-box-number'}>{numbers.map((n) => n + 1).join(' ')}</span>
+            {circles}
+          </button>
+        ) : (
+          <span key={key} className={className} style={style} aria-hidden="true">
+            {circles}
           </span>
         )
       })}
@@ -183,11 +202,15 @@ export function MarkedPicture({ src, clues, picked = null }: { src: string; clue
 }
 
 // The picture with its boxes, and a button (or a tap on the picture) to see it
-// big: full screen, with the same boxes, to look closely at small writing.
+// big: full screen, with the same boxes, to look closely at small writing. There,
+// tapping a box shows its clues in a card at the bottom.
 export function ZoomablePicture({ src, clues, picked = null }: { src: string; clues: Clue[]; picked?: number | null }) {
   const dialog = useRef<HTMLDialogElement>(null)
+  // The clues of the box tapped in the big picture
+  const [shown, setShown] = useState<number[] | null>(null)
   const open = () => dialog.current?.showModal()
   const close = () => dialog.current?.close()
+  const pick = (numbers: number[]) => setShown(shown?.join() === numbers.join() ? null : numbers)
   return (
     <div className="zoomable">
       <button className="zoomable-picture" type="button" onClick={open} aria-label="Make the picture bigger">
@@ -197,11 +220,30 @@ export function ZoomablePicture({ src, clues, picked = null }: { src: string; cl
         <ZoomIcon />
       </button>
       {/* Tapping outside the picture closes it too; Esc closes it (the dialog does that) */}
-      <dialog ref={dialog} className="picture-zoom" aria-label="The picture, bigger" onClick={(e) => e.target === e.currentTarget && close()}>
+      <dialog
+        ref={dialog}
+        className="picture-zoom"
+        aria-label="The picture, bigger"
+        onClick={(e) => e.target === e.currentTarget && close()}
+        onClose={() => setShown(null)}
+      >
         <button className="zoom-close" type="button" onClick={close} aria-label="Close the big picture" autoFocus>
           <CloseIcon />
         </button>
-        <MarkedPicture src={src} clues={clues} picked={picked} />
+        <MarkedPicture src={src} clues={clues} picked={shown} onPick={pick} />
+        {shown && (
+          <ul className="zoom-card" aria-live="polite">
+            {shown.map((n) => (
+              <li key={n}>
+                <span className="picture-box-number">{n + 1}</span>
+                <span>
+                  <strong>{clues[n].label}</strong>
+                  <span>{clues[n].reason}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </dialog>
     </div>
   )
