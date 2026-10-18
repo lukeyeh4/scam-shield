@@ -8,7 +8,10 @@ export type Risk = 'high' | 'medium' | 'none'
 // A box on a picture, from 0 to 1000 across and down
 export type Box = { left: number; top: number; right: number; bottom: number }
 
-export type Clue = { label: string; reason: string; highlight?: string; boxes?: Box[] }
+// `why`: what Shield Buddy says when a kid taps "Why?" on the clue: a few short,
+// scripted lines that end with a grown-up (Result.tsx; without it, Buddy says the
+// reason)
+export type Clue = { label: string; reason: string; highlight?: string; boxes?: Box[]; why?: string[] }
 
 // `good`: facts in its favour (e.g. "This is the real Roblox website"), shown only
 // when there are no clues. Never "safe": a check can miss things.

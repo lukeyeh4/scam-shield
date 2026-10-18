@@ -29,6 +29,18 @@ describe('pictureResult', () => {
     }
   })
 
+  it('has Shield Buddy explain every sign and link in a few short lines, sending the kid to a grown-up', async () => {
+    const result = await pictureResult(
+      facts({ signs: SIGNS.map((s) => sign(s)), links: [link('rbx-free-robux.xyz'), link('rainbet.com'), link('games-unblocked-4u.top')] }),
+      noServer,
+    )
+    expect(result.clues).toHaveLength(SIGNS.length + 3)
+    for (const clue of result.clues) {
+      expect(clue.why?.length, clue.label).toBeGreaterThanOrEqual(2)
+      expect(clue.why!.join(' '), clue.label).toContain('grown-up')
+    }
+  })
+
   it('calls a picture with strong signs a scam, with a box for each', async () => {
     const result = await pictureResult(
       facts({ signs: [sign('pretends to be family or a friend'), sign('asks for money, gift cards or card details'), sign('rushes you')] }),

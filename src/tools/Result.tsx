@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { Buddy } from '../buddy/Buddy'
 import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
 import { ChevronIcon, CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
@@ -42,6 +43,12 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
   // A clue tapped in the list: its reason shows, and its boxes on a picture stand
   // out (tap again to close)
   const [picked, setPicked] = useState<number | null>(null)
+  // The clue the kid asked Shield Buddy about
+  const [asked, setAsked] = useState<number | null>(null)
+  const pick = (i: number) => {
+    setPicked(picked === i ? null : i)
+    setAsked(null)
+  }
   const practice = actions !== undefined
   // Back in the chat, Buddy talks about what this check found
   useEffect(() => {
@@ -79,11 +86,22 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
               // Just the clue's name; tapping it opens why (and makes its boxes on
               // a picture stand out)
               <li key={c.label} className={picked === i ? 'result-clue is-open' : 'result-clue'}>
-                <button className="result-clue-button" type="button" aria-expanded={picked === i} onClick={() => setPicked(picked === i ? null : i)}>
+                <button className="result-clue-button" type="button" aria-expanded={picked === i} onClick={() => pick(i)}>
                   <strong>{c.label}</strong>
                   <ChevronIcon className="result-clue-arrow" />
                 </button>
                 {picked === i && <p className="result-clue-reason">{c.reason}</p>}
+                {/* Not sure why? Shield Buddy explains, in its scripted lines */}
+                {picked === i &&
+                  (asked === i ? (
+                    <div className="result-why">
+                      <Buddy key={i} mood="thinking" messages={c.why ?? [c.reason, "If you're still not sure, ask a grown-up."]} />
+                    </div>
+                  ) : (
+                    <button className="result-why-button" type="button" onClick={() => setAsked(i)}>
+                      Why? Ask Shield Buddy
+                    </button>
+                  ))}
               </li>
             ))}
           </ol>

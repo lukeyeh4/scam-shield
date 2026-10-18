@@ -612,6 +612,41 @@ button.picture-box {
     inset 0 0 0 2px #f5b700;
 }
 
+/* "Why? Ask Shield Buddy" under an open clue's reason, then Buddy explaining:
+   a smaller Buddy, with bubbles in the background cream so they show on the card */
+.result-why-button {
+  grid-column: 2;
+  justify-self: start;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.result-why {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.result-why .buddy-image {
+  width: 96px;
+  height: 96px;
+  margin: -10px -8px 1em;
+}
+
+.result-why .buddy-messages {
+  padding-top: 0.5em;
+  mask-image: none;
+}
+
+.result-why .buddy-bubble {
+  background: var(--bg);
+  box-shadow: none;
+}
+
 /* The clues of a box tapped in the big picture, in a card at the bottom */
 .zoom-card {
   position: fixed;

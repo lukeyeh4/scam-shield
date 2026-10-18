@@ -13,23 +13,82 @@ import type { PictureFacts, Sign } from './pictureSigns'
 
 const SERVER: string | undefined = import.meta.env.VITE_LINK_SERVER
 
-// What each warning sign is called, and why it matters, in one short line. Strong
+// What each warning sign is called, and why it matters in one short line, and what
+// Shield Buddy says if the kid asks why (scripted, ending with a grown-up). Strong
 // signs make it "This looks like a scam"; the others "Be careful".
-const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean }> = {
-  'asks for a password or login code': { label: 'Asks for a password or code', reason: 'Real companies and friends never ask for these.', strong: true },
-  'asks for money, gift cards or card details': { label: 'Asks for money or gift cards', reason: 'Once you send it, the money is gone.', strong: true },
-  'asks for personal details': { label: 'Asks about you', reason: 'Keep where you live and your school private.', strong: true },
-  'asks for photos or videos of you': { label: 'Asks for photos of you', reason: 'Never send photos of yourself.', strong: true },
-  'free prize or free game money': { label: 'Free prizes', reason: 'Free stuff from strangers is a common trick.', strong: true },
-  // Only "Be careful" on its own: real people share sad stories too. With a push to
-  // pay (money, rushing, a trick link) the other signs make it red.
-  'sad story to get you to buy or give money': { label: 'A sad story to make you pay', reason: 'Sad stories are used to make you buy fast.', strong: false },
-  'pretends to be a company, game or famous person': { label: 'Pretending to be someone', reason: 'It might not really be them.', strong: true },
-  'pretends to be family or a friend': { label: 'Maybe not who they say', reason: "Something's different, like a new number.", strong: true },
-  'rushes you': { label: 'Rushing you', reason: "Hurrying stops you from thinking.", strong: false },
-  'threatens you': { label: 'Trying to scare you', reason: "It's not your fault.", strong: true },
-  'asks you to move to another app or keep a secret': { label: 'Asks for a secret', reason: "Safe people don't ask you to keep secrets.", strong: true },
-  'wants you to download something': { label: 'Wants a download', reason: 'It could put a bad app on your device.', strong: true },
+const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean; why: string[] }> = {
+  'asks for a password or login code': {
+    label: 'Asks for a password or code',
+    reason: 'Real companies and friends never ask for these.',
+    strong: true,
+    why: ['A password is like the key to your house.', 'With it, someone can get into your account and take your things.', "Never share it. Ask a grown-up if you're not sure."],
+  },
+  'asks for money, gift cards or card details': {
+    label: 'Asks for money or gift cards',
+    reason: 'Once you send it, the money is gone.',
+    strong: true,
+    why: ['Gift card codes are just like cash.', "Once you send one, you can't get it back. That's why scammers ask for them.", 'Ask a grown-up first.'],
+  },
+  'asks for personal details': {
+    label: 'Asks about you',
+    reason: 'Keep where you live and your school private.',
+    strong: true,
+    why: ['Your address and school tell a stranger where to find you.', 'Keep them private, and tell a grown-up if someone asks.'],
+  },
+  'asks for photos or videos of you': {
+    label: 'Asks for photos of you',
+    reason: 'Never send photos of yourself.',
+    strong: true,
+    why: ['Someone asking for photos of you is not OK.', "You haven't done anything wrong.", 'Show a grown-up you trust right away.'],
+  },
+  'free prize or free game money': {
+    label: 'Free prizes',
+    reason: 'Free stuff from strangers is a common trick.',
+    strong: true,
+    why: ["Nobody gives free Robux or prizes to people they don't know.", "It's bait, like a worm on a fishing hook.", "Ask a grown-up if you're not sure."],
+  },
+  'sad story to get you to buy or give money': {
+    label: 'A sad story to make you pay',
+    reason: 'Sad stories are used to make you buy fast.',
+    strong: false,
+    why: ['Sad stories make us want to help. That shows you are kind!', 'But scammers use them to make people buy without thinking.', 'Ask a grown-up before buying anything.'],
+  },
+  'pretends to be a company, game or famous person': {
+    label: 'Pretending to be someone',
+    reason: 'It might not really be them.',
+    strong: true,
+    why: ['Anyone can use a famous name or logo.', "That doesn't make it real.", 'A grown-up can help you check.'],
+  },
+  'pretends to be family or a friend': {
+    label: 'Maybe not who they say',
+    reason: "Something's different, like a new number.",
+    strong: true,
+    why: ["Scammers say things like 'Hi Mum, new number' to sound like family.", 'A grown-up can call the real person to check.'],
+  },
+  'rushes you': {
+    label: 'Rushing you',
+    reason: 'Hurrying stops you from thinking.',
+    strong: false,
+    why: ["When you hurry, you don't have time to think.", 'Real offers can wait.', 'Take a breath and ask a grown-up.'],
+  },
+  'threatens you': {
+    label: 'Trying to scare you',
+    reason: "It's not your fault.",
+    strong: true,
+    why: ['People who scare you want you to act before you think.', "It's not your fault.", 'Show a grown-up right away.'],
+  },
+  'asks you to move to another app or keep a secret': {
+    label: 'Asks for a secret',
+    reason: "Safe people don't ask you to keep secrets.",
+    strong: true,
+    why: ['Asking you to keep a secret, or to talk in another app, is a big warning sign.', "Safe people don't mind grown-ups knowing.", 'Tell a grown-up.'],
+  },
+  'wants you to download something': {
+    label: 'Wants a download',
+    reason: 'It could put a bad app on your device.',
+    strong: true,
+    why: ['Downloads from strangers can hide bad apps.', 'They can spy on you or break your device.', 'Ask a grown-up first.'],
+  },
 }
 
 // The most links in a picture to look up (each one is a server check)
@@ -83,8 +142,8 @@ export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpL
   const bySign = new Map<Sign, Box[]>()
   for (const { sign, box } of facts.signs) bySign.set(sign, [...(bySign.get(sign) ?? []), box])
   const clues: Clue[] = [...bySign].map(([sign, boxes]) => {
-    const { label, reason } = SIGN_WORDS[sign]
-    return { label, reason, boxes }
+    const { label, reason, why } = SIGN_WORDS[sign]
+    return { label, reason, why, boxes }
   })
   let strong = [...bySign.keys()].some((sign) => SIGN_WORDS[sign].strong)
 
@@ -104,6 +163,11 @@ export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpL
     clues.push({
       label: scam ? 'A trick link' : link.notForKids ? 'A link not for kids' : 'A link to be careful with',
       reason: `${link.clues[0].label}: ${link.site}`,
+      why: scam
+        ? ['Links can look real but take you somewhere else.', `This one goes to ${link.site}. ${link.clues[0].reason}`, "Don't tap it. Show a grown-up."]
+        : link.notForKids
+          ? [`That link goes to ${link.site}, a website made for grown-ups.`, "Don't open it. Show a grown-up."]
+          : ['Something about that link looks odd.', link.clues[0].reason, 'Ask a grown-up before you tap it.'],
       boxes: [box],
     })
     strong ||= scam
