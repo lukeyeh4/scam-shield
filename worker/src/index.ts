@@ -143,6 +143,23 @@ async function exists(host: string) {
   return data.Status !== 3
 }
 
+// Whether Cloudflare's family filter blocks the website for adult content: it
+// answers 0.0.0.0 for adult and dangerous websites, and its security-only twin
+// for dangerous ones alone, so blocked by the first but not the second is adult
+async function isAdult(host: string) {
+  const blocked = async (filter: string) => {
+    const res = await fetch(`https://${filter}.cloudflare-dns.com/dns-query?name=${encodeURIComponent(host)}&type=A`, {
+      headers: { ...headers, accept: 'application/dns-json' },
+      signal: timeout(3000),
+    })
+    if (!res.ok) throw new Error()
+    const data = (await res.json()) as { Answer?: { data: string }[] }
+    return Boolean(data.Answer?.some((a) => a.data === '0.0.0.0'))
+  }
+  const [family, security] = await Promise.all([blocked('family'), blocked('security')])
+  return family && !security
+}
+
 // Any lookup that fails or is slow just leaves its fact out
 const settle = <T>(p: Promise<T>, fallback: T) => p.catch(() => fallback)
 
@@ -150,12 +167,13 @@ async function lookUp(url: string, env: Env): Promise<LinkFacts> {
   const { hops, warns } = await followShortLinks(url)
   const finalUrl = hops[hops.length - 1]
   const host = hostOf(finalUrl)
-  const [listed, made, found] = await Promise.all([
+  const [listed, made, found, adult] = await Promise.all([
     settle(safeBrowsing(hops, env.SAFE_BROWSING_KEY), []),
     isIp(host) ? null : settle(created(siteOf(host)), null),
     isIp(host) ? true : settle(exists(host), null),
+    isIp(host) ? false : settle(isAdult(host), false),
   ])
-  const facts: LinkFacts = { finalUrl, shortenerWarns: warns, listed, created: made, exists: found, page: null }
+  const facts: LinkFacts = { finalUrl, shortenerWarns: warns, listed, created: made, exists: found, page: null, adult }
 
   // Nothing strong found so far (only small clues, like a free website maker or
   // http), and not a real brand's own website or a known betting website: read the page
@@ -164,7 +182,8 @@ async function lookUp(url: string, env: Env): Promise<LinkFacts> {
     device !== null &&
     device.risk !== 'high' &&
     !device.good?.length &&
-    !device.clues.some((c) => c.label === 'A betting website') &&
+    !device.clues.some((c) => c.label === 'A betting website' || c.label === 'Not for kids') &&
+    !adult &&
     !listed.length &&
     !warns &&
     found !== false &&

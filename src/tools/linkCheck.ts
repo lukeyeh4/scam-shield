@@ -46,8 +46,18 @@ const GAMBLING_SITES = new Set([
   'rainbet.com', 'stake.com', 'stake.us', 'roobet.com', 'rollbit.com', 'gamdom.com', 'duelbits.com', 'shuffle.com',
   'bc.game', 'bloxflip.com', 'rbxflip.com', 'csgoroll.com', 'csgoempire.com', 'hellcase.com', 'key-drop.com', 'clash.gg',
   'chumbacasino.com', 'luckylandslots.com', 'pulsz.com', 'mcluck.com', 'wowvegas.com', 'draftkings.com', 'fanduel.com',
-  'pokerstars.com',
+  'pokerstars.com', 'kalshi.com', 'polymarket.com',
 ])
+
+// Adult websites, and endings only for them. The server asks a family filter
+// about every other website (worker/src/index.ts), so this list only has to
+// cover the best-known ones, and works before a grown-up finishes setup.
+const ADULT_SITES = new Set([
+  'pornhub.com', 'xvideos.com', 'xnxx.com', 'xhamster.com', 'redtube.com', 'youporn.com', 'tube8.com', 'spankbang.com',
+  'eporner.com', 'beeg.com', 'motherless.com', 'brazzers.com', 'onlyfans.com', 'fansly.com', 'chaturbate.com',
+  'stripchat.com', 'livejasmin.com', 'bongacams.com', 'cam4.com', 'rule34.xxx', 'nhentai.net', 'e-hentai.org',
+])
+const ADULT_ENDINGS = new Set(['xxx', 'porn', 'sex', 'adult'])
 
 // Words scam links use to tempt kids, after the website's name (like /free-robux)
 const BAIT_WORDS = ['free', 'giveaway', 'claim', 'prize', 'winner', 'gift', 'reward', 'robux', 'vbucks', 'verify', 'unlock']
@@ -338,6 +348,14 @@ function checkOne(typed: string): LinkCheck | null {
     others.push({
       label: 'A betting website',
       reason: `${site} is a website for betting money or items. It isn't meant for kids.`,
+      highlight: inText(typed, typedHost),
+    })
+  }
+
+  if (ADULT_SITES.has(site) || ADULT_ENDINGS.has(ending)) {
+    others.push({
+      label: 'Not for kids',
+      reason: "This website has things that aren't meant for kids. Don't open it. Show a grown-up.",
       highlight: inText(typed, typedHost),
     })
   }

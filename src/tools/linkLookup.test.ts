@@ -134,6 +134,13 @@ describe('withFacts', () => {
     expect(labels(result)).toEqual(['A betting website'])
   })
 
+  it('says not for kids when the family filter blocks a website, once', () => {
+    const result = withFacts(check('example-games.com'), facts('example-games.com', { adult: true }), NOW)
+    expect(result).toMatchObject({ risk: 'medium', clues: [{ label: 'Not for kids' }] })
+    const known = withFacts(check('pornhub.com'), facts('pornhub.com', { adult: true, page: page({ adult: true }) }), NOW)
+    expect(labels(known)).toEqual(['Not for kids'])
+  })
+
   it("says be careful when the website wouldn't let us look at its page", () => {
     const result = withFacts(check('example-games.com'), facts('example-games.com', { pageBlocked: true }), NOW)
     expect(result).toMatchObject({ risk: 'medium', clues: [{ label: "Couldn't look inside" }] })

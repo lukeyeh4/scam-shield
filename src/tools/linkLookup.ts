@@ -34,6 +34,8 @@ export type LinkFacts = {
   // The website wouldn't let the server read its page (it turns away anything
   // that isn't a person's browser), so nobody could check what's on it
   pageBlocked?: boolean
+  // A family filter blocks the website for adult content (not for being dangerous)
+  adult?: boolean
 }
 
 export type PageFacts = {
@@ -240,9 +242,16 @@ export function withFacts(check: LinkCheck, facts: LinkFacts | null, now = Date.
     if (page.gambling && !clues.some((c) => c.label === 'A betting website')) {
       others.push({ label: 'A betting website', reason: "This page is about betting money or items. It isn't meant for kids." })
     }
-    if (page.adult) {
+    if (page.adult && !facts.adult && !clues.some((c) => c.label === 'Not for kids')) {
       others.push({ label: 'Not for kids', reason: "This page has things that aren't meant for kids." })
     }
+  }
+
+  if (facts.adult && !clues.some((c) => c.label === 'Not for kids')) {
+    others.push({
+      label: 'Not for kids',
+      reason: "This website has things that aren't meant for kids. Don't open it. Show a grown-up.",
+    })
   }
 
   if (facts.pageBlocked) {

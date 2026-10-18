@@ -301,7 +301,11 @@ describe('checkLink', () => {
     expect(checkLink('rbxgiveaway.com')).toMatchObject({ risk: 'medium', clues: [{ label: 'Words that tempt you', highlight: 'giveaway' }] })
   })
 
-  it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com'])('says be careful about a betting website: %s', (link) => {
+  it.each(['pornhub.com', 'https://www.xvideos.com/video123', 'onlyfans.com', 'anything.xxx', 'example.porn'])('says an adult website is not for kids: %s', (link) => {
+    expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'Not for kids' }] })
+  })
+
+  it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com', 'kalshi.com'])('says be careful about a betting website: %s', (link) => {
     expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'A betting website' }] })
   })
 })
