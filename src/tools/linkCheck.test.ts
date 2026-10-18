@@ -319,7 +319,7 @@ describe('checkLink', () => {
     },
   )
 
-  it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com', 'kalshi.com'])('says be careful about a betting website: %s', (link) => {
+  it.each(['rainbet.com', 'https://www.stake.us/casino', 'bc.game', 'bloxflip.com', 'kalshi.com', 'polymarket.us', 'stake.bet', 'luckycasino.net'])('says be careful about a betting website: %s', (link) => {
     expect(checkLink(link)).toMatchObject({ risk: 'medium', clues: [{ label: 'A betting website' }] })
   })
 })

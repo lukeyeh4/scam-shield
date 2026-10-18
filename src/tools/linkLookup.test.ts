@@ -141,6 +141,17 @@ describe('withFacts', () => {
     expect(labels(known)).toEqual(['Not for kids'])
   })
 
+  it("treats a website a safety filter blocks as dangerous, with no good sign from Google", () => {
+    const result = withFacts(check('example-games.com'), facts('example-games.com', { dangerous: true, pageBlocked: true }), NOW)
+    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'On a list of dangerous websites' }] })
+    expect(result.good).not.toContain("Google hasn't marked it as dangerous yet.")
+  })
+
+  it('says what Claude knows about a website whose page was blocked, instead of only that it was blocked', () => {
+    const result = withFacts(check('example-games.com'), facts('example-games.com', { pageBlocked: true, page: page({ adult: true }) }), NOW)
+    expect(labels(result)).toEqual(['Not for kids'])
+  })
+
   it("says be careful when the website wouldn't let us look at its page", () => {
     const result = withFacts(check('example-games.com'), facts('example-games.com', { pageBlocked: true }), NOW)
     expect(result).toMatchObject({ risk: 'medium', clues: [{ label: "Couldn't look inside" }] })

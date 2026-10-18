@@ -1,7 +1,7 @@
 import { checkLink, SHORTENERS, siteOf } from '../../src/tools/linkCheck'
 import type { LinkFacts } from '../../src/tools/linkLookup'
 import { answerKid, readEntries } from './ask'
-import { judgePage, readPage } from './page'
+import { judgeName, judgePage, readPage } from './page'
 import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, savedSpeech } from './speak'
 
 // The link checker's server (a Cloudflare Worker): looks a link up in places the
@@ -143,10 +143,12 @@ async function exists(host: string) {
   return data.Status !== 3
 }
 
-// Whether Cloudflare's family filter blocks the website for adult content: it
-// answers 0.0.0.0 for adult and dangerous websites, and its security-only twin
-// for dangerous ones alone, so blocked by the first but not the second is adult
-async function isAdult(host: string) {
+// What Cloudflare's filters say about the website. They answer 0.0.0.0 for
+// websites they block: the family one blocks adult and dangerous websites, the
+// security-only one dangerous ones alone. So blocked by the security one means
+// dangerous (malware or phishing, whatever else it is), and blocked only by the
+// family one means adult.
+async function filterSays(host: string): Promise<'dangerous' | 'adult' | null> {
   const blocked = async (filter: string) => {
     const res = await fetch(`https://${filter}.cloudflare-dns.com/dns-query?name=${encodeURIComponent(host)}&type=A`, {
       headers: { ...headers, accept: 'application/dns-json' },
@@ -157,7 +159,7 @@ async function isAdult(host: string) {
     return Boolean(data.Answer?.some((a) => a.data === '0.0.0.0'))
   }
   const [family, security] = await Promise.all([blocked('family'), blocked('security')])
-  return family && !security
+  return security ? 'dangerous' : family ? 'adult' : null
 }
 
 // Any lookup that fails or is slow just leaves its fact out
@@ -167,13 +169,16 @@ async function lookUp(url: string, env: Env): Promise<LinkFacts> {
   const { hops, warns } = await followShortLinks(url)
   const finalUrl = hops[hops.length - 1]
   const host = hostOf(finalUrl)
-  const [listed, made, found, adult] = await Promise.all([
+  const [listed, made, found, filter] = await Promise.all([
     settle(safeBrowsing(hops, env.SAFE_BROWSING_KEY), []),
     isIp(host) ? null : settle(created(siteOf(host)), null),
     isIp(host) ? true : settle(exists(host), null),
-    isIp(host) ? false : settle(isAdult(host), false),
+    isIp(host) ? null : settle(filterSays(host), null),
   ])
-  const facts: LinkFacts = { finalUrl, shortenerWarns: warns, listed, created: made, exists: found, page: null, adult }
+  const facts: LinkFacts = {
+    finalUrl, shortenerWarns: warns, listed, created: made, exists: found, page: null,
+    adult: filter === 'adult', dangerous: filter === 'dangerous',
+  }
 
   // Nothing strong found so far (only small clues, like a free website maker or
   // http), and not a real brand's own website or a known betting website: read the page
@@ -183,7 +188,7 @@ async function lookUp(url: string, env: Env): Promise<LinkFacts> {
     device.risk !== 'high' &&
     !device.good?.length &&
     !device.clues.some((c) => c.label === 'A betting website' || c.label === 'Not for kids') &&
-    !adult &&
+    !filter &&
     !listed.length &&
     !warns &&
     found !== false &&
@@ -191,8 +196,13 @@ async function lookUp(url: string, env: Env): Promise<LinkFacts> {
   if (nothingFound && env.ANTHROPIC_API_KEY) {
     const page = await settle(readPage(finalUrl, headers), null)
     if (page === 'blocked') facts.pageBlocked = true
-    else if (page && (page.text || page.passwordBoxes || page.cardBoxes)) {
+    if (page && page !== 'blocked' && (page.text || page.passwordBoxes || page.cardBoxes)) {
       facts.page = await settle(judgePage(page, env.ANTHROPIC_API_KEY), null)
+    } else {
+      // Blocked, empty or not a web page: judge the website by its address. If
+      // Claude knows the website, nobody needs to look inside it
+      facts.page = await settle(judgeName(finalUrl, env.ANTHROPIC_API_KEY), null)
+      if (facts.page) facts.pageBlocked = false
     }
   }
   return facts

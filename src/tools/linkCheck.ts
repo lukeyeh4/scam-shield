@@ -39,15 +39,19 @@ const FREE_HOSTS = new Set([
   'myshopify.com', 'azurewebsites.net', 'ngrok-free.app', 'ngrok.io', 'backblazeb2.com', 'appspot.com',
 ])
 
-// Betting websites kids meet: crypto casinos, Robux and skin gambling, and the
-// casinos and sports betting they see ads for. Many block the server from reading
-// their page, so they're known here. Not a scam, but not for kids: only "Be careful".
-const GAMBLING_SITES = new Set([
-  'rainbet.com', 'stake.com', 'stake.us', 'roobet.com', 'rollbit.com', 'gamdom.com', 'duelbits.com', 'shuffle.com',
-  'bc.game', 'bloxflip.com', 'rbxflip.com', 'csgoroll.com', 'csgoempire.com', 'hellcase.com', 'key-drop.com', 'clash.gg',
-  'chumbacasino.com', 'luckylandslots.com', 'pulsz.com', 'mcluck.com', 'wowvegas.com', 'draftkings.com', 'fanduel.com',
-  'pokerstars.com', 'kalshi.com', 'polymarket.com',
+// Betting websites kids meet: crypto casinos, Robux and skin gambling, prediction
+// markets, and the casinos and sports betting they see ads for. Many block the
+// server from reading their page, so they're known here. Not a scam, but not for
+// kids: only "Be careful". Names count with any ending (polymarket.us, stake.us);
+// names that are everyday words count only as the exact website (shuffle.com).
+const GAMBLING_NAMES = new Set([
+  'rainbet', 'stake', 'roobet', 'rollbit', 'gamdom', 'duelbits', 'bloxflip', 'rbxflip', 'csgoroll', 'csgoempire', 'hellcase',
+  'key-drop', 'chumbacasino', 'luckylandslots', 'pulsz', 'mcluck', 'wowvegas', 'draftkings', 'fanduel', 'pokerstars',
+  'kalshi', 'polymarket', 'bet365', 'betway', '1xbet', 'betmgm', 'bovada', 'betfair', 'stake-us',
 ])
+const GAMBLING_SITES = new Set(['shuffle.com', 'bc.game', 'clash.gg'])
+// Words in a website's name that only betting websites use (luckycasino.net)
+const GAMBLING_WORDS = ['casino', 'poker', 'sportsbook', 'roulette', 'blackjack', 'betting']
 
 // Adult websites, and endings only for them. The server asks a family filter
 // about every other website (worker/src/index.ts), so this list only has to
@@ -360,7 +364,11 @@ function checkOne(typed: string): LinkCheck | null {
     })
   }
 
-  if (GAMBLING_SITES.has(site)) {
+  if (
+    !isIp &&
+    !official &&
+    (GAMBLING_SITES.has(site) || GAMBLING_NAMES.has(address.name) || GAMBLING_WORDS.some((w) => skeleton(address.name).includes(w)))
+  ) {
     others.push({
       label: 'A betting website',
       reason: `${site} is a website for betting money or items. It isn't meant for kids.`,

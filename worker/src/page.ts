@@ -181,3 +181,38 @@ export async function judgePage(page: Page, apiKey: string): Promise<PageFacts |
   // So is a known pop-up ad network in its code
   return { ...answers, asksFor: [...asksFor], trickyAds: answers.trickyAds || page.popupAds.length > 0 }
 }
+
+// When the page can't be read (it turns us away, or it's built by code after
+// loading and comes back empty), Claude judges the website by its address alone,
+// from what it already knows about it: recu.me is a well-known adult website even
+// when it blocks us. Only the address is sent, so it costs a fraction of a page.
+const NameAnswers = z.object({
+  known: z.boolean().describe('You know this exact website (not just a similar name)'),
+  gambling: Answers.shape.gambling,
+  adult: z
+    .boolean()
+    .describe('A website for pornography, nudity, sexual content, adult cams, recordings of cam shows, or dating and hookups'),
+  freeStreams: Answers.shape.freeStreams,
+})
+
+const NAME_SYSTEM = `You check websites for a safety app used by children aged 8 to 12.
+The page couldn't be read, so you only get its address. Answer from what you already know about this exact website.
+Answer true only for what you know this website is for. If you don't recognise the website, set known to false and everything else to false; never guess from a name alone.`
+
+export async function judgeName(url: string, apiKey: string): Promise<PageFacts | null> {
+  const client = new Anthropic({ apiKey, timeout: 5000, maxRetries: 1 })
+  const response = await client.messages.parse({
+    model: MODEL,
+    max_tokens: 500,
+    system: NAME_SYSTEM,
+    output_config: { effort: 'low', format: zodOutputFormat(NameAnswers) },
+    messages: [{ role: 'user', content: `Address: ${new URL(url).hostname}` }],
+  })
+  const answers = response.parsed_output
+  if (!answers?.known) return null
+  const { gambling, adult, freeStreams } = answers
+  return {
+    copiesBrand: null, asksFor: [], freePrize: false, unbelievableDeal: false, download: false, trickyAds: false, rushesYou: false,
+    gambling, adult, freeStreams,
+  }
+}

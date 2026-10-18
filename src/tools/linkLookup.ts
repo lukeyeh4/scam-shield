@@ -36,6 +36,8 @@ export type LinkFacts = {
   pageBlocked?: boolean
   // A family filter blocks the website for adult content (not for being dangerous)
   adult?: boolean
+  // A safety filter (Cloudflare's) blocks the website as dangerous: malware or phishing
+  dangerous?: boolean
 }
 
 export type PageFacts = {
@@ -108,6 +110,14 @@ export function withFacts(check: LinkCheck, facts: LinkFacts | null, now = Date.
       reason: harmsDevice
         ? 'Google checks millions of websites, and it lists this one as dangerous: it can put bad apps on your device.'
         : 'Google checks millions of websites, and it lists this one as dangerous: it tricks people into giving away things like passwords.',
+    })
+  }
+
+  // (Google's list says it already)
+  if (facts.dangerous && !facts.listed.length) {
+    strong.push({
+      label: 'On a list of dangerous websites',
+      reason: 'A safety filter that checks millions of websites blocks this one as dangerous: it can harm your device or trick you.',
     })
   }
 
@@ -254,7 +264,8 @@ export function withFacts(check: LinkCheck, facts: LinkFacts | null, now = Date.
     })
   }
 
-  if (facts.pageBlocked) {
+  // (only when nothing else was found about it)
+  if (facts.pageBlocked && !strong.length && !others.length) {
     others.push({
       label: "Couldn't look inside",
       reason: "This website wouldn't let us look at its page, so we can't tell what's on it. Show a grown-up before you open it.",
@@ -265,7 +276,7 @@ export function withFacts(check: LinkCheck, facts: LinkFacts | null, now = Date.
   const good = [...(check.good ?? [])]
   if (final && cleanShortLink) good.push(`This short link goes to ${final.site}.`, ...(final.good ?? []))
   // (Only a small sign: Google can miss websites, especially new ones)
-  if (!facts.listed.length) good.push("Google hasn't marked it as dangerous yet.")
+  if (!facts.listed.length && !facts.dangerous) good.push("Google hasn't marked it as dangerous yet.")
   if (facts.created) {
     const years = Math.floor((now - Date.parse(facts.created)) / DAY / 365)
     if (years >= 1) good.push(`This website has been around for ${years === 1 ? '1 year' : `${years} years`}.`)
