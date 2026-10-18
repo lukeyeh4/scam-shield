@@ -20,7 +20,9 @@ function reachable() {
 
 describe('chat script', () => {
   it('can reach every step from the start, by typing, or by coming back from a check', () => {
-    expect([...new Set([...reachable(), ...TYPED_STEPS, ...Object.values(BACK_AFTER)])].sort()).toEqual([...ids].sort())
+    // (and 'askAbout', from "Ask Buddy about this" on a check's result)
+    const fromAskAbout = [...STEPS.askAbout.options.flatMap((o) => (o.next ? [o.next] : [])), 'askAbout' as StepId]
+    expect([...new Set([...reachable(), ...TYPED_STEPS, ...Object.values(BACK_AFTER), ...fromAskAbout])].sort()).toEqual([...ids].sort())
   })
 
   it('lets a kid go back after picking a checker by mistake', () => {
@@ -30,6 +32,14 @@ describe('chat script', () => {
     for (const id of ids) {
       const undo = STEPS[id].undo
       if (undo) expect(STEPS[undo].options.length, id).toBeGreaterThan(1)
+    }
+  })
+
+  it('tells a kid who already tapped, replied or sent something to tell a grown-up now, without blame', () => {
+    for (const id of ['alreadyTapped', 'alreadyReplied', 'alreadySent'] as const) {
+      const said = STEPS[id].buddy.join(' ')
+      expect(said, id).toContain('grown-up')
+      expect(said, id).toMatch(/not in trouble|not your fault|It's OK/)
     }
   })
 

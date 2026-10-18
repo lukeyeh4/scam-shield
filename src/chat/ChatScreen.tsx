@@ -21,7 +21,7 @@ import {
   type StepId,
   TOPIC_STEPS,
 } from './script'
-import { checkSinceChat, type Entry, forgetCheck, saveChat, savedChat } from './session'
+import { checkSinceChat, type Entry, forgetCheck, saveChat, savedChat, takeAskAbout } from './session'
 import './chat.css'
 
 // How Buddy's messages appear in the chat: 'dots' shows moving "typing" dots,
@@ -51,6 +51,22 @@ const ASKING: StepId[] = ['start', 'again', ...Object.values(BACK_AFTER)]
 // or asking what to check next (unless it just asked)
 function resume() {
   const chat = savedChat()
+  // "Ask Buddy about this" on a result: what Buddy found, then what to ask
+  const about = takeAskAbout()
+  if (about) {
+    const found =
+      about.length === 0
+        ? "I didn't find any clues in it."
+        : `I found ${about.length === 1 ? '1 clue' : `${about.length} clues`}: ${about.join(', ')}.`
+    const before = chat?.entries ?? []
+    return {
+      step: 'askAbout' as StepId,
+      entries: [...before, { from: 'buddy' as const, text: found, mood: STEPS.askAbout.mood }, ...buddyLines('askAbout')],
+      shown: before.length + 1,
+      typedLink: chat?.typedLink,
+      backTurns: chat?.backTurns ?? 0,
+    }
+  }
   if (!chat) return { step: 'start' as StepId, entries: buddyLines('start'), shown: 1, typedLink: undefined, backTurns: 0 }
   const risk = checkSinceChat()
   if (!risk && ASKING.includes(chat.step)) return { ...chat, shown: chat.entries.length }

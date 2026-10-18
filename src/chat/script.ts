@@ -32,6 +32,10 @@ export type StepId =
   | 'backCareful'
   | 'backNotForKids'
   | 'backUrgent'
+  | 'askAbout'
+  | 'alreadyTapped'
+  | 'alreadyReplied'
+  | 'alreadySent'
   | 'backClean'
 
 export type ChatIcon = 'picture' | 'link' | 'message' | 'question'
@@ -194,6 +198,41 @@ export const STEPS: Record<StepId, ChatStep> = {
     ],
     options: CHECKS,
   },
+  // "Ask Buddy about this" on a result: after Buddy says what it found (ChatScreen),
+  // what the kid wants to know: a question in the box, or what to do if they
+  // already did something
+  askAbout: {
+    mood: 'curious',
+    buddy: ['What do you want to know about it? Type a question, or tap one of these.'],
+    options: [
+      { label: 'I already tapped it', next: 'alreadyTapped' },
+      { label: 'I already replied', next: 'alreadyReplied' },
+      { label: 'I sent a code or money', next: 'alreadySent' },
+      { label: 'Check something else', next: 'again' },
+    ],
+    pointAtBox: true,
+  },
+  // Already did something: calm, no blame, what to do now, and a grown-up
+  alreadyTapped: {
+    mood: 'neutral',
+    buddy: ["It's OK, you're not in trouble.", "Close it, and don't type anything on that page.", 'Tell a grown-up now. They can check your device and your accounts.'],
+    options: [{ label: 'Check something else', next: 'again' }],
+  },
+  alreadyReplied: {
+    mood: 'neutral',
+    buddy: ["It's OK. Lots of people reply before they notice.", "Don't send anything else, and stop replying.", 'Show the messages to a grown-up now.'],
+    options: [{ label: 'Check something else', next: 'again' }],
+  },
+  alreadySent: {
+    mood: 'neutral',
+    buddy: [
+      "Thank you for telling me. It's not your fault.",
+      'Tell a grown-up right now. The sooner they know, the more they can do.',
+      'They can help change your password, or call the bank or the shop.',
+    ],
+    options: [{ label: 'Check something else', next: 'again' }],
+  },
+
   // Someone is threatening the child or asking for photos: calm, no blame, and a
   // grown-up right now
   backUrgent: {

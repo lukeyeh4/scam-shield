@@ -30,6 +30,8 @@ type ResultViewProps = {
   result: CheckResult
   onAgain?: () => void
   onDone?: () => void
+  // "Ask Buddy about this": the chat, knowing what this check found
+  onAskAbout?: () => void
   // Buttons to show instead of Check something else / I'm done, in the game's
   // "Check with Scam Shield" practice (which the chat doesn't hear about)
   actions?: ReactNode
@@ -38,7 +40,7 @@ type ResultViewProps = {
 // The result of any check: what was checked beside how risky it looks and what to
 // do, the clues (one card each, numbered to match the marks), good signs when
 // there are no clues, then the buttons
-export function ResultView({ subject, result, onAgain, onDone, actions }: ResultViewProps) {
+export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actions }: ResultViewProps) {
   const risk = result.urgent ? URGENT : result.notForKids ? NOT_FOR_KIDS : RISKS[result.risk]
   // A clue tapped in the list: its reason shows, and its boxes on a picture stand
   // out (tap again to close)
@@ -124,6 +126,11 @@ export function ResultView({ subject, result, onAgain, onDone, actions }: Result
               <button className="tool-button tool-button-main" type="button" onClick={onAgain}>
                 Check something else
               </button>
+              {onAskAbout && (
+                <button className="tool-button" type="button" onClick={onAskAbout}>
+                  Ask Buddy about this
+                </button>
+              )}
               <button className="tool-button" type="button" onClick={onDone}>
                 I'm done
               </button>

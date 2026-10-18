@@ -33,3 +33,15 @@ export const checkSinceChat = () => lastCheck
 export const forgetCheck = () => {
   lastCheck = null
 }
+
+// "Ask Buddy about this" on a check's result: the names of the clues it found, so
+// the chat can say what was found and ask what the kid wants to know (once)
+let askingAbout: string[] | null = null
+export const askAbout = (clues: string[]) => {
+  askingAbout = clues
+}
+export const takeAskAbout = () => {
+  const clues = askingAbout
+  askingAbout = null
+  return clues
+}

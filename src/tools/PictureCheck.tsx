@@ -1,5 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
+import { askAbout } from '../chat/session'
 import { useSetUp } from '../setup'
 import { type CheckResult, inPictureOrder } from './examples'
 import { contextFor, lookUpPicture, type Place, PLACES, pictureResult } from './pictureLookup'
@@ -259,6 +260,10 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
             )}
             result={shown}
             onAgain={onAsk}
+            onAskAbout={() => {
+              askAbout(shown.clues.map((c) => c.label))
+              onAsk()
+            }}
             onDone={onHome}
           />
         )}
