@@ -73,15 +73,15 @@ A friendly yellow shield with a face and little hands, who guides each scam in s
 
 ## Check a link
 
-Kids paste a link (or a whole message with a link in it) and see whether it looks like a scam, with each clue marked in the link and explained in kid words: what the trick is, and what the real website looks like. Results are soft red ("This looks like a scam"), yellow ("Be careful") or green ("No clues found", with good signs). It never says "safe", and always ends with "show a grown-up".
+Kids paste a link (or a whole message with a link in it) and see whether it looks like a scam, with each clue marked in the link and explained in kid words: what the trick is, and what the real website looks like. Results are soft red ("This looks like a scam"), yellow ("Be careful") or green ("No clues found", with good signs), with what to do right under the heading. Betting, adult and pirated streaming websites are red too, headed "This website isn't for kids", and by default only say that, not what's there (a grown-up can turn on "Say what kind of website it is"). It never says "safe", and always ends with "show a grown-up".
 
 It checks in three layers, and never opens the link on the kid's device:
 
-1. **The address, on the device (instant):** the real website is found with the Public Suffix List; then it looks for brand copies (rob1ox, ronlox, letters from other alphabets, roblox.com.evil.net), a real address hidden after an @ or in the path, free website makers, short links, cheap endings, tempting words and http. Fan websites of games get a gentler clue than copies of accounts and money services like PayPal.
-2. **Facts from our small server** (a Cloudflare Worker): Google Safe Browsing, how new the website is, whether it exists, and where a short link really goes (that address gets every check too).
-3. **Claude reads the page** (Claude Haiku 5.5), only when nothing strong was found: fixed yes/no questions, like "Does it copy a brand?", "Does it ask for a password?", "Free prizes?", "Free paid sports or shows?", "Pop-up ads?". The AI never writes what kids read and can't say a website is fine.
+1. **The address, on the device (instant):** the real website is found with the Public Suffix List; then it looks for brand copies (rob1ox, ronlox, letters from other alphabets, roblox.com.evil.net), a real address hidden after an @ or in the path, free website makers, short links, cheap endings, tempting words and http. Fan websites of games get a gentler clue than copies of accounts and money services like PayPal. Known betting and adult websites, and adult or betting words in a website's name, are caught here too, so they're flagged even before a grown-up finishes setup.
+2. **Facts from our small server** (a Cloudflare Worker): Google Safe Browsing, Cloudflare's free DNS filters (dangerous websites, and adult ones), how new the website is, whether it exists, and where a short link really goes (that address gets every check too).
+3. **Claude reads the page** (Claude Haiku 5.5), only when nothing strong was found: fixed yes/no questions, like "Does it copy a brand?", "Does it ask for a password?", "Free prizes?", "Free paid sports or shows?", "Pop-up ads?", "Betting?", "Adult, or an 18+ age gate?". When the page can't be read (bot protection, or a page built by code that comes back empty), Claude judges the website by its address alone, from what it knows about it; websites it doesn't know get nothing, never a guess. The AI never writes what kids read and can't say a website is fine.
 
-Tested against 140 real websites (no false alarms) and 40 live phishing links (39 caught or flagged).
+Tested against 140 real websites (no false alarms) and 40 live phishing links (39 caught or flagged). On the device alone, 47 of 47 adult websites are caught, with no false alarms on 50 everyday websites (including Essex, Milford schools and NHS sexual health).
 
 ## Look and feel
 
