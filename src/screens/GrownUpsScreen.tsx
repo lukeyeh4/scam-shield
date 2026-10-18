@@ -3,12 +3,13 @@ import { setQuestionsAllowed, useQuestionsAllowed } from '../chat/askBuddy'
 import { LockIcon } from '../icons'
 import { setSetUp, useSetUp } from '../setup'
 import { ToolScreen } from '../tools/ToolScreen'
+import { setSayWebsiteKind, useSayWebsiteKind } from '../tools/websiteKind'
 import { canTalk, setTalkingAllowed, useTalkingAllowed } from '../voiceInput'
 
 // The grown-ups' area. A parent gate first, then the settings: agreeing to how
 // checks work (nothing is sent anywhere until then: setup.ts), a family code word
-// (not saved yet), and whether Shield Buddy answers the child's questions and they
-// can ask out loud. Everything but the code word is saved on the device.
+// (not saved yet), whether link results say what kind of grown-up website it is,
+// and whether Shield Buddy answers the child's questions and they can ask out loud. Everything but the code word is saved on the device.
 // Written for adults, so the kids' reading-level rules don't apply here.
 
 // The parent gate: a question young children can't easily answer (app stores
@@ -62,6 +63,7 @@ function Settings({ onDone }: { onDone: () => void }) {
   const agreed = useSetUp()
   const questions = useQuestionsAllowed()
   const voice = useTalkingAllowed()
+  const sayKind = useSayWebsiteKind()
 
   return (
     <div className="settings">
@@ -116,6 +118,15 @@ function Settings({ onDone }: { onDone: () => void }) {
           together, and don't write it in messages.
         </p>
         <input className="settings-input" type="text" placeholder="Choose a word together" readOnly />
+      </Section>
+
+      <Section title="Websites that aren't for kids">
+        <Toggle on={sayKind} onChange={setSayWebsiteKind} label="Say what kind of website it is">
+          When a link leads to a betting, adult or pirated streaming website, the link checker tells your child it's
+          not for kids and to show you. Turn this on to also say which kind it is. It's off by default, because
+          describing what's there can make a child curious to look. Scam warnings always explain the trick, since
+          learning to spot it is the point.
+        </Toggle>
       </Section>
 
       <Section title="Asking questions">

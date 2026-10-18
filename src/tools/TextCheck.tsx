@@ -7,6 +7,7 @@ import { lookUpLink, withFacts } from './linkLookup'
 import { MarkedText, ResultView } from './Result'
 import { useSetUp } from '../setup'
 import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
+import { useSayWebsiteKind, withoutWebsiteKind } from './websiteKind'
 
 // Check a link and Check a message work the same way: paste it in, then see the
 // result with the clues marked in the text. Links are really checked (linkCheck.ts,
@@ -40,6 +41,7 @@ type TextCheckProps = ToolNav & {
 export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCheckProps) {
   const k = KINDS[kind]
   const setUp = useSetUp()
+  const sayKind = useSayWebsiteKind()
   const [stage, setStage] = useState<Stage>('paste')
   const [text, setText] = useState(kind === 'link' ? initial : exampleMessage)
   const [result, setResult] = useState<CheckResult>()
@@ -72,8 +74,9 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
     })
   }
   const showResult = stage === 'checking' && waited && lookedUp
-  // Numbered in the order they come in the text
-  const shown = result && inTextOrder(result, text.trim())
+  // Numbered in the order they come in the text. Unless a grown-up chose otherwise,
+  // only "Not for kids", not what kind of website it is (websiteKind.ts)
+  const shown = result && inTextOrder(sayKind ? result : withoutWebsiteKind(result), text.trim())
   // Messages will be sent to be checked, so a grown-up has to finish setup first.
   // Links are checked on the device until then, with a note saying so.
   if (kind === 'message' && !setUp) return <SetupFirst title={k.title} what="messages" onHome={onHome} onSetUp={onSetUp} />
