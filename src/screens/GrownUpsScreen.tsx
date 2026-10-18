@@ -1,61 +1,144 @@
-import { type ReactNode, useState } from 'react'
+import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
 import { setQuestionsAllowed, useQuestionsAllowed } from '../chat/askBuddy'
 import { LockIcon } from '../icons'
+import { checkPin, hasPin, isPin, makeQuestion, noteTry, PIN_LENGTH, removePin, secondsLocked, setPin } from '../parentGate'
 import { setSetUp, useSetUp } from '../setup'
 import { ToolScreen } from '../tools/ToolScreen'
 import { setSayWebsiteKind, useSayWebsiteKind } from '../tools/websiteKind'
 import { canTalk, setTalkingAllowed, useTalkingAllowed } from '../voiceInput'
 
-// The grown-ups' area. A parent gate first, then the settings: agreeing to how
-// checks work (nothing is sent anywhere until then: setup.ts), a family code word
-// (not saved yet), whether link results say what kind of grown-up website it is,
-// and whether Shield Buddy answers the child's questions and they can ask out loud. Everything but the code word is saved on the device.
+// The grown-ups' area. The parent gate first (parentGate.ts): the grown-up PIN if
+// one is set, otherwise a sum to type. Then the settings, in short cards with the
+// details behind "More": whether the child can use the checks (nothing is sent
+// anywhere until then: setup.ts), Shield Buddy's questions and listening, what
+// results say about grown-up websites, the PIN, and a family code word (advice
+// only: it's never saved). Everything is saved on this device.
 // Written for adults, so the kids' reading-level rules don't apply here.
-
-// The parent gate: a question young children can't easily answer (app stores
-// require one in kids' apps before settings, links or purchases)
-const GATE = { question: 'What is 12 × 4?', answers: [36, 44, 48, 52], correct: 48 }
 
 export function GrownUpsScreen({ onBack }: { onBack: () => void }) {
   const [unlocked, setUnlocked] = useState(false)
+  return (
+    <ToolScreen title="For grown-ups" onBack={onBack} note={null}>
+      {unlocked ? <Settings onDone={onBack} /> : <Gate onOpen={() => setUnlocked(true)} />}
+    </ToolScreen>
+  )
+}
+
+// The parent gate: the PIN, or (no PIN yet, or it's forgotten) a sum to type
+function Gate({ onOpen }: { onOpen: () => void }) {
+  const [usePin, setUsePin] = useState(hasPin)
+  // Came from "Forgot the PIN?": the sum then removes the PIN and turns everything
+  // off, so it can't be used to get around the PIN
+  const [forgot, setForgot] = useState(false)
+  const [question, setQuestion] = useState(makeQuestion)
+  const [typed, setTyped] = useState('')
   const [wrong, setWrong] = useState(false)
+  // Seconds left to wait after too many wrong tries (counting down)
+  const [wait, setWait] = useState(secondsLocked)
+  useEffect(() => {
+    if (!wait) return
+    const timer = setTimeout(() => setWait(secondsLocked()), 1000)
+    return () => clearTimeout(timer)
+  }, [wait])
+
+  const answer = async (right: boolean) => {
+    noteTry(right)
+    if (right && forgot) {
+      removePin()
+      setSetUp(false)
+      setQuestionsAllowed(false)
+      setTalkingAllowed(false)
+    }
+    if (right) return onOpen()
+    setWrong(true)
+    setTyped('')
+    setQuestion(makeQuestion())
+    setWait(secondsLocked())
+  }
+
+  const submitSum = (e: FormEvent) => {
+    e.preventDefault()
+    if (typed.trim()) void answer(Number(typed) === question.answer)
+  }
+
+  // The PIN is checked as soon as all its digits are in
+  const pressDigit = async (digit: string) => {
+    const next = (typed + digit).slice(0, PIN_LENGTH)
+    setTyped(next)
+    setWrong(false)
+    if (next.length === PIN_LENGTH) void answer(await checkPin(next))
+  }
 
   return (
-    <ToolScreen
-      title="For grown-ups"
-      onBack={onBack}
-      note="Preview: the family code word isn't saved yet"
-    >
-      {!unlocked ? (
-        <div className="tool-column gate">
-          <span className="gate-icon">
-            <LockIcon />
-          </span>
-          <h2 className="tool-heading">Grown-ups only</h2>
-          <p className="tool-text">Please answer this to continue.</p>
-          <p className="gate-question">{GATE.question}</p>
-          <div className="gate-answers">
-            {GATE.answers.map((n) => (
-              <button
-                key={n}
-                className="tool-button"
-                type="button"
-                onClick={() => (n === GATE.correct ? setUnlocked(true) : setWrong(true))}
-              >
-                {n}
-              </button>
+    <div className="tool-column gate">
+      <span className="gate-icon">
+        <LockIcon />
+      </span>
+      <h2 className="tool-heading">Grown-ups only</h2>
+      {wait > 0 ? (
+        <p className="gate-wrong" role="alert">
+          Too many tries. Wait {wait} seconds.
+        </p>
+      ) : usePin ? (
+        <>
+          <p className="tool-text">Enter your grown-up PIN.</p>
+          <div className="pin-dots" aria-label={`${typed.length} of ${PIN_LENGTH} digits entered`}>
+            {Array.from({ length: PIN_LENGTH }, (_, i) => (
+              <span key={i} className={i < typed.length ? 'pin-dot is-filled' : 'pin-dot'} />
             ))}
           </div>
-          {wrong && (
-            <p className="gate-wrong" role="alert">
-              That's not right. Kids: ask a grown-up to help.
-            </p>
-          )}
-        </div>
+          <div className="pin-pad">
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((d) => (
+              <button key={d} className="tool-button" type="button" onClick={() => void pressDigit(d)}>
+                {d}
+              </button>
+            ))}
+            <button className="tool-button pin-delete" type="button" onClick={() => setTyped(typed.slice(0, -1))} aria-label="Delete">
+              ⌫
+            </button>
+            <button className="tool-button" type="button" onClick={() => void pressDigit('0')}>
+              0
+            </button>
+          </div>
+          <button
+            className="tool-button"
+            type="button"
+            onClick={() => {
+              setUsePin(false)
+              setForgot(true)
+              setTyped('')
+              setWrong(false)
+            }}
+          >
+            Forgot the PIN?
+          </button>
+        </>
       ) : (
-        <Settings onDone={onBack} />
+        <form className="gate-sum" onSubmit={submitSum}>
+          {forgot && <p className="tool-text">This removes the PIN and turns the checks off. You can set them up again.</p>}
+          <label className="gate-question" htmlFor="gate-answer">
+            {question.text}
+          </label>
+          <input
+            id="gate-answer"
+            className="settings-input gate-input"
+            type="text"
+            inputMode="numeric"
+            autoComplete="off"
+            value={typed}
+            onChange={(e) => setTyped(e.target.value.replace(/\D/g, ''))}
+          />
+          <button className="tool-button tool-button-main" type="submit" disabled={!typed}>
+            Continue
+          </button>
+        </form>
       )}
-    </ToolScreen>
+      {wrong && wait === 0 && (
+        <p className="gate-wrong" role="alert">
+          That's not right. Kids: ask a grown-up to help.
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -67,92 +150,76 @@ function Settings({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="settings">
-      <h2 className="tool-heading">Set up Scam Shield</h2>
-      <p className="tool-text">
-        Your child can play the game without this. Until you agree below, nothing your child checks or asks is sent
-        anywhere: links are only checked on this device, and the picture and message checks stay locked.
-      </p>
-
-      <Section title="What is sent, and where">
-        <ul className="settings-list">
-          <li>
-            <strong>Links</strong> go to our server, which looks them up on Google Safe Browsing and in public website
-            records, and may have AI (Claude, by Anthropic) read the page.
-          </li>
-          <li>
-            <strong>Pictures and messages</strong> (coming soon), and <strong>questions to Shield Buddy</strong> if you
-            turn them on below, go to our server and are checked by AI (Claude, by Anthropic). Messages that look like
-            an address, phone number or password are never sent.
-          </li>
-          <li>
-            <strong>Read aloud</strong> (the switch in the corner): Shield Buddy's own lines, never anything your child
-            types, are turned into speech by Google Cloud Text-to-Speech. This works without setup, since no
-            information about your child is sent.
-          </li>
-          <li>
-            <strong>Speech</strong>, if you turn on asking out loud, is turned into text by your browser's speech
-            service (Google in Chrome, Apple in Safari).
-          </li>
-        </ul>
-        <p>
-          Scam Shield keeps nothing it is sent. Anthropic and Google have their own rules for what they keep: see{' '}
-          <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noreferrer">
-            Anthropic's privacy policy
-          </a>{' '}
-          and{' '}
-          <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
-            Google's privacy policy
-          </a>
-          . AI can make mistakes, so Scam Shield always tells your child to show a grown-up.
-        </p>
-        <label className="settings-check">
-          <input type="checkbox" checked={agreed} onChange={(e) => setSetUp(e.target.checked)} />I understand, and
-          agree to my child using the checks
-        </label>
-        {agreed && <p className="settings-off">To stop sending anything at all, untick this. It takes effect straight away.</p>}
+      <Section title="Checks">
+        <Toggle on={agreed} onChange={setSetUp} label="Let my child use the checks">
+          {agreed
+            ? 'Pictures, messages and links are sent to our server and checked by AI. Scam Shield keeps nothing.'
+            : 'Off: nothing is sent anywhere. Links are only checked on this device, and pictures and messages stay locked.'}
+        </Toggle>
+        <More summary="What is sent, and where">
+          <ul className="settings-list">
+            <li>
+              <strong>Pictures</strong> go to our server and are checked by AI (Claude, by Anthropic).
+            </li>
+            <li>
+              <strong>Messages</strong> have phone numbers, emails, codes and addresses blanked out on this device first,
+              then are checked the same way. Names can't always be caught.
+            </li>
+            <li>
+              <strong>Links</strong> are checked against Google Safe Browsing, public website records and family-safe
+              filters, and AI may read the page.
+            </li>
+            <li>
+              <strong>Questions to Shield Buddy</strong> and <strong>speech</strong>, only if you turn them on below.
+            </li>
+            <li>
+              <strong>Read aloud</strong> (the speaker in the corner) turns Shield Buddy's own lines, never anything your
+              child types, into speech with Google. It works without this switch.
+            </li>
+          </ul>
+          <p>
+            Anthropic deletes what it's sent within 30 days and doesn't train on it. See{' '}
+            <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noreferrer">
+              Anthropic's privacy policy
+            </a>{' '}
+            and{' '}
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">
+              Google's
+            </a>
+            . Each home can check 40 pictures and 100 messages a day. AI can make mistakes, so Scam Shield always tells
+            your child to show a grown-up.
+          </p>
+        </More>
       </Section>
+
+      <Section title="Shield Buddy">
+        <Toggle on={questions && agreed} disabled={!agreed} onChange={setQuestionsAllowed} label="Answer my child's questions">
+          Typed questions are answered by AI, only about scams and staying safe, always pointing to a grown-up.
+        </Toggle>
+        {canTalk ? (
+          <Toggle on={voice && agreed} disabled={!agreed} onChange={setTalkingAllowed} label="Let my child ask out loud">
+            Uses your browser's speech service (Google in Chrome, Apple in Safari). No recordings are kept.
+          </Toggle>
+        ) : (
+          <p className="settings-off">Asking out loud needs Chrome or Safari.</p>
+        )}
+        {!agreed && <p className="settings-off">Turn on the checks first.</p>}
+      </Section>
+
+      <Section title="Results">
+        <Toggle on={sayKind} onChange={setSayWebsiteKind} label="Say what kind of website it is">
+          Off: betting, adult and pirated streaming sites just say "not for kids", so they don't spark curiosity. Scam
+          warnings always explain the trick.
+        </Toggle>
+      </Section>
+
+      <PinSection />
 
       <Section title="Family code word">
         <p>
-          A secret word only your family knows. If someone says they're you, your child can ask for it. Choose it
-          together, and don't write it in messages.
+          Choose a secret word together. If someone says they're you, your child can ask for it. Keep it in your heads:
+          don't write it in messages, or here.
         </p>
-        <input className="settings-input" type="text" placeholder="Choose a word together" readOnly />
-      </Section>
-
-      <Section title="Websites that aren't for kids">
-        <Toggle on={sayKind} onChange={setSayWebsiteKind} label="Say what kind of website it is">
-          When a link leads to a betting, adult or pirated streaming website, the link checker tells your child it's
-          not for kids and to show you. Turn this on to also say which kind it is. It's off by default, because
-          describing what's there can make a child curious to look. Scam warnings always explain the trick, since
-          learning to spot it is the point.
-        </Toggle>
-      </Section>
-
-      <Section title="Asking questions">
-        <Toggle
-          on={questions && agreed}
-          disabled={!agreed}
-          onChange={setQuestionsAllowed}
-          label="Let Shield Buddy answer your child's questions"
-        >
-          What your child types in the chat is sent to our server and answered by AI (Claude, by Anthropic). Nothing is
-          kept after the answer. Answers can be wrong, so Shield Buddy only answers questions about scams and staying
-          safe online, and always tells your child to show a grown-up. When this is off, Shield Buddy asks your child
-          to show a grown-up instead.
-        </Toggle>
-      </Section>
-
-      <Section title="Talking to Shield Buddy">
-        {canTalk ? (
-          <Toggle on={voice && agreed} disabled={!agreed} onChange={setTalkingAllowed} label="Let your child ask questions out loud">
-            Your child can tap the microphone and talk instead of typing, and checks the words before sending. Speech
-            is turned into text by your browser's own speech service, which may send the recording to Google (Chrome)
-            or Apple (Safari). Scam Shield never keeps recordings.
-          </Toggle>
-        ) : (
-          <p>This browser can't turn speech into text. Try Chrome or Safari to let your child ask out loud.</p>
-        )}
       </Section>
 
       <div className="tool-actions">
@@ -161,6 +228,69 @@ function Settings({ onDone }: { onDone: () => void }) {
         </button>
       </div>
     </div>
+  )
+}
+
+// Setting, changing or removing the grown-up PIN
+function PinSection() {
+  const [set, setSet] = useState(hasPin)
+  const [editing, setEditing] = useState(false)
+  const [pin, setPinText] = useState('')
+  const [again, setAgain] = useState('')
+  const mismatch = again.length === PIN_LENGTH && again !== pin
+  const save = async (e: FormEvent) => {
+    e.preventDefault()
+    if (!isPin(pin) || pin !== again) return
+    await setPin(pin)
+    setSet(true)
+    setEditing(false)
+    setPinText('')
+    setAgain('')
+  }
+  const digits = (value: string) => value.replace(/\D/g, '').slice(0, PIN_LENGTH)
+  return (
+    <Section title="Grown-up PIN">
+      <p>{set ? 'These settings are locked with your PIN.' : `Set a ${PIN_LENGTH}-digit PIN so only you can open these settings.`}</p>
+      {editing ? (
+        <form className="pin-form" onSubmit={save}>
+          <label>
+            New PIN
+            <input className="settings-input" type="password" inputMode="numeric" autoComplete="new-password" value={pin} onChange={(e) => setPinText(digits(e.target.value))} />
+          </label>
+          <label>
+            Same PIN again
+            <input className="settings-input" type="password" inputMode="numeric" autoComplete="new-password" value={again} onChange={(e) => setAgain(digits(e.target.value))} />
+          </label>
+          {mismatch && <p className="gate-wrong">The two PINs don't match.</p>}
+          <div className="settings-buttons">
+            <button className="tool-button tool-button-main" type="submit" disabled={!isPin(pin) || pin !== again}>
+              Save PIN
+            </button>
+            <button className="tool-button" type="button" onClick={() => setEditing(false)}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="settings-buttons">
+          <button className="tool-button" type="button" onClick={() => setEditing(true)}>
+            {set ? 'Change PIN' : 'Set a PIN'}
+          </button>
+          {set && (
+            <button
+              className="tool-button"
+              type="button"
+              onClick={() => {
+                removePin()
+                setSet(false)
+              }}
+            >
+              Remove PIN
+            </button>
+          )}
+        </div>
+      )}
+    </Section>
   )
 }
 
@@ -173,7 +303,17 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-// `disabled`: can't be turned on until the grown-up agrees to how checks work
+// Details a grown-up can open, so each card stays short
+function More({ summary, children }: { summary: string; children: ReactNode }) {
+  return (
+    <details className="settings-more">
+      <summary>{summary}</summary>
+      {children}
+    </details>
+  )
+}
+
+// `disabled`: can't be turned on until the grown-up turns on the checks
 function Toggle({
   on,
   disabled = false,
@@ -192,7 +332,6 @@ function Toggle({
       <div>
         <strong>{label}</strong>
         <p>{children}</p>
-        {disabled && <p className="settings-off">Agree to how checks work above first.</p>}
       </div>
       <button
         className="switch"

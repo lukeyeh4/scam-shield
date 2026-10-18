@@ -879,11 +879,51 @@ button.picture-box {
   font-weight: 800;
 }
 
-.gate-answers {
+/* The sum to type (no PIN yet, or it's forgotten) */
+.gate-sum {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.gate-input {
+  font-size: var(--text-heading);
+  font-weight: 800;
+  text-align: center;
+}
+
+/* The PIN: dots for the digits entered, and a number pad */
+.pin-dots {
+  display: flex;
+  gap: 14px;
+}
+
+.pin-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--muted);
+}
+
+.pin-dot.is-filled {
+  background: var(--ink);
+  box-shadow: none;
+}
+
+.pin-pad {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   width: 100%;
+  max-width: 300px;
+}
+
+/* 0 sits in the middle of the last row, with delete on its left */
+.pin-pad .pin-delete {
+  grid-column: 1;
 }
 
 .gate-wrong {
@@ -920,18 +960,72 @@ button.picture-box {
   color: var(--muted);
 }
 
-.settings-check {
+/* "More": details a grown-up can open, so each card stays short */
+.settings-more {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 600;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.settings-check input {
-  flex: none;
-  width: 26px;
-  height: 26px;
-  accent-color: var(--accent);
+.settings-more summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink);
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+
+.settings-more summary::-webkit-details-marker {
+  display: none;
+}
+
+/* An arrow, like the clue cards', turning down when open */
+.settings-more summary::after {
+  content: '›';
+  color: var(--muted);
+  font-size: 1.5em;
+  line-height: 1;
+  transition: transform 200ms var(--ease);
+}
+
+.settings-more[open] summary::after {
+  transform: rotate(90deg);
+}
+
+.settings-more[open] summary {
+  margin-bottom: 8px;
+}
+
+.settings-more p {
+  margin-top: 10px;
+}
+
+/* Setting a PIN, and the buttons under a card */
+.pin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.settings-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.settings-buttons .tool-button {
+  flex: 1 1 140px;
+  min-height: 56px;
 }
 
 .settings-toggle {
