@@ -83,15 +83,29 @@ export function ResultView({ subject, result, onAgain, onDone, onAskAbout, histo
         </div>
 
         {result.urgent && (
-          <ol className="result-urgent" aria-label="What to do">
-            {URGENT_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
+          <div className="result-urgent">
+            <h3 className="result-label" id="result-steps">
+              What to do
+            </h3>
+            <ol aria-labelledby="result-steps">
+              {URGENT_STEPS.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </div>
         )}
 
+        {/* "Clues", a small label like "What you checked", and how to open one */}
         {result.clues.length > 0 && (
-          <ol className="result-clues" aria-label="Clues">
+          <div className="result-section-head">
+            <h3 className="result-label" id="result-clues">
+              {result.clues.length === 1 ? 'Clue' : 'Clues'}
+            </h3>
+            <span className="result-hint">Tap one to see why</span>
+          </div>
+        )}
+        {result.clues.length > 0 && (
+          <ol className="result-clues" aria-labelledby="result-clues">
             {result.clues.map((c, i) => (
               // Just the clue's name; tapping it opens why (and makes its boxes on
               // a picture stand out)

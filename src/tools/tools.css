@@ -791,13 +791,34 @@ button.picture-box {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 0;
-  padding: 16px 18px 16px 40px;
+  padding: 16px 18px;
   border-radius: 20px;
   background: var(--surface);
   box-shadow: var(--shadow-sm);
+}
+
+.result-urgent ol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding-left: 22px;
   font-weight: 700;
   line-height: 1.4;
+}
+
+/* A small label over the clues ("Clues"), with how to open one on the right */
+.result-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px 4px -4px;
+}
+
+.result-hint {
+  color: var(--muted);
+  font-size: var(--text-small);
 }
 
 /* Facts in a link's favour, when there are no clues (never "safe") */
