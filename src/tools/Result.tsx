@@ -4,6 +4,7 @@ import { noteCheck } from '../chat/session'
 import { splitByHighlights } from '../highlight'
 import { ChevronIcon, CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
 import type { Box, CheckResult, Clue, Risk } from './examples'
+import { buddyWhy } from './clueWhy'
 import { marksOf } from './pictureMarks'
 
 // How each risk level is shown: soft red, yellow or green, each with its own icon
@@ -97,7 +98,7 @@ export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actio
                 {picked === i &&
                   (asked === i ? (
                     <div className="result-why">
-                      <Buddy key={i} mood="thinking" messages={c.why ?? [c.reason, "If you're still not sure, ask a grown-up."]} />
+                      <Buddy key={i} mood="thinking" messages={buddyWhy(c, i + 1)} />
                     </div>
                   ) : (
                     <button className="result-why-button" type="button" onClick={() => setAsked(i)}>
