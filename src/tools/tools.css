@@ -407,6 +407,59 @@ button.picture-box {
   width: 100%;
 }
 
+/* The pictures to check (up to 3), each with a small × to take it out */
+.picture-set {
+  display: grid;
+  grid-template-columns: repeat(var(--count, 1), minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.picture-set.count-2 {
+  --count: 2;
+}
+
+.picture-set.count-3 {
+  --count: 3;
+}
+
+.picture-set-item {
+  position: relative;
+}
+
+.picture-set .tool-photo {
+  width: 100%;
+  max-height: min(600px, 62vh);
+  object-fit: contain;
+}
+
+.picture-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink);
+}
+
+.picture-remove svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.6;
+}
+
+/* Several checked pictures, one under another */
+.picture-results {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 /* A picture that may not be OK to look at again: blurred past recognising */
 .tool-photo.is-hidden {
   filter: blur(28px);

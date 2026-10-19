@@ -169,8 +169,11 @@ export function MarkedText({ text, clues, className = '' }: { text: string; clue
 // are only decoration: the list says everything, in order, for screen readers.
 // `picked`: the clue (or clues) whose boxes stand out. `onPick`: boxes become
 // buttons that say which clues they mark (in the big picture).
-type MarkedPictureProps = { src: string; clues: Clue[]; picked?: number | number[] | null; onPick?: (clues: number[]) => void }
-export function MarkedPicture({ src, clues, picked = null, onPick }: MarkedPictureProps) {
+// `index`: which of the check's pictures this is (its boxes only)
+type MarkedPictureProps = { src: string; clues: Clue[]; index?: number; picked?: number | number[] | null; onPick?: (clues: number[]) => void }
+export function MarkedPicture({ src, clues: all, index = 0, picked = null, onPick }: MarkedPictureProps) {
+  // Every clue (so the numbers match the list), with only this picture's boxes
+  const clues = all.map((c) => ({ ...c, boxes: c.boxes?.filter((b) => (b.picture ?? 0) === index) }))
   const standOut = picked === null ? [] : Array.isArray(picked) ? picked : [picked]
   const marked = clues.filter((c) => c.boxes?.length).length
   // Each number sits on its box's top-left corner, or the top-right one if another
@@ -229,7 +232,7 @@ export function MarkedPicture({ src, clues, picked = null, onPick }: MarkedPictu
 // The picture with its boxes, and a button (or a tap on the picture) to see it
 // big: full screen, with the same boxes, to look closely at small writing. There,
 // tapping a box shows its clues in a card at the bottom.
-export function ZoomablePicture({ src, clues, picked = null }: { src: string; clues: Clue[]; picked?: number | null }) {
+export function ZoomablePicture({ src, clues, index = 0, picked = null }: { src: string; clues: Clue[]; index?: number; picked?: number | null }) {
   const dialog = useRef<HTMLDialogElement>(null)
   // The clues of the box tapped in the big picture
   const [shown, setShown] = useState<number[] | null>(null)
@@ -239,7 +242,7 @@ export function ZoomablePicture({ src, clues, picked = null }: { src: string; cl
   return (
     <div className="zoomable">
       <button className="zoomable-picture" type="button" onClick={open} aria-label="Make the picture bigger">
-        <MarkedPicture src={src} clues={clues} picked={picked} />
+        <MarkedPicture src={src} clues={clues} index={index} picked={picked} />
       </button>
       <button className="zoom-button" type="button" onClick={open} aria-label="Make the picture bigger">
         <ZoomIcon />
@@ -255,7 +258,7 @@ export function ZoomablePicture({ src, clues, picked = null }: { src: string; cl
         <button className="zoom-close" type="button" onClick={close} aria-label="Close the big picture" autoFocus>
           <CloseIcon />
         </button>
-        <MarkedPicture src={src} clues={clues} picked={shown} onPick={pick} />
+        <MarkedPicture src={src} clues={clues} index={index} picked={shown} onPick={pick} />
         {shown && (
           <ul className="zoom-card" aria-live="polite">
             {shown.map((n) => (

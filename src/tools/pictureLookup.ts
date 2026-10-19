@@ -122,15 +122,16 @@ export function contextFor(place: Place | null, typed: string) {
   return { context: parts.join('. ') || undefined, personal, upset: soundsUpset(note) }
 }
 
-// Sends the picture to be checked; null if the server can't answer (no server, no
-// setup, too slow, or the AI couldn't answer)
-export async function lookUpPicture(picture: PreparedPicture, context?: string): Promise<PictureFacts | null> {
+// Sends the pictures (up to 3, of the same thing) to be checked together; null if
+// the server can't answer (no server, no setup, too slow, the AI couldn't answer,
+// or over today's limit)
+export async function lookUpPicture(pictures: PreparedPicture[], context?: string): Promise<PictureFacts | null> {
   if (!SERVER || !isSetUp()) return null
   try {
     const res = await fetch(`${SERVER}/picture`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ image: await base64(picture.blob), context }),
+      body: JSON.stringify({ images: await Promise.all(pictures.map((p) => base64(p.blob))), context }),
       // Looking at a picture takes a few seconds
       signal: AbortSignal.timeout(30000),
     })

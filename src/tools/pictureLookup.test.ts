@@ -106,6 +106,21 @@ describe('pictureResult', () => {
     expect(result).toMatchObject({ risk: 'high', urgent: true })
   })
 
+  it('numbers clues picture by picture, then down each one', async () => {
+    const box = (top: number, picture?: number) => ({ left: 0, top, right: 100, bottom: top + 50, ...(picture ? { picture } : {}) })
+    const result = await pictureResult(
+      facts({
+        signs: [
+          { sign: 'rushes you', words: 'hurry', box: box(100, 1) },
+          { sign: 'free prize or free game money', words: 'free', box: box(900) },
+          { sign: 'sad story to get you to buy or give money', words: 'sad', box: box(50, 2) },
+        ],
+      }),
+      noServer,
+    )
+    expect(inPictureOrder(result).clues.map((c) => c.label)).toEqual(['Free prizes', 'Rushing you', 'A sad story to make you pay'])
+  })
+
   it('numbers clues down the picture, links included', async () => {
     const at = (top: number) => ({ left: 0, top, right: 100, bottom: top + 50 })
     const result = await pictureResult(
