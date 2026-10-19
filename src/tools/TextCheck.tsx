@@ -1,4 +1,4 @@
-import { type FormEvent, useRef, useState } from 'react'
+import { type FormEvent, useMemo, useRef, useState } from 'react'
 import { ScanIcon } from '../icons'
 import type { CheckResult } from './examples'
 import { inTextOrder } from './examples'
@@ -104,6 +104,9 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
   // Numbered in the order they come in the text. Unless a grown-up chose otherwise,
   // only "Not for kids", not what kind of website it is (websiteKind.ts)
   const shownText = kind === 'message' ? checkedText : text.trim()
+  // For the grown-ups' history: which checker, and a link's website (never the message)
+  const site = kind === 'link' && result && 'site' in result ? String(result.site) : undefined
+  const history = useMemo(() => ({ checker: kind, site }), [kind, site])
   const shown = result && inTextOrder(sayKind ? result : withoutWebsiteKind(result), shownText)
   // Messages will be sent to be checked, so a grown-up has to finish setup first.
   // Links are checked on the device until then, with a note saying so.
@@ -204,6 +207,7 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
         <ResultView
           subject={<MarkedText text={shownText} clues={shown.clues} className={`checked-${kind}`} />}
           result={shown}
+          history={history}
           onAgain={onAsk}
           onDone={onHome}
           onAskAbout={

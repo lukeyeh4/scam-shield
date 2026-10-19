@@ -85,7 +85,7 @@ Tested against 140 real websites (no false alarms) and 40 live phishing links (3
 
 ## Check a picture
 
-Kids take a screenshot or photo of anything that worries them (a text, a game chat, an ad, a website, a pop-up, a short video) and can say where it's from (someone they don't know, a friend, a game, an ad). Claude looks for warning signs from a fixed list: asking for a password, code, money or photos, free prizes, pretending to be a company or family, rushing, threats, secrets, downloads, sad stories used to sell, and product photos that may not be the real thing. Links in the picture go through the link checker.
+Kids take a screenshot or photo of anything that worries them (a text, a game chat, an ad, a website, a pop-up, a short video), with up to two more of the same thing (like a video's comments or the shop it links to), and can say where it's from (someone they don't know, a friend, a game, an ad). Claude looks for warning signs from a fixed list: asking for a password, code, money or photos, free prizes, pretending to be a company or family, rushing, threats, secrets, downloads, sad stories used to sell, and product photos that may not be the real thing. Links in the picture go through the link checker.
 
 The result shows the picture with numbered boxes around each warning sign, a short list of clue names (tap one for a one-line reason, then "Why? Ask Shield Buddy" for Buddy's scripted explanation), a magnifier to see it big, and "Ask Buddy about this", which opens the chat with help for kids who already tapped, replied or sent something. A threat, a request for photos, or a picture Claude won't look at gets a calm "Show a grown-up right now / It's not your fault" (the picture is blurred if it may not be OK to see). The AI only answers fixed questions: the app writes everything kids read, and it never says "safe".
 
@@ -102,6 +102,7 @@ Behind the gear on the home screen, past a parent gate (a grown-up PIN, or a sum
 - **Checks:** nothing a child checks or asks is sent anywhere until a grown-up turns this on. "What is sent, and where" explains each part in plain words.
 - **Shield Buddy:** whether Buddy answers typed questions (with AI, only about scams and staying safe) and whether the child can ask out loud.
 - **Results:** whether to name the type of unsafe website (betting, adult, pirated streaming) or just say it isn't for kids.
+- **History:** the child's recent checks: when, which checker, the result and the clues found (and a link's website). It's kept only on the device and never includes the pictures or messages.
 - **Grown-up PIN:** set, change or remove it. A wrong PIN shakes, like a phone's lock screen.
 - **Family code word:** advice only. Nothing is saved.
 

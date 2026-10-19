@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Buddy } from '../buddy/Buddy'
 import { noteCheck } from '../chat/session'
+import { type Checker, recordCheck } from '../history'
 import { splitByHighlights } from '../highlight'
 import { ChevronIcon, CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
 import type { Box, CheckResult, Clue, Risk } from './examples'
@@ -33,6 +34,8 @@ type ResultViewProps = {
   onDone?: () => void
   // "Ask Buddy about this": the chat, knowing what this check found
   onAskAbout?: () => void
+  // Which checker this is (and a link's website), for the grown-ups' history
+  history?: { checker: Checker; site?: string }
   // Buttons to show instead of Check something else / I'm done, in the game's
   // "Check with Scam Shield" practice (which the chat doesn't hear about)
   actions?: ReactNode
@@ -41,7 +44,7 @@ type ResultViewProps = {
 // The result of any check: what was checked beside how risky it looks and what to
 // do, the clues (one card each, numbered to match the marks), good signs when
 // there are no clues, then the buttons
-export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actions }: ResultViewProps) {
+export function ResultView({ subject, result, onAgain, onDone, onAskAbout, history, actions }: ResultViewProps) {
   const risk = result.urgent ? URGENT : result.notForKids ? NOT_FOR_KIDS : RISKS[result.risk]
   // A clue tapped in the list: its reason shows, and its boxes on a picture stand
   // out (tap again to close)
@@ -57,6 +60,10 @@ export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actio
   useEffect(() => {
     if (!practice) noteCheck(result.urgent ? 'urgent' : result.notForKids ? 'notForKids' : result.risk)
   }, [practice, result.risk, result.notForKids, result.urgent])
+  // In the grown-ups' history (not the game's practice checks)
+  useEffect(() => {
+    if (!practice && history) recordCheck(history.checker, result, history.site)
+  }, [practice, history, result])
   return (
     <section className={`result result-${result.risk}`} aria-labelledby="result-title">
       <div className="result-subject">

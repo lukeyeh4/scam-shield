@@ -21,6 +21,9 @@ import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 type Stage = 'choose' | 'check' | 'checking'
 const STEP: Record<Stage, number> = { choose: 0, check: 1, checking: 2 }
 
+// For the grown-ups' history (history.ts)
+const PICTURE_HISTORY = { checker: 'picture' as const }
+
 // The most pictures checked together (the Worker takes up to 3)
 const MAX_PICTURES = 3
 
@@ -260,6 +263,7 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
               </div>
             )}
             result={shown}
+            history={PICTURE_HISTORY}
             onAgain={onAsk}
             onAskAbout={() => {
               askAbout(shown.clues.map((c) => c.label))

@@ -1086,6 +1086,64 @@ button.picture-box {
   margin-top: 10px;
 }
 
+/* The history of checks: a coloured dot for the result, then what was found */
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.history-item.is-urgent {
+  background: var(--danger-bg);
+}
+
+.history-dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.history-dot.risk-high {
+  background: var(--danger-ink);
+}
+
+.history-dot.risk-medium {
+  background: #d9a400;
+}
+
+.history-dot.risk-none {
+  background: var(--good-ink);
+}
+
+.history-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.history-text > span {
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.history-clues {
+  overflow-wrap: anywhere;
+}
+
 /* Setting a PIN, and the buttons under a card */
 .pin-form {
   display: flex;
