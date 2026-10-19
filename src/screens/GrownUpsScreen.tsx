@@ -24,6 +24,9 @@ export function GrownUpsScreen({ onBack }: { onBack: () => void }) {
   )
 }
 
+// How long a wrong PIN's shake lasts (the animation in tools.css)
+const SHAKE_MS = 450
+
 // The parent gate: the PIN, or (no PIN yet, or it's forgotten) a sum to type
 function Gate({ onOpen }: { onOpen: () => void }) {
   const [usePin, setUsePin] = useState(hasPin)
@@ -61,12 +64,24 @@ function Gate({ onOpen }: { onOpen: () => void }) {
     if (typed.trim()) void answer(Number(typed) === question.answer)
   }
 
+  // A wrong PIN: the dots shake (and the phone buzzes, if it can), like a phone's
+  // lock screen, then clear
+  const [shaking, setShaking] = useState(false)
+
   // The PIN is checked as soon as all its digits are in
   const pressDigit = async (digit: string) => {
+    if (shaking) return
     const next = (typed + digit).slice(0, PIN_LENGTH)
     setTyped(next)
     setWrong(false)
-    if (next.length === PIN_LENGTH) void answer(await checkPin(next))
+    if (next.length < PIN_LENGTH) return
+    if (await checkPin(next)) return void answer(true)
+    setShaking(true)
+    navigator.vibrate?.(200)
+    setTimeout(() => {
+      setShaking(false)
+      void answer(false)
+    }, SHAKE_MS)
   }
 
   return (
@@ -82,7 +97,7 @@ function Gate({ onOpen }: { onOpen: () => void }) {
       ) : usePin ? (
         <>
           <p className="tool-text">Enter your grown-up PIN.</p>
-          <div className="pin-dots" aria-label={`${typed.length} of ${PIN_LENGTH} digits entered`}>
+          <div className={shaking ? 'pin-dots is-shaking' : 'pin-dots'} aria-label={`${typed.length} of ${PIN_LENGTH} digits entered`}>
             {Array.from({ length: PIN_LENGTH }, (_, i) => (
               <span key={i} className={i < typed.length ? 'pin-dot is-filled' : 'pin-dot'} />
             ))}

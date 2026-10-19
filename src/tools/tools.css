@@ -913,6 +913,36 @@ button.picture-box {
   box-shadow: none;
 }
 
+/* A wrong PIN: the dots shake side to side, like a phone's lock screen */
+.pin-dots.is-shaking {
+  animation: pin-shake 450ms var(--ease);
+}
+
+.pin-dots.is-shaking .pin-dot.is-filled {
+  background: #b3261e;
+}
+
+@keyframes pin-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15%,
+  55% {
+    transform: translateX(-12px);
+  }
+  35%,
+  75% {
+    transform: translateX(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pin-dots.is-shaking {
+    animation: none;
+  }
+}
+
 .pin-pad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
