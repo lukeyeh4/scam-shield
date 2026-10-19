@@ -73,7 +73,7 @@ A friendly yellow shield with a face and little hands, who guides each scam in s
 
 ## Check a link
 
-Kids paste a link (or a whole message with a link in it) and see whether it looks like a scam, with each clue marked in the link and explained in kid words: what the trick is, and what the real website looks like. Results are soft red ("This looks like a scam"), yellow ("Be careful") or green ("No clues found", with good signs), with what to do right under the heading. Betting, adult and pirated streaming websites are red too, headed "This website isn't for kids", and by default only say that, not what's there (a grown-up can turn on "Say what kind of website it is"). It never says "safe", and always ends with "show a grown-up".
+Kids paste a link (or a whole message with a link in it) and see whether it looks like a scam, with each clue marked in the link and explained in kid words: what the trick is, and what the real website looks like. Results are soft red ("This looks like a scam"), yellow ("Be careful") or green ("No clues found", with good signs), with what to do right under the heading. Betting, adult and pirated streaming websites are red too, headed "This website isn't for kids", and by default only say that, not what's there (a grown-up can turn on "Name the type of unsafe website"). It never says "safe", and always ends with "show a grown-up".
 
 It checks in three layers, and never opens the link on the kid's device:
 
@@ -82,6 +82,30 @@ It checks in three layers, and never opens the link on the kid's device:
 3. **Claude reads the page** (Claude Haiku 5.5), only when nothing strong was found: fixed yes/no questions, like "Does it copy a brand?", "Does it ask for a password?", "Free prizes?", "Free paid sports or shows?", "Pop-up ads?", "Betting?", "Adult, or an 18+ age gate?". When the page can't be read (bot protection, or a page built by code that comes back empty), Claude judges the website by its address alone, from what it knows about it; websites it doesn't know get nothing, never a guess. The AI never writes what kids read and can't say a website is fine.
 
 Tested against 140 real websites (no false alarms) and 40 live phishing links (39 caught or flagged). On the device alone, 47 of 47 adult websites are caught, with no false alarms on 50 everyday websites (including Essex, Milford schools and NHS sexual health).
+
+## Check a picture
+
+Kids take a screenshot or photo of anything that worries them (a text, a game chat, an ad, a website, a pop-up, a short video) and can say where it's from (someone they don't know, a friend, a game, an ad). Claude looks for warning signs from a fixed list: asking for a password, code, money or photos, free prizes, pretending to be a company or family, rushing, threats, secrets, downloads, sad stories used to sell, and product photos that may not be the real thing. Links in the picture go through the link checker.
+
+The result shows the picture with numbered boxes around each warning sign, a short list of clue names (tap one for a one-line reason, then "Why? Ask Shield Buddy" for Buddy's scripted explanation), a magnifier to see it big, and "Ask Buddy about this", which opens the chat with help for kids who already tapped, replied or sent something. A threat, a request for photos, or a picture Claude won't look at gets a calm "Show a grown-up right now / It's not your fault" (the picture is blurred if it may not be OK to see). The AI only answers fixed questions: the app writes everything kids read, and it never says "safe".
+
+Tested on 17 made-up screenshots and 48 made-up photos of screens (angled, glare, dim): every scam caught, no false alarms, and look-alike links (dlscord, rnicrosoft, paypa1) copied exactly.
+
+## Check a message
+
+Kids paste a text, chat, email or post. Phone numbers, emails, codes and addresses are blanked out on the device before anything is sent. Claude names the same warning signs and quotes the words that show them, which are highlighted and numbered in the message. The result screen is the same as for pictures. Tested on 12 made-up messages: every scam caught, no false alarms.
+
+## For grown-ups
+
+Behind the gear on the home screen, past a parent gate (a grown-up PIN, or a sum that changes every time until one is set):
+
+- **Checks:** nothing a child checks or asks is sent anywhere until a grown-up turns this on. "What is sent, and where" explains each part in plain words.
+- **Shield Buddy:** whether Buddy answers typed questions (with AI, only about scams and staying safe) and whether the child can ask out loud.
+- **Results:** whether to name the type of unsafe website (betting, adult, pirated streaming) or just say it isn't for kids.
+- **Grown-up PIN:** set, change or remove it. A wrong PIN shakes, like a phone's lock screen.
+- **Family code word:** advice only. Nothing is saved.
+
+Each home can check 40 pictures and 100 messages a day. Kids are told the checks use AI: Buddy says it's "a computer helper, not a real person", and every AI result says so.
 
 ## Look and feel
 
@@ -107,16 +131,16 @@ npm install
 npm run dev      # play it locally
 npm run build    # type-check and build static files for hosting
 npm run lint
-npm test         # check every scenario file, the red-flag highlighting, the link checker and the chat script
+npm test         # check every scenario file, the highlighting, the link, picture and message checks, the chat script and the parent gate
 ```
 
-The link checker's server is in `worker/` (`npm install`, then `npm run dev` or `npm run deploy` there). Its keys (Google Safe Browsing, Claude) are secrets: locally in `worker/.dev.vars`, which git ignores, and on Cloudflare with `npx wrangler secret put`. Never put them in a committed file; this repo is public.
+The server is in `worker/` (`npm install`, then `npm run dev` or `npm run deploy` there). With it running, `npm run test-pictures` and `npm run test-messages` there send the made-up test screenshots and messages through Claude (real calls, a few cents in all). Its keys (Google Safe Browsing, Claude) are secrets: locally in `worker/.dev.vars`, which git ignores, and on Cloudflare with `npx wrangler secret put`. Never put them in a committed file; this repo is public.
 
 While running `npm run dev`, a **Dev** button in the corner jumps to any screen, has a fast mode that skips Buddy's typing, and lets you try other colour palettes and fonts. It's left out of the build and must be removed before shipping (see `PROJECT.md`).
 
 ## How it's built
 
-React + TypeScript + Vite, as a web app for tablets. Every push to `main` rebuilds the game and puts it on GitHub Pages (`.github/workflows/deploy.yml`). The link checker's server is a Cloudflare Worker at scam-shield-links.lukeyeh4.workers.dev (its address is in `.env.production`); it keeps nothing it's sent, and allows 20 checks a minute per person.
+React + TypeScript + Vite, as a web app for tablets. Every push to `main` rebuilds the game and puts it on GitHub Pages (`.github/workflows/deploy.yml`). The server is a Cloudflare Worker at scam-shield-links.lukeyeh4.workers.dev (its address is in `.env.production`): it checks links, pictures and messages and answers Buddy's questions, keeps nothing it's sent, and allows 20 checks a minute per person, plus daily limits for pictures and messages.
 
 The game is **data-driven**: every scam uses the same screens, and each one is just a JSON file in `scenarios/` (format: `Scenario` in `src/types.ts`). A scenario picks a fake screen (`sms`, `search`, `shorts`, …), fills in its content, and lists Buddy's lines, the outcomes, and the red flags for the recap and Spot the clues.
 
@@ -130,9 +154,12 @@ src/buddy/        Shield Buddy and its speech bubbles
 src/badges.ts     badges, saved on the device
 src/chat/         Ask Shield Buddy: the chat, its script, and the conversation so far
 src/tools/        the checkers: linkCheck.ts (the address), brands.ts (official websites),
-                  linkLookup.ts (the server's facts as clues), the result screen
+                  linkLookup.ts (the server's facts as clues), pictureLookup.ts and
+                  messageLookup.ts (pictures and messages), the result screen
+src/screens/GrownUpsScreen.tsx  the parent gate and settings (parentGate.ts: the PIN)
 src/readAloud.ts  read-aloud with the device's voice
-worker/           the link checker's server: lookups, and Claude reading pages
+worker/           the server: link lookups, Claude reading pages, pictures and messages,
+                  Buddy's answers and voice, and the daily limits
 ```
 
 `PROJECT.md` tracks what's next. `CLAUDE.md` has the full details for working on the code.
