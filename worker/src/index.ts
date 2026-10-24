@@ -18,7 +18,7 @@ import { charactersUsed, makeSpeech, MAX_SPEECH, MONTHLY_LIMIT, readSpeech, save
 // It also checks pictures kids take (picture.ts) and messages they paste (message.ts).
 //
 // POST /link { url } → LinkFacts
-// POST /picture { image, context? } → PictureFacts
+// POST /picture { images (up to 3) or image, context? } → PictureFacts
 // POST /message { text, context? } → MessageFacts
 // POST /ask { entries } → BuddyAnswer
 // POST /speak { text } → MP3 audio
@@ -287,8 +287,8 @@ export default {
       all: Number(all ?? LIMITS[what].all),
       each: Number(each ?? LIMITS[what].each),
     })
-    const checkWithin = async <T,>(what: Checked, limits: { all: number; each: number }, judge: () => Promise<T | null>) => {
-      if (env.SPEECH && !(await roomFor(env.SPEECH, what, who, limits))) return json({ error: 'Daily limit reached' }, 429)
+    const checkWithin = async <T,>(what: Checked, limits: { all: number; each: number }, judge: () => Promise<T | null>, count = 1) => {
+      if (env.SPEECH && !(await roomFor(env.SPEECH, what, who, limits, count))) return json({ error: 'Daily limit reached' }, 429)
       const facts = await judge()
         .catch(judge)
         .catch((e: unknown) => {
@@ -296,16 +296,16 @@ export default {
           console.warn(`${what}: failed`, e instanceof Error ? e.name : typeof e)
           return null
         })
-      if (facts && env.SPEECH) await countCheck(env.SPEECH, what, who)
+      if (facts && env.SPEECH) await countCheck(env.SPEECH, what, who, count)
       return facts ? json(facts) : json({ error: 'No answer' }, 502)
     }
 
     if (path === '/picture') {
       if (!env.ANTHROPIC_API_KEY) return json({ error: 'No AI' }, 503)
       const picture = readPicture(await request.json().catch(() => null))
-      if (!picture) return json({ error: 'Send { "image": "<base64 JPEG or PNG>", "context"?: "..." }' }, 400)
+      if (!picture) return json({ error: 'Send { "images": ["<base64 JPEG or PNG>", ...up to 3], "context"?: "..." }' }, 400)
       const limits = limitsFor('pictures', env.PICTURES_PER_DAY, env.PICTURES_PER_PERSON)
-      return checkWithin('pictures', limits, () => judgePicture(picture, env.ANTHROPIC_API_KEY!, env.PICTURE_MODEL))
+      return checkWithin('pictures', limits, () => judgePicture(picture, env.ANTHROPIC_API_KEY!, env.PICTURE_MODEL), picture.pictures.length)
     }
 
     if (path === '/message') {

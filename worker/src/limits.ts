@@ -33,19 +33,19 @@ export async function checkedToday(kv: Counter, what: Checked, now = new Date())
   return Number((await kv.get(`${what}:${today(now)}`)) ?? 0)
 }
 
-// Whether there's room for one more today, for everyone and for this person
-export async function roomFor(kv: Counter, what: Checked, who: string, limits: { all: number; each: number }, now = new Date()) {
+// Whether there's room for `count` more today, for everyone and for this person
+export async function roomFor(kv: Counter, what: Checked, who: string, limits: { all: number; each: number }, count = 1, now = new Date()) {
   const [all, mine] = await Promise.all([checkedToday(kv, what, now), kv.get(await personKey(what, who, now))])
-  return all < limits.all && Number(mine ?? 0) < limits.each
+  return all + count <= limits.all && Number(mine ?? 0) + count <= limits.each
 }
 
-// Counts a check (the counters are thrown away after two days). Close enough: two
-// at the same moment can count as one.
-export async function countCheck(kv: Counter, what: Checked, who: string, now = new Date()) {
+// Counts `count` checked (e.g. 3 pictures in one check). The counters are thrown
+// away after two days. Close enough: two at the same moment can count as one.
+export async function countCheck(kv: Counter, what: Checked, who: string, count = 1, now = new Date()) {
   const key = await personKey(what, who, now)
   const [all, mine] = await Promise.all([checkedToday(kv, what, now), kv.get(key)])
   await Promise.all([
-    kv.put(`${what}:${today(now)}`, String(all + 1), { expirationTtl: TWO_DAYS }),
-    kv.put(key, String(Number(mine ?? 0) + 1), { expirationTtl: TWO_DAYS }),
+    kv.put(`${what}:${today(now)}`, String(all + count), { expirationTtl: TWO_DAYS }),
+    kv.put(key, String(Number(mine ?? 0) + count), { expirationTtl: TWO_DAYS }),
   ])
 }

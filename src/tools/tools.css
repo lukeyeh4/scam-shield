@@ -407,6 +407,59 @@ button.picture-box {
   width: 100%;
 }
 
+/* The pictures to check (up to 3), each with a small × to take it out */
+.picture-set {
+  display: grid;
+  grid-template-columns: repeat(var(--count, 1), minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.picture-set.count-2 {
+  --count: 2;
+}
+
+.picture-set.count-3 {
+  --count: 3;
+}
+
+.picture-set-item {
+  position: relative;
+}
+
+.picture-set .tool-photo {
+  width: 100%;
+  max-height: min(600px, 62vh);
+  object-fit: contain;
+}
+
+.picture-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink);
+}
+
+.picture-remove svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.6;
+}
+
+/* Several checked pictures, one under another */
+.picture-results {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 /* A picture that may not be OK to look at again: blurred past recognising */
 .tool-photo.is-hidden {
   filter: blur(28px);
@@ -738,13 +791,34 @@ button.picture-box {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 0;
-  padding: 16px 18px 16px 40px;
+  padding: 16px 18px;
   border-radius: 20px;
   background: var(--surface);
   box-shadow: var(--shadow-sm);
+}
+
+.result-urgent ol {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding-left: 22px;
   font-weight: 700;
   line-height: 1.4;
+}
+
+/* A small label over the clues ("Clues"), with how to open one on the right */
+.result-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px 4px -4px;
+}
+
+.result-hint {
+  color: var(--muted);
+  font-size: var(--text-small);
 }
 
 /* Facts in a link's favour, when there are no clues (never "safe") */
@@ -1031,6 +1105,64 @@ button.picture-box {
 
 .settings-more p {
   margin-top: 10px;
+}
+
+/* The history of checks: a coloured dot for the result, then what was found */
+.history {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.history-item {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.history-item.is-urgent {
+  background: var(--danger-bg);
+}
+
+.history-dot {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.history-dot.risk-high {
+  background: var(--danger-ink);
+}
+
+.history-dot.risk-medium {
+  background: #d9a400;
+}
+
+.history-dot.risk-none {
+  background: var(--good-ink);
+}
+
+.history-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.history-text > span {
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.history-clues {
+  overflow-wrap: anywhere;
 }
 
 /* Setting a PIN, and the buttons under a card */

@@ -1,9 +1,11 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 import { Buddy } from '../buddy/Buddy'
 import { noteCheck } from '../chat/session'
+import { type Checker, recordCheck } from '../history'
 import { splitByHighlights } from '../highlight'
 import { ChevronIcon, CloseIcon, DangerIcon, GoodIcon, GrownUpIcon, NoEntryIcon, UnsureIcon, ZoomIcon } from '../icons'
 import type { Box, CheckResult, Clue, Risk } from './examples'
+import { buddyWhy } from './clueWhy'
 import { marksOf } from './pictureMarks'
 
 // How each risk level is shown: soft red, yellow or green, each with its own icon
@@ -32,6 +34,8 @@ type ResultViewProps = {
   onDone?: () => void
   // "Ask Buddy about this": the chat, knowing what this check found
   onAskAbout?: () => void
+  // Which checker this is (and a link's website), for the grown-ups' history
+  history?: { checker: Checker; site?: string }
   // Buttons to show instead of Check something else / I'm done, in the game's
   // "Check with Scam Shield" practice (which the chat doesn't hear about)
   actions?: ReactNode
@@ -40,7 +44,7 @@ type ResultViewProps = {
 // The result of any check: what was checked beside how risky it looks and what to
 // do, the clues (one card each, numbered to match the marks), good signs when
 // there are no clues, then the buttons
-export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actions }: ResultViewProps) {
+export function ResultView({ subject, result, onAgain, onDone, onAskAbout, history, actions }: ResultViewProps) {
   const risk = result.urgent ? URGENT : result.notForKids ? NOT_FOR_KIDS : RISKS[result.risk]
   // A clue tapped in the list: its reason shows, and its boxes on a picture stand
   // out (tap again to close)
@@ -56,6 +60,10 @@ export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actio
   useEffect(() => {
     if (!practice) noteCheck(result.urgent ? 'urgent' : result.notForKids ? 'notForKids' : result.risk)
   }, [practice, result.risk, result.notForKids, result.urgent])
+  // In the grown-ups' history (not the game's practice checks)
+  useEffect(() => {
+    if (!practice && history) recordCheck(history.checker, result, history.site)
+  }, [practice, history, result])
   return (
     <section className={`result result-${result.risk}`} aria-labelledby="result-title">
       <div className="result-subject">
@@ -75,15 +83,29 @@ export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actio
         </div>
 
         {result.urgent && (
-          <ol className="result-urgent" aria-label="What to do">
-            {URGENT_STEPS.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
+          <div className="result-urgent">
+            <h3 className="result-label" id="result-steps">
+              What to do
+            </h3>
+            <ol aria-labelledby="result-steps">
+              {URGENT_STEPS.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </div>
         )}
 
+        {/* "Clues", a small label like "What you checked", and how to open one */}
         {result.clues.length > 0 && (
-          <ol className="result-clues" aria-label="Clues">
+          <div className="result-section-head">
+            <h3 className="result-label" id="result-clues">
+              {result.clues.length === 1 ? 'Clue' : 'Clues'}
+            </h3>
+            <span className="result-hint">Tap one to see why</span>
+          </div>
+        )}
+        {result.clues.length > 0 && (
+          <ol className="result-clues" aria-labelledby="result-clues">
             {result.clues.map((c, i) => (
               // Just the clue's name; tapping it opens why (and makes its boxes on
               // a picture stand out)
@@ -97,7 +119,7 @@ export function ResultView({ subject, result, onAgain, onDone, onAskAbout, actio
                 {picked === i &&
                   (asked === i ? (
                     <div className="result-why">
-                      <Buddy key={i} mood="thinking" messages={c.why ?? [c.reason, "If you're still not sure, ask a grown-up."]} />
+                      <Buddy key={i} mood="thinking" messages={buddyWhy(c, i + 1)} />
                     </div>
                   ) : (
                     <button className="result-why-button" type="button" onClick={() => setAsked(i)}>
@@ -169,8 +191,11 @@ export function MarkedText({ text, clues, className = '' }: { text: string; clue
 // are only decoration: the list says everything, in order, for screen readers.
 // `picked`: the clue (or clues) whose boxes stand out. `onPick`: boxes become
 // buttons that say which clues they mark (in the big picture).
-type MarkedPictureProps = { src: string; clues: Clue[]; picked?: number | number[] | null; onPick?: (clues: number[]) => void }
-export function MarkedPicture({ src, clues, picked = null, onPick }: MarkedPictureProps) {
+// `index`: which of the check's pictures this is (its boxes only)
+type MarkedPictureProps = { src: string; clues: Clue[]; index?: number; picked?: number | number[] | null; onPick?: (clues: number[]) => void }
+export function MarkedPicture({ src, clues: all, index = 0, picked = null, onPick }: MarkedPictureProps) {
+  // Every clue (so the numbers match the list), with only this picture's boxes
+  const clues = all.map((c) => ({ ...c, boxes: c.boxes?.filter((b) => (b.picture ?? 0) === index) }))
   const standOut = picked === null ? [] : Array.isArray(picked) ? picked : [picked]
   const marked = clues.filter((c) => c.boxes?.length).length
   // Each number sits on its box's top-left corner, or the top-right one if another
@@ -229,7 +254,7 @@ export function MarkedPicture({ src, clues, picked = null, onPick }: MarkedPictu
 // The picture with its boxes, and a button (or a tap on the picture) to see it
 // big: full screen, with the same boxes, to look closely at small writing. There,
 // tapping a box shows its clues in a card at the bottom.
-export function ZoomablePicture({ src, clues, picked = null }: { src: string; clues: Clue[]; picked?: number | null }) {
+export function ZoomablePicture({ src, clues, index = 0, picked = null }: { src: string; clues: Clue[]; index?: number; picked?: number | null }) {
   const dialog = useRef<HTMLDialogElement>(null)
   // The clues of the box tapped in the big picture
   const [shown, setShown] = useState<number[] | null>(null)
@@ -239,7 +264,7 @@ export function ZoomablePicture({ src, clues, picked = null }: { src: string; cl
   return (
     <div className="zoomable">
       <button className="zoomable-picture" type="button" onClick={open} aria-label="Make the picture bigger">
-        <MarkedPicture src={src} clues={clues} picked={picked} />
+        <MarkedPicture src={src} clues={clues} index={index} picked={picked} />
       </button>
       <button className="zoom-button" type="button" onClick={open} aria-label="Make the picture bigger">
         <ZoomIcon />
@@ -255,7 +280,7 @@ export function ZoomablePicture({ src, clues, picked = null }: { src: string; cl
         <button className="zoom-close" type="button" onClick={close} aria-label="Close the big picture" autoFocus>
           <CloseIcon />
         </button>
-        <MarkedPicture src={src} clues={clues} picked={shown} onPick={pick} />
+        <MarkedPicture src={src} clues={clues} index={index} picked={shown} onPick={pick} />
         {shown && (
           <ul className="zoom-card" aria-live="polite">
             {shown.map((n) => (

@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
-import { CameraIcon, ImageIcon, ScanIcon } from '../icons'
+import { CameraIcon, CloseIcon, ImageIcon, ScanIcon } from '../icons'
 import { askAbout } from '../chat/session'
 import { useSetUp } from '../setup'
 import { type CheckResult, inPictureOrder } from './examples'
@@ -21,6 +21,12 @@ import { Checking, SetupFirst, ToolScreen, type ToolNav } from './ToolScreen'
 type Stage = 'choose' | 'check' | 'checking'
 const STEP: Record<Stage, number> = { choose: 0, check: 1, checking: 2 }
 
+// For the grown-ups' history (history.ts)
+const PICTURE_HISTORY = { checker: 'picture' as const }
+
+// The most pictures checked together (the Worker takes up to 3)
+const MAX_PICTURES = 3
+
 // What to say when a picture can't be used
 const PROBLEMS: Record<PictureProblem, string> = {
   notAPicture: "That isn't a picture. Try a screenshot or a photo.",
@@ -39,8 +45,9 @@ const SCREENSHOT_TIP = !canTakePhoto
 const imageIn = (files: FileList | null | undefined) => [...(files ?? [])].find((f) => f.type.startsWith('image/')) ?? null
 
 // Check a picture, the main tool. Choose a screenshot or photo (or paste or drag
-// one in; in the app, share one to Scam Shield: picturePicker.ts), make sure it's
-// the right one, then see the result. Pictures will be sent to be checked, so a
+// one in; in the app, share one to Scam Shield: picturePicker.ts), add up to two
+// more of the same thing (e.g. a video's comments, or the shop it links to), make
+// sure they're the right ones, then see the result. Pictures will be sent to be checked, so a
 // grown-up has to finish setup first.
 // The picture is sent to our server, which has Claude look for warning signs
 // (pictureLookup.ts).
@@ -56,7 +63,8 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   const [place, setPlace] = useState<Place | null>(null)
   const [typed, setTyped] = useState('')
   const about = contextFor(place, typed)
-  const [picture, setPicture] = useState<PreparedPicture | null>(null)
+  // The pictures to check together (up to MAX_PICTURES)
+  const [pictures, setPictures] = useState<PreparedPicture[]>([])
   // A picture shared to the app (or handed over from elsewhere) opens straight away
   const [received] = useState(() => (setUp ? takeReceivedPicture() : null))
   const [problem, setProblem] = useState<PictureProblem | null>(null)
@@ -68,9 +76,10 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   const show = (prepared: PreparedPicture | PictureProblem) => {
     setPreparing(false)
     if (typeof prepared === 'string') return setProblem(prepared)
-    setPicture((old) => {
-      forgetPicture(old)
-      return prepared
+    setPictures((old) => {
+      if (old.length < MAX_PICTURES) return [...old, prepared]
+      forgetPicture(prepared)
+      return old
     })
     setStage('check')
   }
@@ -88,17 +97,25 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
     if (received) void preparePicture(received).then(showReceived)
   }, [received])
 
-  // The picture is let go when leaving
-  const current = useRef(picture)
+  // Taking one out (back to choosing if it was the last)
+  const remove = (gone: PreparedPicture) => {
+    forgetPicture(gone)
+    const left = pictures.filter((p) => p !== gone)
+    setPictures(left)
+    if (!left.length) setStage('choose')
+  }
+
+  // The pictures are let go when leaving
+  const current = useRef(pictures)
   useEffect(() => {
-    current.current = picture
-  }, [picture])
-  useEffect(() => () => forgetPicture(current.current), [])
+    current.current = pictures
+  }, [pictures])
+  useEffect(() => () => current.current.forEach(forgetPicture), [])
 
   // Pasting (Cmd+V or Ctrl+V) or dropping a picture anywhere on the page works on
   // the first two steps. (Dropping is always caught here, so a picture dropped by
   // mistake never opens in place of the app.)
-  const takesPictures = setUp && (stage === 'choose' || stage === 'check')
+  const takesPictures = setUp && (stage === 'choose' || stage === 'check') && pictures.length < MAX_PICTURES
   const onPaste = useEffectEvent((e: ClipboardEvent) => {
     const image = imageIn(e.clipboardData?.files)
     if (!image || !takesPictures) return
@@ -122,15 +139,15 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
     }
   }, [])
 
-  // Sends the picture, and turns the answer into the result
+  // Sends the pictures, and turns the answer into the result
   const check = () => {
-    if (!picture) return
+    if (!pictures.length) return
     const id = ++latestCheck.current
     setResult(null)
     setWaited(false)
     setStage('checking')
     const { context, upset } = about
-    void lookUpPicture(picture, context)
+    void lookUpPicture(pictures, context)
       .then(pictureResult)
       // Something upsetting typed about it: a grown-up right now, whatever's in it
       .then((checked) => (upset ? { ...checked, risk: 'high' as const, urgent: true } : checked))
@@ -188,13 +205,20 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
           </div>
         )}
 
-        {stage === 'check' && picture && (
+        {stage === 'check' && pictures.length > 0 && (
           <div className="tool-split">
-            <div className="tool-picture">
-              <img className="tool-photo" src={picture.url} alt="The picture you chose" />
+            <div className={`tool-picture picture-set count-${pictures.length}`}>
+              {pictures.map((p, i) => (
+                <div key={p.url} className="picture-set-item">
+                  <img className="tool-photo" src={p.url} alt={`Picture ${i + 1} you chose`} />
+                  <button className="picture-remove" type="button" onClick={() => remove(p)} aria-label={`Take out picture ${i + 1}`}>
+                    <CloseIcon />
+                  </button>
+                </div>
+              ))}
             </div>
             <div className="tool-column">
-              <h2 className="tool-heading">Is this the right picture?</h2>
+              <h2 className="tool-heading">{pictures.length > 1 ? 'Are these the right pictures?' : 'Is this the right picture?'}</h2>
               {/* Where it came from helps the check (optional) */}
               <PlacePicker place={place} onPlace={setPlace} typed={typed} onTyped={setTyped} personal={about.personal} />
               <div className="tool-actions">
@@ -202,10 +226,16 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
                   <ScanIcon />
                   Check it
                 </button>
-                <button className="tool-button" type="button" disabled={preparing} onClick={() => choose('library')}>
-                  Choose another
-                </button>
+                {pictures.length < MAX_PICTURES && (
+                  <button className="tool-button" type="button" disabled={preparing} onClick={() => choose('library')}>
+                    <ImageIcon />
+                    Add another screenshot
+                  </button>
+                )}
               </div>
+              {pictures.length < MAX_PICTURES && (
+                <p className="tool-text">You can add the comments or the shop page too.</p>
+              )}
               {problem && (
                 <p className="tool-problem" role="alert">
                   {PROBLEMS[problem]}
@@ -217,19 +247,23 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
 
         {stage === 'checking' && !showResult && <Checking onDone={() => setWaited(true)} ms={1500} />}
 
-        {showResult && picture && shown && (
+        {showResult && pictures.length > 0 && shown && (
           <ResultView
             subject={(picked) => (
-              <div className="tool-picture">
-                {/* A picture that may not be OK to look at is blurred, with no boxes */}
-                {shown.hidePicture ? (
-                  <img className="tool-photo is-hidden" src={picture.url} alt="Your picture, hidden" />
-                ) : (
-                  <ZoomablePicture src={picture.url} clues={shown.clues} picked={picked} />
+              <div className="tool-picture picture-results">
+                {/* Each picture with its own boxes (numbered across all of them). A
+                    picture that may not be OK to look at is blurred, with no boxes */}
+                {pictures.map((p, i) =>
+                  shown.hidePicture ? (
+                    <img key={p.url} className="tool-photo is-hidden" src={p.url} alt={`Picture ${i + 1}, hidden`} />
+                  ) : (
+                    <ZoomablePicture key={p.url} src={p.url} index={i} clues={shown.clues} picked={picked} />
+                  ),
                 )}
               </div>
             )}
             result={shown}
+            history={PICTURE_HISTORY}
             onAgain={onAsk}
             onAskAbout={() => {
               askAbout(shown.clues.map((c) => c.label))

@@ -4,8 +4,9 @@
 // pictures (pictureLookup.ts) and messages (messageLookup.ts) are really checked.
 export type Risk = 'high' | 'medium' | 'none'
 
-// A box on a picture, from 0 to 1000 across and down
-export type Box = { left: number; top: number; right: number; bottom: number }
+// A box on a picture, from 0 to 1000 across and down. `picture`: which of the
+// pictures in a check it's on (from 0; the first if left out)
+export type Box = { left: number; top: number; right: number; bottom: number; picture?: number }
 
 // `why`: what Shield Buddy says when a kid taps "Why?" on the clue: a few short,
 // scripted lines that end with a grown-up (Result.tsx; without it, Buddy says the
@@ -31,9 +32,9 @@ export function inTextOrder(result: CheckResult, text: string): CheckResult {
   return { ...result, clues: [...result.clues].sort((a, b) => at(a) - at(b)) }
 }
 
-// The clues in the order their first boxes come down a picture, so the numbers
-// count down it as you read; clues without boxes go last
+// The clues in the order their first boxes come, picture by picture and down each
+// one, so the numbers count on as you read; clues without boxes go last
 export function inPictureOrder(result: CheckResult): CheckResult {
-  const at = (c: Clue) => (c.boxes?.length ? Math.min(...c.boxes.map((b) => b.top)) : Infinity)
+  const at = (c: Clue) => (c.boxes?.length ? Math.min(...c.boxes.map((b) => (b.picture ?? 0) * 1000 + b.top)) : Infinity)
   return { ...result, clues: [...result.clues].sort((a, b) => at(a) - at(b)) }
 }

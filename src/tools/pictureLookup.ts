@@ -22,37 +22,60 @@ const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean;
     label: 'Asks for a password or code',
     reason: 'Real companies and friends never ask for these.',
     strong: true,
-    why: ['A password is like the key to your house.', 'With it, someone can get into your account and take your things.', "Never share it. Ask a grown-up if you're not sure."],
+    why: [
+      'A password is like the key to your house.',
+      'Real companies and friends never ask for it.',
+      'Next time, say no and show a grown-up.',
+    ],
   },
   'asks for money, gift cards or card details': {
     label: 'Asks for money or gift cards',
     reason: 'Once you send it, the money is gone.',
     strong: true,
-    why: ['Gift card codes are just like cash.', "Once you send one, you can't get it back. That's why scammers ask for them.", 'Ask a grown-up first.'],
+    why: [
+      'Gift card codes are just like cash.',
+      "Once you send one, you can't get it back.",
+      'Next time, never send codes or money. Ask a grown-up first.',
+    ],
   },
   'asks for personal details': {
     label: 'Asks about you',
     reason: 'Keep where you live and your school private.',
     strong: true,
-    why: ['Your address and school tell a stranger where to find you.', 'Keep them private, and tell a grown-up if someone asks.'],
+    why: [
+      'Your address and school tell a stranger where to find you.',
+      'Next time, keep them private and tell a grown-up who asked.',
+    ],
   },
   'asks for photos or videos of you': {
     label: 'Asks for photos of you',
     reason: 'Never send photos of yourself.',
     strong: true,
-    why: ['Someone asking for photos of you is not OK.', "You haven't done anything wrong.", 'Show a grown-up you trust right away.'],
+    why: [
+      'Someone asking for photos of you is not OK.',
+      "You haven't done anything wrong.",
+      'Show a grown-up you trust right away.',
+    ],
   },
   'free prize or free game money': {
     label: 'Free prizes',
     reason: 'Free stuff from strangers is a common trick.',
     strong: true,
-    why: ["Nobody gives free Robux or prizes to people they don't know.", "It's bait, like a worm on a fishing hook.", "Ask a grown-up if you're not sure."],
+    why: [
+      "Nobody gives free Robux or prizes to people they don't know.",
+      "It's bait, like a worm on a fishing hook.",
+      'Next time, ask a grown-up before you tap.',
+    ],
   },
   'sad story to get you to buy or give money': {
     label: 'A sad story to make you pay',
     reason: 'Sad stories are used to make you buy fast.',
     strong: false,
-    why: ['Sad stories make us want to help. That shows you are kind!', 'But scammers use them to make people buy without thinking.', 'Ask a grown-up before buying anything.'],
+    why: [
+      "Sad stories make us want to help. That shows you're kind!",
+      'But scammers use them to make people buy fast.',
+      'Next time, ask a grown-up before buying anything.',
+    ],
   },
   // Only "Be careful": we can't prove a photo is made with AI, only that what
   // arrives may look very different (even from a real shop like Amazon)
@@ -61,46 +84,69 @@ const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean;
     reason: 'What arrives may look very different.',
     strong: false,
     why: [
-      'Some product photos are made with AI or changed to look amazing.',
-      'What comes in the post can look nothing like the picture, even from a real shop.',
-      'Ask a grown-up before buying.',
+      'Some product photos are made with AI to look amazing.',
+      'What comes in the post can look nothing like it.',
+      'Next time, ask a grown-up before buying.',
     ],
   },
   'pretends to be a company, game or famous person': {
     label: 'Pretending to be someone',
     reason: 'It might not really be them.',
     strong: true,
-    why: ['Anyone can use a famous name or logo.', "That doesn't make it real.", 'A grown-up can help you check.'],
+    why: [
+      'Anyone can use a famous name or logo.',
+      "That doesn't make it real.",
+      'Next time, check the real app or website with a grown-up.',
+    ],
   },
   'pretends to be family or a friend': {
     label: 'Maybe not who they say',
     reason: "Something's different, like a new number.",
     strong: true,
-    why: ["Scammers say things like 'Hi Mum, new number' to sound like family.", 'A grown-up can call the real person to check.'],
+    why: [
+      "Scammers say things like 'Hi Mum, new number' to sound like family.",
+      'Next time, ask a grown-up to call the person on their old number.',
+    ],
   },
   'rushes you': {
     label: 'Rushing you',
     reason: 'Hurrying stops you from thinking.',
     strong: false,
-    why: ["When you hurry, you don't have time to think.", 'Real offers can wait.', 'Take a breath and ask a grown-up.'],
+    why: [
+      "When you hurry, you don't have time to think.",
+      'Real offers can wait.',
+      'Next time, take a breath and ask a grown-up.',
+    ],
   },
   'threatens you': {
     label: 'Trying to scare you',
     reason: "It's not your fault.",
     strong: true,
-    why: ['People who scare you want you to act before you think.', "It's not your fault.", 'Show a grown-up right away.'],
+    why: [
+      'People who scare you want you to act before you think.',
+      "It's not your fault.",
+      'Show a grown-up right away.',
+    ],
   },
   'asks you to move to another app or keep a secret': {
     label: 'Asks for a secret',
     reason: "Safe people don't ask you to keep secrets.",
     strong: true,
-    why: ['Asking you to keep a secret, or to talk in another app, is a big warning sign.', "Safe people don't mind grown-ups knowing.", 'Tell a grown-up.'],
+    why: [
+      'Asking you to keep a secret, or to talk in another app, is a big warning sign.',
+      "Safe people don't mind grown-ups knowing.",
+      'Next time, tell a grown-up straight away.',
+    ],
   },
   'wants you to download something': {
     label: 'Wants a download',
     reason: 'It could put a bad app on your device.',
     strong: true,
-    why: ['Downloads from strangers can hide bad apps.', 'They can spy on you or break your device.', 'Ask a grown-up first.'],
+    why: [
+      'Downloads from strangers can hide bad apps.',
+      'They can spy on you or break your device.',
+      'Next time, ask a grown-up before downloading anything.',
+    ],
   },
 }
 
@@ -122,15 +168,16 @@ export function contextFor(place: Place | null, typed: string) {
   return { context: parts.join('. ') || undefined, personal, upset: soundsUpset(note) }
 }
 
-// Sends the picture to be checked; null if the server can't answer (no server, no
-// setup, too slow, or the AI couldn't answer)
-export async function lookUpPicture(picture: PreparedPicture, context?: string): Promise<PictureFacts | null> {
+// Sends the pictures (up to 3, of the same thing) to be checked together; null if
+// the server can't answer (no server, no setup, too slow, the AI couldn't answer,
+// or over today's limit)
+export async function lookUpPicture(pictures: PreparedPicture[], context?: string): Promise<PictureFacts | null> {
   if (!SERVER || !isSetUp()) return null
   try {
     const res = await fetch(`${SERVER}/picture`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ image: await base64(picture.blob), context }),
+      body: JSON.stringify({ images: await Promise.all(pictures.map((p) => base64(p.blob))), context }),
       // Looking at a picture takes a few seconds
       signal: AbortSignal.timeout(30000),
     })

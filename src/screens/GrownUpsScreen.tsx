@@ -1,5 +1,6 @@
 import { type FormEvent, type ReactNode, useEffect, useState } from 'react'
 import { setQuestionsAllowed, useQuestionsAllowed } from '../chat/askBuddy'
+import { clearHistory, type HistoryEntry, type Outcome, setKeepHistory, useHistory, useKeepHistory } from '../history'
 import { LockIcon } from '../icons'
 import { checkPin, hasPin, isPin, makeQuestion, noteTry, PIN_LENGTH, removePin, secondsLocked, setPin } from '../parentGate'
 import { setSetUp, useSetUp } from '../setup'
@@ -11,8 +12,9 @@ import { canTalk, setTalkingAllowed, useTalkingAllowed } from '../voiceInput'
 // one is set, otherwise a sum to type. Then the settings, in short cards with the
 // details behind "More": whether the child can use the checks (nothing is sent
 // anywhere until then: setup.ts), Shield Buddy's questions and listening, what
-// results say about grown-up websites, the PIN, and a family code word (advice
-// only: it's never saved). Everything is saved on this device.
+// results say about grown-up websites, the history of checks (history.ts), the
+// PIN, and a family code word (advice only: it's never saved). Everything is saved
+// on this device.
 // Written for adults, so the kids' reading-level rules don't apply here.
 
 export function GrownUpsScreen({ onBack }: { onBack: () => void }) {
@@ -233,6 +235,8 @@ function Settings({ onDone }: { onDone: () => void }) {
         </Toggle>
       </Section>
 
+      <HistorySection />
+
       <PinSection />
 
       <Section title="Family code word">
@@ -248,6 +252,80 @@ function Settings({ onDone }: { onDone: () => void }) {
         </button>
       </div>
     </div>
+  )
+}
+
+// How each result reads in the history, and its colour
+const OUTCOMES: Record<Outcome, { text: string; tone: 'high' | 'medium' | 'none' }> = {
+  urgent: { text: 'Needs a grown-up now', tone: 'high' },
+  scam: { text: 'Looked like a scam', tone: 'high' },
+  notForKids: { text: 'Website not for kids', tone: 'high' },
+  careful: { text: 'Be careful', tone: 'medium' },
+  couldNotCheck: { text: "Couldn't be checked", tone: 'medium' },
+  clean: { text: 'No clues found', tone: 'none' },
+}
+const CHECKERS = { picture: 'Picture', message: 'Message', link: 'Link' }
+
+// "Today, 3:42 pm", "Yesterday, 9:05 am" or "12 Oct, 3:42 pm"
+function when(at: string, now = new Date()) {
+  const date = new Date(at)
+  const time = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  const days = Math.round((new Date(now.toDateString()).getTime() - new Date(date.toDateString()).getTime()) / 86_400_000)
+  const day = days === 0 ? 'Today' : days === 1 ? 'Yesterday' : date.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+  return `${day}, ${time}`
+}
+
+// The child's recent checks (history.ts): never the pictures or messages themselves
+function HistorySection() {
+  const keep = useKeepHistory()
+  const entries = useHistory()
+  const [all, setAll] = useState(false)
+  const shown = all ? entries : entries.slice(0, 5)
+  return (
+    <Section title="History">
+      <Toggle on={keep} onChange={setKeepHistory} label="Keep a history of checks">
+        See what your child checked and what Scam Shield found. It is saved only on this device. It never includes the
+        pictures or messages.
+      </Toggle>
+      {entries.length === 0 ? (
+        <p>{keep ? 'No checks yet.' : 'The history is off.'}</p>
+      ) : (
+        <>
+          <ul className="history">
+            {shown.map((entry: HistoryEntry) => {
+              const outcome = OUTCOMES[entry.outcome]
+              return (
+                <li key={entry.at} className={entry.outcome === 'urgent' ? 'history-item is-urgent' : 'history-item'}>
+                  <span className={`history-dot risk-${outcome.tone}`} aria-hidden="true" />
+                  <span className="history-text">
+                    <strong>{outcome.text}</strong>
+                    <span>
+                      {CHECKERS[entry.checker]}
+                      {entry.site ? ` · ${entry.site}` : ''} · {when(entry.at)}
+                    </span>
+                    {entry.clues.length > 0 && <span className="history-clues">{entry.clues.join(' · ')}</span>}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+          <div className="settings-buttons">
+            {entries.length > 5 && (
+              <button className="tool-button" type="button" onClick={() => setAll(!all)}>
+                {all ? 'Show fewer' : `Show all ${entries.length}`}
+              </button>
+            )}
+            <button
+              className="tool-button"
+              type="button"
+              onClick={() => window.confirm('Clear the history of checks on this device?') && clearHistory()}
+            >
+              Clear history
+            </button>
+          </div>
+        </>
+      )}
+    </Section>
   )
 }
 

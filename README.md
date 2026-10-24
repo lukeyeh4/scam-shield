@@ -59,8 +59,6 @@ Every scam follows the same steps, so kids always know what's coming.
 
 <img src="docs/screenshots/scam-shorts.png" alt="A fake giveaway on YouTube Shorts" width="50%">
 
-*The screenshots show an earlier look (grey colours and the old robot Buddy); the game now uses the cream look below.*
-
 ## Shield Buddy
 
 A friendly yellow shield with a face and little hands, who guides each scam in short speech bubbles. It has six moods (`happy`, `curious`, `thinking`, `worried`, `cheering`, `neutral`) and a little move for each.
@@ -70,6 +68,23 @@ A friendly yellow shield with a face and little hands, who guides each scam in s
 - **Every line is scripted** in the scenario files. Nothing is generated.
 - **Read aloud:** a "Read aloud" switch in the top corner (off by default) has the device's own voice read Buddy's lines; each bubble waits until the voice has finished.
 - **A conversation that carries on:** in Ask Shield Buddy, leaving to check something and coming back continues the same chat. Buddy greets once, then reacts to what the check found, in a different way each time.
+
+## Check something
+
+The home screen has two parts: **Check something**, for anything that feels weird right now, and **Learn about scams**, the game.
+
+![The home screen: Check something and Learn about scams](docs/screenshots/home.png)
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/ask-buddy.png" alt="Ask Shield Buddy: Buddy asks what to check, with A picture, A link, A message and I'm not sure"></td>
+    <td width="50%"><img src="docs/screenshots/check-link.png" alt="A link result: This looks like a scam, with the clues Pretending to be Roblox and Words that tempt you"></td>
+  </tr>
+  <tr>
+    <td><b>Ask Shield Buddy.</b> Buddy asks what it is and opens the right checker. Kids can also type or say a question.</td>
+    <td><b>The result.</b> What was checked, with each clue marked and numbered, what to do, and the clues in a short list. Tap one to see why.</td>
+  </tr>
+</table>
 
 ## Check a link
 
@@ -85,15 +100,21 @@ Tested against 140 real websites (no false alarms) and 40 live phishing links (3
 
 ## Check a picture
 
-Kids take a screenshot or photo of anything that worries them (a text, a game chat, an ad, a website, a pop-up, a short video) and can say where it's from (someone they don't know, a friend, a game, an ad). Claude looks for warning signs from a fixed list: asking for a password, code, money or photos, free prizes, pretending to be a company or family, rushing, threats, secrets, downloads, sad stories used to sell, and product photos that may not be the real thing. Links in the picture go through the link checker.
+Kids take a screenshot or photo of anything that worries them (a text, a game chat, an ad, a website, a pop-up, a short video), with up to two more of the same thing (like a video's comments or the shop it links to), and can say where it's from (someone they don't know, a friend, a game, an ad). Claude looks for warning signs from a fixed list: asking for a password, code, money or photos, free prizes, pretending to be a company or family, rushing, threats, secrets, downloads, sad stories used to sell, and product photos that may not be the real thing. Links in the picture go through the link checker.
 
 The result shows the picture with numbered boxes around each warning sign, a short list of clue names (tap one for a one-line reason, then "Why? Ask Shield Buddy" for Buddy's scripted explanation), a magnifier to see it big, and "Ask Buddy about this", which opens the chat with help for kids who already tapped, replied or sent something. A threat, a request for photos, or a picture Claude won't look at gets a calm "Show a grown-up right now / It's not your fault" (the picture is blurred if it may not be OK to see). The AI only answers fixed questions: the app writes everything kids read, and it never says "safe".
+
+<img src="docs/screenshots/check-picture.png" alt="A picture result: the YouTube Short with its clues highlighted, and the clues Someone rushing you, A fake channel name and A free prize" width="50%">
+
+*The practice check in the game, where the clues are the scam's own. A real picture check draws numbered boxes around each warning sign.*
 
 Tested on 17 made-up screenshots and 48 made-up photos of screens (angled, glare, dim): every scam caught, no false alarms, and look-alike links (dlscord, rnicrosoft, paypa1) copied exactly.
 
 ## Check a message
 
 Kids paste a text, chat, email or post. Phone numbers, emails, codes and addresses are blanked out on the device before anything is sent. Claude names the same warning signs and quotes the words that show them, which are highlighted and numbered in the message. The result screen is the same as for pictures. Tested on 12 made-up messages: every scam caught, no false alarms.
+
+<img src="docs/screenshots/check-message.png" alt="A message result: the Mom text with three highlighted, numbered clues" width="50%">
 
 ## For grown-ups
 
@@ -102,8 +123,11 @@ Behind the gear on the home screen, past a parent gate (a grown-up PIN, or a sum
 - **Checks:** nothing a child checks or asks is sent anywhere until a grown-up turns this on. "What is sent, and where" explains each part in plain words.
 - **Shield Buddy:** whether Buddy answers typed questions (with AI, only about scams and staying safe) and whether the child can ask out loud.
 - **Results:** whether to name the type of unsafe website (betting, adult, pirated streaming) or just say it isn't for kids.
+- **History:** the child's recent checks: when, which checker, the result and the clues found (and a link's website). It's kept only on the device and never includes the pictures or messages.
 - **Grown-up PIN:** set, change or remove it. A wrong PIN shakes, like a phone's lock screen.
 - **Family code word:** advice only. Nothing is saved.
+
+<img src="docs/screenshots/grown-ups.png" alt="The grown-ups settings: Checks, Shield Buddy, Results, History, Grown-up PIN and Family code word" width="50%">
 
 Each home can check 40 pictures and 100 messages a day. Kids are told the checks use AI: Buddy says it's "a computer helper, not a real person", and every AI result says so.
 
