@@ -110,7 +110,7 @@ export function TextCheck({ kind, initial = '', onHome, onAsk, onSetUp }: TextCh
   const shown = result && inTextOrder(sayKind ? result : withoutWebsiteKind(result), shownText)
   // Messages will be sent to be checked, so a grown-up has to finish setup first.
   // Links are checked on the device until then, with a note saying so.
-  if (kind === 'message' && !setUp) return <SetupFirst title={k.title} what="messages" onHome={onHome} onSetUp={onSetUp} />
+  if (kind === 'message' && !setUp) return <SetupFirst title={k.title} what="messages" onAsk={onAsk} onSetUp={onSetUp} />
   // A message's result says an AI checked it (kids must be told: Anthropic's rules
   // for apps used by minors)
   const note =

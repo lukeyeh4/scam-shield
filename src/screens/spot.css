@@ -154,8 +154,31 @@ mark.flag-hint {
     font-size: var(--text-body);
   }
 
+  /* The clues two to a row, with the hint button in the next free place, so the
+     fake screen keeps most of the room */
+  .spot-footer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .spot-list {
+    display: contents;
+  }
+
+  .spot-footer .primary-button {
+    grid-column: 1 / -1;
+  }
+
   .spot-item {
     min-height: 44px;
+    padding: 4px 10px 4px 8px;
     font-size: var(--text-small);
+    line-height: 1.2;
+  }
+
+  .hint-button {
+    justify-content: center;
+    min-height: 44px;
   }
 }

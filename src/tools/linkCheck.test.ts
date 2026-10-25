@@ -110,8 +110,8 @@ describe('checkLink', () => {
   })
 
   it('only says be careful about a brand inside a longer name without bait words (fan websites)', () => {
-    expect(checkLink('planetminecraft.com')).toMatchObject({ risk: 'medium', clues: [{ label: "Uses Minecraft's name" }] })
-    expect(checkLink('fortnitetracker.com')).toMatchObject({ risk: 'medium', clues: [{ label: "Uses Fortnite's name" }] })
+    expect(checkLink('planetminecraft.com')).toMatchObject({ risk: 'medium', clues: [{ label: "Not the real Minecraft website" }] })
+    expect(checkLink('fortnitetracker.com')).toMatchObject({ risk: 'medium', clues: [{ label: "Not the real Fortnite website" }] })
   })
 
   it('knows YouTube Kids is the real YouTube', () => {
@@ -156,7 +156,7 @@ describe('checkLink', () => {
     })
 
     it('only says be careful about a brand subdomain on its own (a fan wiki)', () => {
-      expect(checkLink('roblox.fandom.com')).toMatchObject({ risk: 'medium', clues: [{ label: "Uses Roblox's name" }] })
+      expect(checkLink('roblox.fandom.com')).toMatchObject({ risk: 'medium', clues: [{ label: "Not the real Roblox website" }] })
     })
   })
 

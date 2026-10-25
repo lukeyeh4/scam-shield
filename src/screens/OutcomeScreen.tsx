@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { Buddy } from '../buddy/Buddy'
+import { ChevronIcon } from '../icons'
 import { CHOICES, RESULTS, WHAT_IF } from '../labels'
 import type { Choice, Scenario } from '../types'
 import './results.css'
@@ -12,10 +13,14 @@ type OutcomeScreenProps = {
 }
 
 // Screen 3: what happened after the player's choice, explained by Shield Buddy,
-// then what the other two choices would have led to.
+// then what the other two choices would have led to: just the choice and its
+// result, and tapping one opens what would have happened (like a result's clues),
+// so there's never much to read at once.
 export function OutcomeScreen({ scenario, choice, onBack, onContinue }: OutcomeScreenProps) {
   const [revealed, setRevealed] = useState(false)
   const reveal = useCallback(() => setRevealed(true), [])
+  // The "What if you had…" card that's open, if any
+  const [open, setOpen] = useState<Choice>()
 
   const chosen = CHOICES.find((c) => c.id === choice)!
   const outcome = scenario.outcomes[choice]
@@ -42,17 +47,27 @@ export function OutcomeScreen({ scenario, choice, onBack, onContinue }: OutcomeS
         <Buddy mood={reaction.mood} messages={[reaction.text, outcome.text]} onDone={reveal} />
 
         <section className={revealed ? 'outcome-others' : 'outcome-others is-hidden'} inert={!revealed}>
-          <h2 className="outcome-others-title">What if you had…</h2>
+          <div className="outcome-others-head">
+            <h2 className="outcome-others-title">What if you had…</h2>
+            <span className="outcome-others-hint">Tap one to see</span>
+          </div>
           <div className="outcome-cards">
             {others.map((c) => {
               const other = scenario.outcomes[c.id]
+              const isOpen = open === c.id
               return (
-                <div key={c.id} className="outcome-card">
-                  <div className="outcome-card-top">
+                <div key={c.id} className={isOpen ? 'outcome-card is-open' : 'outcome-card'}>
+                  <button
+                    className="outcome-card-button"
+                    type="button"
+                    aria-expanded={isOpen}
+                    onClick={() => setOpen(isOpen ? undefined : c.id)}
+                  >
                     <strong>…{scenario.whatIf?.[c.id] ?? WHAT_IF[c.id]}</strong>
                     <span className={`result-tag result-${other.result}`}>{RESULTS[other.result].label}</span>
-                  </div>
-                  <p>{other.text}</p>
+                    <ChevronIcon className="outcome-card-arrow" />
+                  </button>
+                  {isOpen && <p>{other.text}</p>}
                 </div>
               )
             })}

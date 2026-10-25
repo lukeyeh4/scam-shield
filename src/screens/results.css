@@ -82,6 +82,12 @@
   margin: 0 auto;
   padding: 24px 16px;
   overflow: auto;
+  /* Scrolls without a scroll bar, like Buddy's bubbles and the chat */
+  scrollbar-width: none;
+}
+
+.outcome-main::-webkit-scrollbar {
+  display: none;
 }
 
 .outcome-heading {
@@ -107,6 +113,7 @@
 
 .outcome-others {
   width: 100%;
+  max-width: 560px;
   transition:
     opacity 400ms ease-out,
     transform 500ms var(--ease);
@@ -117,38 +124,81 @@
   transform: translateY(16px);
 }
 
+.outcome-others-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px 12px;
+}
+
 .outcome-others-title {
-  margin-bottom: 12px;
   font-size: var(--text-large);
 }
 
-.outcome-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+.outcome-others-hint {
+  color: var(--muted);
+  font-size: var(--text-small);
 }
 
+.outcome-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Each other choice shows only what it was and its result; tapping it opens
+   what would have happened (like a result's clues) */
 .outcome-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  border-radius: var(--radius);
+  gap: 6px;
+  padding: 12px 16px;
+  border-radius: 20px;
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
 
-.outcome-card-top {
+.outcome-card.is-open {
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 0 0 2px var(--accent);
+}
+
+.outcome-card-button {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.outcome-card-button strong {
+  flex: 1;
+  line-height: 1.3;
+}
+
+.outcome-card-arrow {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--muted);
+  transition: transform 200ms var(--ease);
+}
+
+.outcome-card.is-open .outcome-card-arrow {
+  transform: rotate(90deg);
 }
 
 .outcome-card p {
   color: var(--muted);
-  font-size: var(--text-body);
+  font-size: var(--text-small);
+  line-height: 1.45;
 }
 
 /* Stop, Check, Tell */
@@ -336,10 +386,6 @@ mark.flag {
     padding: 16px;
   }
 
-  .outcome-cards {
-    grid-template-columns: 1fr;
-  }
-
   .outcome-main .buddy-image {
     width: 138px;
     height: 138px;
@@ -347,6 +393,23 @@ mark.flag {
 
   .stepper-hint {
     display: none;
+  }
+
+  /* Smaller steps, so the fake screen gets the room */
+  .stepper-dot {
+    width: 32px;
+    height: 32px;
+  }
+
+  .stepper-step:not(:last-child)::after {
+    top: 14px;
+    left: calc(50% + 22px);
+    right: calc(-50% + 22px);
+  }
+
+  .stepper-label {
+    margin-top: 2px;
+    font-size: var(--text-body);
   }
 
   .primary-button,
@@ -380,4 +443,53 @@ mark.flag {
 
 .check-it-tool .tool-picture .mockup {
   height: 440px;
+}
+
+/* Phones: the screenshot shrinks so Check it and Shield Buddy fit under it */
+@media (max-width: 560px) {
+  .check-it-tool {
+    gap: 14px;
+  }
+
+  .check-it-tool .tool-picture .mockup {
+    height: min(440px, 38dvh);
+  }
+}
+
+/* Learn about scams: progress and one button in a card, then the scams and the badges.
+   The gap matches the menu's, so lists sit close under their headings. */
+.learn {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+  max-width: 560px;
+  padding-bottom: 32px;
+}
+
+.learn-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.learn-progress-text {
+  font-size: var(--text-large);
+  font-weight: 800;
+}
+
+.learn-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: -16px;
+}
+
+.learn-number {
+  font-size: var(--text-large);
+  font-weight: 800;
 }

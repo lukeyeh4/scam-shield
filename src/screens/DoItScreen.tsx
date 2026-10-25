@@ -33,7 +33,7 @@ export function DoItScreen({ scenario, doIt, onBack, onContinue }: DoItScreenPro
         </div>
       </main>
 
-      <footer className={ready ? 'scenario-footer' : 'scenario-footer scenario-footer-hidden'} inert={!ready}>
+      <footer className={ready ? 'scenario-footer scenario-footer-over' : 'scenario-footer scenario-footer-over scenario-footer-hidden'} inert={!ready}>
         <button className="primary-button" type="button" onClick={onContinue}>
           See what happens
         </button>

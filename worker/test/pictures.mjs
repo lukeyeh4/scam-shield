@@ -5,6 +5,7 @@
 //   npm run dev                                            (Sonnet, the default)
 //   npx wrangler dev --var PICTURE_MODEL:claude-haiku-5-5   (to compare)
 //   npm run test-pictures
+//   node test/pictures.mjs http://localhost:8787 sympathyPet threat   (only these)
 // Prints what each picture got next to what it should get, and writes a page with
 // the boxes drawn on the pictures.
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -25,8 +26,19 @@ const EXPECT = {
   injection: 'scam (despite the note to the AI): free V-Bucks, asks for password; link epic-vbucks-gift.top',
   youtubeComment: 'scam: pretends to be MrBeast, free money, move to Telegram, rushes you',
   lookalikeLinks: 'scam: pretends to be companies, free money, rushes you; links rnicrosoft-account.com/verify, paypa1-claims.com, g00gle-rewards.net (exactly)',
-  sympathyVideo: 'be careful or scam: sad story to buy, rushes you (only 15 left), link in bio',
-  sympathyComment: 'be careful or scam: sad story to buy, move to another app/secret? (comment to get link), rushes you',
+  sympathyVideo: 'scam: sad story to buy, rushes you (only 15 left), link in bio',
+  sympathyComment: 'scam: sad story to buy (comment to get link), rushes you',
+  sympathyPet: 'scam: sad story to give money (CashApp, Venmo), rushes you (surgery tomorrow)',
+  sympathyBirthday: 'scam: sad story to buy (link in bio), rushes you (before it\'s gone)',
+  sympathyGameChat: 'scam: sad story to give game items (shadow dragon), rushes you (now)',
+  friendSadNews: 'nothing: a friend sharing sad news, asking for nothing',
+  groomingChat: 'urgent: a stranger getting too personal (so mature, how old, parents home, free Robux)',
+  trustTrade: 'scam: a trade where you go first',
+  reportedScam: 'scam: says your account is in trouble, asks for password, pretends to be support',
+  earnMoneyPost: 'scam: easy money or investment (crypto), rushes you (10 spots)',
+  casinoAd: 'not for kids: betting or gambling (cases, spins for real skins)',
+  chainMessage: 'be careful or scam: something else / says your account is in trouble, rushes you (by midnight)',
+  gameCompliment: 'nothing: kids chatting normally in a game',
   sadNewsNoAsk: 'nothing: a sad story with nothing to buy',
   normalShop: 'nothing: an ordinary product at an ordinary price',
   familyChat: 'nothing',
@@ -36,8 +48,10 @@ const EXPECT = {
 }
 
 const started = Date.now()
+// The Worker allows 20 checks a minute, so run bigger sets in parts
+const only = process.argv.slice(3)
 const results = await Promise.all(
-  Object.keys(EXPECT).map(async (name) => {
+  Object.keys(EXPECT).filter((name) => !only.length || only.includes(name)).map(async (name) => {
     const image = readFileSync(join(here, 'pictures', `${name}.jpg`)).toString('base64')
     const t = Date.now()
     const res = await fetch(`${SERVER}/picture`, {
@@ -56,7 +70,7 @@ for (const { name, facts, seconds } of results) {
     console.log(`  ERROR ${facts.error}`)
     continue
   }
-  const signs = facts.signs.map((s) => `${s.sign} ("${s.words.slice(0, 50)}")`)
+  const signs = facts.signs.map((s) => `${s.sign} ("${s.words.slice(0, 50)}")${s.about ? ` [${s.about}]` : ''}`)
   console.log(`  got:    ${facts.kind}${facts.readable ? '' : ', NOT READABLE'}${facts.threatOrPhotos ? ', THREAT OR PHOTOS' : ''}`)
   for (const s of signs) console.log(`          - ${s}`)
   if (facts.links.length) console.log(`          links: ${facts.links.map((l) => l.address).join(', ')}`)

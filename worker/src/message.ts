@@ -22,6 +22,7 @@ const Answers = z.object({
         words: z
           .string()
           .describe('The exact words in the message that show this sign, copied character for character (at most a sentence), so they can be found in it'),
+        about: z.string().describe('Only for "something else that looks like a trick": what the trick is, in a few words. Empty for every other sign'),
       }),
     )
     .describe('Each warning sign the message shows, once per place it appears. Empty if there are none'),
@@ -73,7 +74,8 @@ export async function judgeMessage(message: Message, apiKey: string, model = PIC
     console.warn('message: no answer', response.stop_reason)
     return null
   }
-  return { ...answers, signs: answers.signs.flatMap(({ sign, words }) => (isSign(sign) ? [{ sign, words }] : [])) }
+  const signs = answers.signs.flatMap(({ sign, words, about }) => (isSign(sign) ? [{ sign, words, ...(about.trim() ? { about: about.trim() } : {}) }] : []))
+  return { ...answers, signs }
 }
 
 // The message from a request body: { text, context? }. Null if it isn't one.

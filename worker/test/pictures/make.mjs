@@ -3,7 +3,8 @@
 // shrunk to a JPEG like the app sends (1568px on the longest side). The pictures
 // are committed, so this only needs running after changing them (macOS: Chrome
 // and sips):
-//   node test/pictures/make.mjs
+//   node test/pictures/make.mjs              (all of them)
+//   node test/pictures/make.mjs sympathyPet  (only the ones named)
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -104,6 +105,64 @@ const PICTURES = {
     <div>Thank you all ❤️ My grandma is alone this winter and knitting is all she has. Comment HELP and I'll send you the link to buy her blankets. Only 20 left!</div></div></div>
     <div style="padding:10px 16px;display:flex;gap:10px"><div class="av" style="background:#090"></div><div>
     <div style="font-size:13px;color:#606060">@sunny_days · 1 hour ago</div><div>HELP 🥺</div></div></div>`),
+  sympathyPet: page(`<div style="padding:54px 16px 10px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #eee">
+    <div class="av" style="background:#c0392b"></div><div><b>help_max_2026</b><div style="font-size:12px;color:#888">Sponsored · 2h</div></div></div>
+    <div style="height:330px;background:linear-gradient(160deg,#d9c3a5,#8a6d4b);display:grid;place-items:center;font-size:150px">🐕</div>
+    <div style="padding:12px 16px"><div>❤️ 24.1K &nbsp; 💬 3,208 &nbsp; ↗️ 9,877</div>
+    <p style="margin-top:8px"><b>help_max_2026</b> This is Max 😭 He needs surgery TOMORROW or the vet says he will be put down. We can't pay the $800. Anything helps 🙏 CashApp $SaveMaxNow or Venmo @help-max. Please share before it's too late!!</p></div>`),
+  sympathyBirthday: page(`<div style="padding:54px 16px 10px;display:flex;gap:10px;align-items:center;border-bottom:1px solid #eee">
+    <div class="av" style="background:#2c3e50"></div><div><b>Heartwarming Moments 💙</b><div style="font-size:12px;color:#888">3h · 🌎</div></div></div>
+    <p style="padding:12px 16px">He's a disabled veteran and he made this cake himself for his 90th birthday, but nobody came 😢 Can he get a happy birthday? 🎂</p>
+    <div style="height:330px;background:linear-gradient(160deg,#9aa7b0,#4b5860);display:grid;place-items:center;font-size:150px">👴🎂</div>
+    <div style="padding:12px 16px"><div>👍❤️😢 186K · 41K comments</div>
+    <p style="margin-top:8px;font-size:15px">His wood carvings are all he has left. Shop his art before it's gone 👉 link in our bio</p></div>`),
+  sympathyGameChat: page(`<div class="top"><b>Adopt Me · Chat</b><small>lily_petlover22</small></div><div class="chat">
+    <div class="row"><div class="av" style="background:#e84393"></div><div><div class="name">lily_petlover22 <small>5:02 PM</small></div>
+    <div>hi sorry to bother u 😢 my little brother is really sick in hospital</div></div></div>
+    <div class="row"><div class="av" style="background:#e84393"></div><div><div class="name">lily_petlover22 <small>5:02 PM</small></div>
+    <div>his only wish is a shadow dragon. can u give me urs?? i promise ill give it back tomorrow</div></div></div>
+    <div class="row"><div class="av" style="background:#3ba55c"></div><div><div class="name">You <small>5:03 PM</small></div><div>idk</div></div></div>
+    <div class="row"><div class="av" style="background:#e84393"></div><div><div class="name">lily_petlover22 <small>5:03 PM</small></div><div>pls hes so sad. just trade it to me now before he goes to sleep</div></div></div>
+  </div>`, '#232527'),
+  friendSadNews: texts('Ava 🌸', 'iMessage', `
+    <div class="time">Today 18:20</div>
+    <div class="in">my cat Biscuit died today 😭 i'm so sad</div>
+    <div class="out">oh no I'm so sorry 💔</div>
+    <div class="in">thanks. can we just play minecraft tomorrow, I need cheering up</div>`),
+  groomingChat: page(`<div class="top"><b>Roblox · Chat</b><small>sk8rboi_17</small></div><div class="chat">
+    <div class="row"><div class="av" style="background:#8e44ad"></div><div><div class="name">sk8rboi_17 <small>7:41 PM</small></div><div>ur builds are honestly the best ive seen 😍 ur so mature for ur age</div></div></div>
+    <div class="row"><div class="av" style="background:#8e44ad"></div><div><div class="name">sk8rboi_17 <small>7:41 PM</small></div><div>how old r u btw?</div></div></div>
+    <div class="row"><div class="av" style="background:#3ba55c"></div><div><div class="name">You <small>7:42 PM</small></div><div>11</div></div></div>
+    <div class="row"><div class="av" style="background:#8e44ad"></div><div><div class="name">sk8rboi_17 <small>7:42 PM</small></div><div>cool 😊 r ur parents home rn? i can send u some robux, ur my fav friend on here</div></div></div>
+  </div>`, '#232527'),
+  gameCompliment: page(`<div class="top"><b>Roblox · Chat</b><small>blocky_builder</small></div><div class="chat">
+    <div class="row"><div class="av" style="background:#e67e22"></div><div><div class="name">blocky_builder <small>3:10 PM</small></div><div>gg!! nice build on that tower</div></div></div>
+    <div class="row"><div class="av" style="background:#3ba55c"></div><div><div class="name">You <small>3:10 PM</small></div><div>thx!</div></div></div>
+    <div class="row"><div class="av" style="background:#e67e22"></div><div><div class="name">blocky_builder <small>3:11 PM</small></div><div>wanna team up next round?</div></div></div>
+  </div>`, '#232527'),
+  trustTrade: page(`<div class="top"><b>Adopt Me · Trade chat</b><small>kawaii_traderx</small></div><div class="chat">
+    <div class="row"><div class="av" style="background:#16a085"></div><div><div class="name">kawaii_traderx <small>6:12 PM</small></div><div>ill give u my neon unicorn for ur frost dragon 🦄</div></div></div>
+    <div class="row"><div class="av" style="background:#16a085"></div><div><div class="name">kawaii_traderx <small>6:12 PM</small></div><div>but trades r glitchy rn so u have to go first, its a trust trade. i promise ill send mine right after</div></div></div>
+  </div>`, '#232527'),
+  reportedScam: page(`<div class="top"><b>Discord · Direct Messages</b><small>zack.gamer</small></div><div class="chat">
+    <div class="row"><div class="av" style="background:#5865f2"></div><div><div class="name">zack.gamer <small>9:02 PM</small></div><div>hey sorry!! i accidentally reported ur account 😭 it says it will be banned in 24 hours</div></div></div>
+    <div class="row"><div class="av" style="background:#5865f2"></div><div><div class="name">zack.gamer <small>9:02 PM</small></div><div>message the admin @RobloxSupport_Help on discord, he can fix it if u give him ur login</div></div></div>
+  </div>`, '#232527'),
+  earnMoneyPost: page(`<div style="height:844px;position:relative;background:linear-gradient(170deg,#0f2027,#2c5364);color:#fff">
+    <div style="position:absolute;top:170px;left:24px;right:24px;text-align:center;font-size:30px;font-weight:900;text-shadow:0 2px 8px #000">I made $3,000 this week from my phone 💸📈</div>
+    <div style="position:absolute;top:330px;left:0;right:0;text-align:center;font-size:110px">🤑</div>
+    <div style="position:absolute;bottom:90px;left:16px;right:80px"><div style="font-weight:700">@richkid.trading</div>
+    <div style="margin-top:6px;font-size:15px">No work, no boss. I'll show you how to double your money with crypto 🚀 DM me "START" to join, only 10 spots! #money #crypto</div></div>
+    <div style="position:absolute;right:14px;bottom:200px;text-align:center;font-size:13px">❤️<br>51K<br><br>💬<br>2,204</div>
+  </div>`, '#0f2027'),
+  casinoAd: page(`<div style="padding:60px 16px 0;color:#666;font-size:13px">Ad · skinspin-gg</div>
+    <div class="card" style="text-align:center;background:#1b1036;color:#fff"><div style="font-size:30px;font-weight:900">🎰 SPIN TO WIN 🎰</div>
+    <p style="margin-top:12px">Open cases and win real Fortnite skins and V-Bucks! Deposit $5, get 3 FREE spins 🔥</p>
+    <div style="margin-top:16px;font-size:70px">🎁🎁🎁</div>
+    <div class="btn" style="background:#f39c12">OPEN A CASE</div></div>`),
+  chainMessage: texts('Mia 🎀', 'iMessage', `
+    <div class="time">Today 20:14</div>
+    <div class="in">⚠️ SEND THIS TO 10 PEOPLE ⚠️ Roblox is deleting accounts that don't send this message by midnight. If you don't send it, your account and all your items will be gone forever. It's true, my cousin lost hers!!</div>`),
   sadNewsNoAsk: page(`<div style="padding:54px 16px 12px;border-bottom:1px solid #ddd;font-weight:700">Kids News</div>
     <div style="padding:16px"><div style="font-size:20px;font-weight:700">Neighbours help Mr Lee rebuild his bakery after a storm</div>
     <p style="margin-top:10px">When a storm damaged Mr Lee's bakery last month, he was very sad. But his neighbours came together to fix the roof and paint the walls.</p>
@@ -138,7 +197,9 @@ const PICTURES = {
 }
 
 const out = mkdtempSync(join(tmpdir(), 'pictures-'))
+const only = process.argv.slice(2)
 for (const [name, html] of Object.entries(PICTURES)) {
+  if (only.length && !only.includes(name)) continue
   const htmlFile = join(out, `${name}.html`)
   const png = join(out, `${name}.png`)
   writeFileSync(htmlFile, html)

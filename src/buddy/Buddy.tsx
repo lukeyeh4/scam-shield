@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import type { Mood } from '../types'
 import { isFast } from '../dev/devSettings'
-import { speak, useReadAloud } from '../readAloud'
+import { preloadVoice, speak, useReadAloud } from '../readAloud'
 import { IMAGES } from './moods'
 import { readingPause, useTypewriter } from './useTypewriter'
 
@@ -24,7 +24,8 @@ type BuddyProps = {
 // Tapping anywhere on the screen (except a button) hurries Buddy along: the first tap
 // finishes the message being typed, the next skips the pause before the next message.
 // With read-aloud on, each message appears whole and Buddy reads it out loud;
-// the next one waits until it has finished (a tap stops the voice and moves on).
+// the next one waits until it has finished. A tap stops the voice and goes straight
+// to the next message, which is read from the start.
 // Buddy moves to match its mood as each new message appears (e.g. a wobble when
 // worried, a jump when cheering), bobs while it talks, and floats gently otherwise.
 export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
@@ -51,6 +52,12 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
     return speak(latest, () => setSaid(saying))
   }, [readAloud, saying, said, latest])
 
+  // The next message's voice is fetched while this one is read, so it's ready to go
+  const next = messages[shown]
+  useEffect(() => {
+    if (readAloud && next) preloadVoice(next)
+  }, [readAloud, next])
+
   useEffect(() => {
     if (finished) doneAt.current = Date.now()
   }, [finished, latest])
@@ -67,8 +74,11 @@ export function Buddy({ mood, messages, delayMs = 0, onDone }: BuddyProps) {
   const hurry = useEffectEvent(() => {
     if (shown === 0) return
     if (!done) setHurried(shown - 1)
-    else if (readAloud && said !== saying) setSaid(saying)
-    else if (shown < messages.length) setCount(shown + 1)
+    else if (readAloud && said !== saying) {
+      // Stop reading this message, and go straight on to the next (read from its start)
+      setSaid(saying)
+      if (shown < messages.length) setCount(shown + 1)
+    } else if (shown < messages.length) setCount(shown + 1)
   })
   useEffect(() => {
     const onTap = (e: MouseEvent) => {

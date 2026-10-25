@@ -351,7 +351,8 @@ function checkOne(typed: string): LinkCheck | null {
                 ? `Only ${brand.name} owns ${real}. ${site} just uses its name, so anyone could own it.`
                 : `Anyone can make a website with ${brand.name}'s name in it. The real ${brand.name} website is only ${real}.`
     ;(copy.strong ? strong : others).push({
-      label: copy.strong ? `Pretending to be ${brand.name}` : `Uses ${brand.name}'s name`,
+      // "Not the real…", not "Uses Roblox's name", which kids can read as "is Roblox"
+      label: copy.strong ? `Pretending to be ${brand.name}` : `Not the real ${brand.name} website`,
       reason,
       highlight: inText(typed, typedHost),
     })

@@ -159,7 +159,7 @@ export function PictureCheck({ onHome, onAsk, onSetUp }: ToolNav) {
   // Numbered in the order they come down the picture
   const shown = result && inPictureOrder(result)
 
-  if (!setUp) return <SetupFirst title="Check a picture" what="pictures" onHome={onHome} onSetUp={onSetUp} />
+  if (!setUp) return <SetupFirst title="Check a picture" what="pictures" onAsk={onAsk} onSetUp={onSetUp} />
 
   return (
     // (The note under a result says an AI checked it: kids must be told, by

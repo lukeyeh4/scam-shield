@@ -116,3 +116,17 @@
     display: none;
   }
 }
+
+/* Phones, with no iPad around it (.mockup-bare in index.css): just the address bar,
+   full width, like Safari on an iPhone */
+.mockup-bare .safari-bar {
+  padding: 8px 10px;
+}
+
+.mockup-bare .safari-buttons {
+  display: none;
+}
+
+.mockup-bare .safari-address {
+  max-width: none;
+}

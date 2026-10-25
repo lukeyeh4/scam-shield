@@ -4,6 +4,7 @@ import { parseHash, type Route, toHash } from './router'
 describe('router', () => {
   const routes: Route[] = [
     { name: 'home' },
+    { name: 'learnHub' },
     { name: 'learn', scenario: 1 },
     { name: 'learn', scenario: 3 },
     { name: 'learnDone' },
@@ -24,8 +25,9 @@ describe('router', () => {
     expect(parseHash('#')).toEqual({ name: 'home' })
   })
 
-  it('starts the game at the first scenario', () => {
-    expect(parseHash('#/learn')).toEqual({ name: 'learn', scenario: 1 })
+  it('opens Learn about scams with no scenario number', () => {
+    expect(parseHash('#/learn')).toEqual({ name: 'learnHub' })
+    expect(parseHash('#/learn/')).toEqual({ name: 'learnHub' })
   })
 
   it.each(['#/nowhere', '#/learn/0', '#/learn/abc', '#/learn/1.5', '#/ask/extra', '#/check', '#/check/qr', '#/tell', '#/grown-ups/qr'])('goes home for %s', (hash) => {
