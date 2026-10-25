@@ -24,6 +24,8 @@ const QUESTIONS: Record<string, { entries: AskEntry[]; expect: Topic | Topic[] }
   alreadyClicked: { entries: kid('i already clicked a link and typed my password, am i in trouble'), expect: 'safety' },
   friendHacked: { entries: kid('my friends account is sending me weird messages about free vbucks'), expect: 'safety' },
   whatIsPhishing: { entries: kid('what is phishing'), expect: 'safety' },
+  // Must say plainly it isn't Roblox, not "it uses Roblox's name"
+  brandInName: { entries: kid('a website has roblox in its name so is it roblox'), expect: 'safety' },
   followUp: {
     entries: [
       { from: 'kid', text: 'someone said i won a prize' },

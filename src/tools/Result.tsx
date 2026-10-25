@@ -18,7 +18,7 @@ const RISKS: Record<Risk, Look> = {
   none: { title: 'No clues found', tell: 'Still not sure? Show a grown-up.', icon: <GoodIcon /> },
 }
 // Red too, but not a scam: betting, adult or pirated streaming websites
-const NOT_FOR_KIDS: Look = { title: "This website isn't for kids", tell: "Don't open it. Show a grown-up.", icon: <NoEntryIcon /> }
+const NOT_FOR_KIDS: Look = { title: "This isn't for kids", tell: "Don't open it. Show a grown-up.", icon: <NoEntryIcon /> }
 // Someone is threatening the child or asking for photos: calm, no blame, and what
 // to do, before anything else (scripted, never from the AI)
 const URGENT: Look = { title: 'Show a grown-up right now', tell: "It's not your fault.", icon: <GrownUpIcon /> }

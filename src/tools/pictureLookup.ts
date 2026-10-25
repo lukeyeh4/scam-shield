@@ -148,6 +148,66 @@ const SIGN_WORDS: Record<Sign, { label: string; reason: string; strong: boolean;
       'Next time, ask a grown-up before downloading anything.',
     ],
   },
+  // Grooming: someone getting close to a child before asking for anything. Urgent
+  // ("Show a grown-up right now"), like threats: see resultFrom
+  'a stranger getting too personal': {
+    label: 'Someone getting too close',
+    reason: "People you only know online shouldn't ask you this.",
+    strong: true,
+    why: [
+      'Some people online pretend to be your friend to get close to you.',
+      "Asking your age, or if you're alone, isn't OK from someone you don't know.",
+      "This isn't your fault. Show a grown-up you trust.",
+    ],
+  },
+  'easy money or investment': {
+    label: 'Easy money',
+    reason: "Nobody gets rich fast for doing almost nothing.",
+    strong: true,
+    why: [
+      'Offers to make lots of money fast are a trick.',
+      'They end up taking your money or your account.',
+      'Next time, show a grown-up before you answer.',
+    ],
+  },
+  'a trade where you go first': {
+    label: 'A trick trade',
+    reason: 'You give first, and they never give back.',
+    strong: true,
+    why: [
+      'In a trick trade, they ask you to go first.',
+      'Once you give your item, they leave with it.',
+      'Next time, ask a grown-up before you trade.',
+    ],
+  },
+  'says your account is in trouble': {
+    label: 'Says your account is in trouble',
+    reason: 'Games tell you about problems in the game, not in a chat.',
+    strong: true,
+    why: [
+      'Scammers say your account will be banned to scare you.',
+      'Then they ask you to log in or talk to a fake helper.',
+      "Next time, don't answer. Show a grown-up.",
+    ],
+  },
+  // Like links to betting websites: "This isn't for kids", and not what kind
+  'betting or gambling': {
+    label: 'Not for kids',
+    reason: 'This is made for grown-ups, not kids.',
+    strong: false,
+    why: ['This is made for grown-ups.', "It isn't a place for kids.", "Don't open it. Show a grown-up."],
+  },
+  // Any other trick Claude spots: the app's own words, never Claude's
+  'something else that looks like a trick': {
+    label: 'Something else looks wrong',
+    reason: "This looks like a trick, even if it's a new one.",
+    strong: false,
+    why: [
+      'Scammers keep making up new tricks.',
+      "This part doesn't look right to me.",
+      'Next time, show a grown-up before you do anything.',
+    ],
+  },
 }
 
 // The most links in a picture to look up (each one is a server check)
@@ -242,7 +302,9 @@ export async function linkClues(links: { address: string; box?: Box }[], lookUp 
     const scam = link.risk === 'high' && !link.notForKids
     clues.push({
       label: scam ? 'A trick link' : link.notForKids ? 'A link not for kids' : 'A link to be careful with',
-      reason: `${link.clues[0].label}: ${link.site}`,
+      // Where it goes, then what's wrong, in a sentence (not "Uses Roblox's name:
+      // gamehack.co", which reads as if gamehack.co were Roblox)
+      reason: `This link goes to ${link.site}. ${firstSentence(link.clues[0].reason)}`,
       why: scam
         ? ['Links can look real but take you somewhere else.', `This one goes to ${link.site}. ${link.clues[0].reason}`, "Don't tap it. Show a grown-up."]
         : link.notForKids
@@ -256,19 +318,31 @@ export async function linkClues(links: { address: string; box?: Box }[], lookUp 
   return { clues, strong, notForKids }
 }
 
+// A clue's reason up to the end of its first sentence ("roblox.com." ends one;
+// the dot in an address doesn't)
+const firstSentence = (text: string) => text.split(/(?<=[.!?])\s/)[0]
+
 // The clue for a warning sign, in kid words, marked by `mark` (boxes or words)
 export function signClue(sign: Sign, mark: Pick<Clue, 'boxes' | 'highlight'>): Clue {
   const { label, reason, why } = SIGN_WORDS[sign]
   return { label, reason, why, ...mark }
 }
 
+// A sad story is only "Be careful" on its own (real people share sad stories), but
+// one that also rushes you or moves you somewhere else to pay is a sympathy scam
+const SAD_STORY_AND: Sign[] = ['rushes you', 'asks you to move to another app or keep a secret']
+
 // The result from the signs and the links' clues: red for strong signs or links (or
-// a website not for kids), yellow for others, and urgent for threats
+// something not for kids), yellow for others, and urgent for threats and grooming
 export function resultFrom(signs: { sign: Sign; clue: Clue }[], links: Awaited<ReturnType<typeof linkClues>>, urgent: boolean): CheckResult {
-  const strong = signs.some(({ sign }) => SIGN_WORDS[sign].strong) || links.strong
+  const has = (sign: Sign) => signs.some((s) => s.sign === sign)
+  const sympathyScam = has('sad story to get you to buy or give money') && SAD_STORY_AND.some(has)
+  const strong = signs.some(({ sign }) => SIGN_WORDS[sign].strong) || sympathyScam || links.strong
+  const notForKids = links.notForKids || has('betting or gambling')
   const clues = [...signs.map(({ clue }) => clue), ...links.clues]
-  const risk = strong || links.notForKids ? 'high' : clues.length ? 'medium' : 'none'
-  return { risk, clues, notForKids: links.notForKids && !strong, urgent }
+  const risk = strong || notForKids ? 'high' : clues.length ? 'medium' : 'none'
+  // Someone getting too close to a child gets "Show a grown-up right now", like a threat
+  return { risk, clues, notForKids: notForKids && !strong, urgent: urgent || has('a stranger getting too personal') }
 }
 
 export async function pictureResult(facts: PictureFacts | null, lookUp = lookUpLink): Promise<CheckResult> {

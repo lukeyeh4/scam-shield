@@ -20,7 +20,7 @@ import { canTalk, setTalkingAllowed, useTalkingAllowed } from '../voiceInput'
 export function GrownUpsScreen({ onBack }: { onBack: () => void }) {
   const [unlocked, setUnlocked] = useState(false)
   return (
-    <ToolScreen title="For grown-ups" onBack={onBack} note={null}>
+    <ToolScreen title="For grown-ups" onBack={onBack} close note={null}>
       {unlocked ? <Settings onDone={onBack} /> : <Gate onOpen={() => setUnlocked(true)} />}
     </ToolScreen>
   )

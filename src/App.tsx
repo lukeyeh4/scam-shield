@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
-import { recordFinished } from './badges'
+import { recordFinished, recordScenarioDone } from './badges'
 import { ChatScreen } from './chat/ChatScreen'
 import type { DevJump } from './dev/DevConsole'
 import { navigate, type Route, type Tool, useRoute } from './router'
@@ -7,6 +7,7 @@ import { scenarios } from './scenarios'
 import { BadgeToast } from './screens/Badges'
 import { EndScreen } from './screens/EndScreen'
 import { GrownUpsScreen } from './screens/GrownUpsScreen'
+import { LearnScreen } from './screens/LearnScreen'
 import { MainMenu } from './screens/MainMenu'
 import { ReadAloudToggle } from './screens/ReadAloudToggle'
 import { ScenarioScreen, type ScenarioStart } from './screens/ScenarioScreen'
@@ -22,6 +23,7 @@ const DevConsole = import.meta.env.DEV
 // Names each place in the browser tab, which screen readers also read out
 const TITLES: Record<Route['name'], string> = {
   home: 'Scam Shield',
+  learnHub: 'Learn about scams',
   learn: 'Learn about scams',
   learnDone: 'You did it!',
   ask: 'Ask Shield Buddy',
@@ -83,6 +85,7 @@ export default function App() {
         onBack={home}
         onNext={() => {
           setJumped(undefined)
+          recordScenarioDone(scenarios[index].id)
           // Each new scenario replaces the last, so back always leads to the menu
           if (!isLast) return learn(route.scenario + 1, true)
           recordFinished()
@@ -90,6 +93,8 @@ export default function App() {
         }}
       />
     )
+  } else if (route.name === 'learnHub') {
+    content = <LearnScreen onPlay={learn} onBack={home} />
   } else if (route.name === 'learnDone') {
     content = <EndScreen key={run} onPlayAgain={() => learn(1, true)} onMenu={home} />
   } else if (route.name === 'ask') {
@@ -116,7 +121,7 @@ export default function App() {
     content = (
       <MainMenu
         onCheck={ask}
-        onLearn={() => learn(1)}
+        onLearn={() => navigate({ name: 'learnHub' })}
         onGrownUps={() => navigate({ name: 'grownUps' })}
       />
     )

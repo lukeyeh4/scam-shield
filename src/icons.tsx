@@ -51,6 +51,13 @@ export const GoodIcon = (p: IconProps) => (
   </Icon>
 )
 
+// A tick on its own: a scam played to the end (Learn about scams)
+export const TickIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </Icon>
+)
+
 // A viewfinder with a magnifying glass: looking closely at a picture
 export const ScanIcon = (p: IconProps) => (
   <Icon {...p}>

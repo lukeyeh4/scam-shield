@@ -1,6 +1,6 @@
 import { type ReactNode, useEffect, useEffectEvent } from 'react'
 import { Buddy } from '../buddy/Buddy'
-import { LockIcon } from '../icons'
+import { CloseIcon, LockIcon } from '../icons'
 import './tools.css'
 
 type ToolScreenProps = {
@@ -11,6 +11,9 @@ type ToolScreenProps = {
   step?: number
   // The first step goes back to the menu; later steps go back a step
   onBack: () => void
+  // A round × instead of Menu or Back, for screens that ask for a grown-up: they
+  // close and go back to where the kid was
+  close?: boolean
   // These screens are wireframes: a quiet note at the bottom says nothing really happens
   // yet (null: no note, for a tool that really works)
   note?: string | null
@@ -19,13 +22,19 @@ type ToolScreenProps = {
 
 // The frame every tool shares: the header with a back button, a slim progress bar,
 // the step itself, then the preview note
-export function ToolScreen({ title, steps, step = 0, onBack, note = 'Preview: nothing is really checked yet', children }: ToolScreenProps) {
+export function ToolScreen({ title, steps, step = 0, onBack, close = false, note = 'Preview: nothing is really checked yet', children }: ToolScreenProps) {
   return (
     <div className="tool">
       <header className="scenario-header">
-        <button className="back" type="button" onClick={onBack}>
-          {step === 0 ? 'Menu' : 'Back'}
-        </button>
+        {close ? (
+          <button className="back back-close" type="button" onClick={onBack} aria-label="Close">
+            <CloseIcon />
+          </button>
+        ) : (
+          <button className="back" type="button" onClick={onBack}>
+            {step === 0 ? 'Menu' : 'Back'}
+          </button>
+        )}
         <h1 className="scenario-title">{title}</h1>
       </header>
 
@@ -77,10 +86,11 @@ export type ToolNav = {
 }
 
 // Instead of a tool that sends something to be checked, until a grown-up has
-// finished setup (setup.ts). `what`: what the tool checks, e.g. "pictures".
-export function SetupFirst({ title, what, onHome, onSetUp }: { title: string; what: string; onHome: () => void; onSetUp: () => void }) {
+// finished setup (setup.ts). `what`: what the tool checks, e.g. "pictures". The ×
+// goes back to the chat, where the tools are opened from.
+export function SetupFirst({ title, what, onAsk, onSetUp }: { title: string; what: string; onAsk: () => void; onSetUp: () => void }) {
   return (
-    <ToolScreen title={title} onBack={onHome} note={null}>
+    <ToolScreen title={title} onBack={onAsk} close note={null}>
       <div className="tool-column gate">
         <span className="gate-icon">
           <LockIcon />

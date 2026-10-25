@@ -8,6 +8,10 @@ import { useSyncExternalStore } from 'react'
 // Off by default; the player's choice is remembered on the device.
 
 const SERVER: string | undefined = import.meta.env.VITE_LINK_SERVER
+// Optional: a folder of Buddy's lines made ahead of time, for builds that can't
+// reach the server (e.g. the demo page). Each line is <first 20 hex of its
+// SHA-256>.mp3; lines not in it come from the server as usual.
+const VOICE_FILES: string | undefined = import.meta.env.VITE_VOICE_FILES
 
 const KEY = 'scam-shield-read-aloud'
 
@@ -47,7 +51,7 @@ export function useReadAloud() {
 }
 
 // Buddy's voice is played with Web Audio, made on first use
-const hasServerVoice = Boolean(SERVER) && typeof window !== 'undefined' && 'AudioContext' in window
+const hasServerVoice = Boolean(SERVER || VOICE_FILES) && typeof window !== 'undefined' && 'AudioContext' in window
 let audio: AudioContext | null = null
 const audioContext = () => (audio ??= new AudioContext())
 
@@ -68,22 +72,44 @@ if (canReadAloud) {
 // said again, e.g. after going back)
 const lines = new Map<string, Promise<AudioBuffer | null>>()
 
+// A line's audio made ahead of time, or null
+async function savedVoice(text: string) {
+  if (!VOICE_FILES) return null
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
+  const name = [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, '0')).join('').slice(0, 20)
+  const res = await fetch(`${VOICE_FILES}${name}.mp3`)
+  return res.ok ? res : null
+}
+
+const fromServer = (text: string) =>
+  SERVER
+    ? fetch(`${SERVER}/speak`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ text }),
+        signal: AbortSignal.timeout(5000),
+      })
+    : null
+
 function buddyVoice(text: string): Promise<AudioBuffer | null> {
   let line = lines.get(text)
   if (!line) {
-    line = fetch(`${SERVER}/speak`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text }),
-      signal: AbortSignal.timeout(5000),
-    })
-      .then(async (res) => (res.ok ? audioContext().decodeAudioData(await res.arrayBuffer()) : null))
+    line = savedVoice(text)
+      .catch(() => null)
+      .then((res) => res ?? fromServer(text))
+      .then(async (res) => (res?.ok ? audioContext().decodeAudioData(await res.arrayBuffer()) : null))
       .catch(() => null)
     lines.set(text, line)
     // A line that failed is tried again next time
     void line.then((buffer) => buffer || lines.delete(text))
   }
   return line
+}
+
+// Fetches a line's audio ahead of time (e.g. Buddy's next message while it reads
+// this one), so a tap that moves on can read the next line straight away
+export function preloadVoice(text: string) {
+  if (on && hasServerVoice && text) void buddyVoice(text)
 }
 
 // Says `text` out loud, then calls `onEnd`: in Buddy's voice, or the device's if

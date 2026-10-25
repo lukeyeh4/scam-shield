@@ -1,5 +1,4 @@
 /* DEV CONSOLE: remove before shipping (see "Dev console" in PROJECT.md). */
-.dev-toggle,
 .dev-console {
   position: fixed;
   right: 12px;
@@ -8,18 +7,6 @@
   font-family: ui-monospace, Menlo, monospace;
   font-size: 13px;
   line-height: 1.3;
-}
-
-.dev-toggle {
-  padding: 6px 10px;
-  border-radius: 8px;
-  background: #1d2433;
-  color: #fff;
-  opacity: 0.5;
-}
-
-.dev-toggle:hover {
-  opacity: 1;
 }
 
 .dev-console {

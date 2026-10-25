@@ -9,7 +9,7 @@ import type { Clue } from './examples'
 // The link checker's clues (linkCheck.ts, linkLookup.ts), by name or its start
 const LINK_WHY: [string, string[]][] = [
   ['Pretending to be ', ['Scammers make addresses that look like a real website.', "The website's real name is the part just before the ending, like .com.", 'Next time, check that part carefully. Ask a grown-up if you are not sure.']],
-  ['Uses ', ['Anyone can put a famous name in a website address.', "It doesn't mean the website belongs to them.", 'Next time, ask a grown-up to find the real website with you.']],
+  ['Not the real ', ['Anyone can put a famous name in a website address.', "It doesn't mean the website belongs to them.", 'Next time, ask a grown-up to find the real website with you.']],
   ['Some letters are fakes', ['Some letters from other alphabets look just like ours.', 'Scammers use them to copy real addresses.', 'Next time, if an address looks odd, show a grown-up.']],
   ['The address is hiding something', ['In a web address, everything before an @ is ignored.', 'Scammers put a real name there to fool you.', 'Next time, look after the @. Ask a grown-up if you are not sure.']],
   ['No website name', ['Real websites have names, like roblox.com.', 'A link that is only numbers hides who owns it.', "Don't tap it. Show a grown-up."]],

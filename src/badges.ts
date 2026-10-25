@@ -18,10 +18,12 @@ type Progress = {
   // adult (still saved as `told`, so badges from before Check was added stay)
   spotted: string[]
   told: string[]
+  // Scenarios played to the end (for the progress on the Learn screen)
+  done: string[]
 }
 
 const KEY = 'scam-shield-badges'
-const EMPTY: Progress = { earned: [], spotted: [], told: [] }
+const EMPTY: Progress = { earned: [], spotted: [], told: [], done: [] }
 
 function load(): Progress {
   try {
@@ -69,6 +71,7 @@ const addOnce = (list: string[], id: string) => (list.includes(id) ? list : [...
 
 export const recordAllCluesFound = (scenarioId: string) => record({ spotted: addOnce(progress.spotted, scenarioId) })
 export const recordGoodCall = (scenarioId: string) => record({ told: addOnce(progress.told, scenarioId) })
+export const recordScenarioDone = (scenarioId: string) => record({ done: addOnce(progress.done, scenarioId) })
 export const recordFinished = () => record({}, 'scam-shield')
 
 // The notification shows the oldest waiting badge; call this once it has been shown
@@ -78,4 +81,5 @@ export const dismissToast = () => update(progress, toasts.slice(1))
 export const resetBadges = () => update(EMPTY, [])
 
 export const useEarnedBadges = () => useSyncExternalStore(subscribe, () => progress.earned)
+export const useDoneScenarios = () => useSyncExternalStore(subscribe, () => progress.done)
 export const useNextToast = () => useSyncExternalStore(subscribe, () => toasts[0])

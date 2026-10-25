@@ -5,6 +5,8 @@ import { useSyncExternalStore } from 'react'
 // The # keeps it working on GitHub Pages and, later, inside a phone app.
 export type Route =
   | { name: 'home' }
+  // Learn about scams: the scams, the player's progress and badges
+  | { name: 'learnHub' }
   // The game, used as the tutorial: `scenario` counts from 1
   | { name: 'learn'; scenario: number }
   | { name: 'learnDone' }
@@ -23,6 +25,8 @@ export function toHash(route: Route): string {
   switch (route.name) {
     case 'home':
       return '#/'
+    case 'learnHub':
+      return '#/learn'
     case 'learn':
       return `#/learn/${route.scenario}`
     case 'learnDone':
@@ -40,8 +44,9 @@ export function toHash(route: Route): string {
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
   if (parts[0] === 'learn' && parts[1] === 'done') return { name: 'learnDone' }
+  if (parts[0] === 'learn' && parts.length === 1) return { name: 'learnHub' }
   if (parts[0] === 'learn') {
-    const scenario = parts[1] === undefined ? 1 : Number(parts[1])
+    const scenario = Number(parts[1])
     if (Number.isInteger(scenario) && scenario >= 1) return { name: 'learn', scenario }
   }
   if (parts[0] === 'ask' && parts.length === 1) return { name: 'ask' }

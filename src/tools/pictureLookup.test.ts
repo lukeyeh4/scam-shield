@@ -55,6 +55,30 @@ describe('pictureResult', () => {
     expect(await pictureResult(facts({ signs: [sign('rushes you')] }), noServer)).toMatchObject({ risk: 'medium' })
   })
 
+  it('calls a sad story be careful on its own, but a scam when it rushes you or moves you elsewhere', async () => {
+    const sad = sign('sad story to get you to buy or give money')
+    expect((await pictureResult(facts({ signs: [sad] }), noServer)).risk).toBe('medium')
+    expect((await pictureResult(facts({ signs: [sad, sign('rushes you')] }), noServer)).risk).toBe('high')
+    expect((await pictureResult(facts({ signs: [sad, sign('asks you to move to another app or keep a secret')] }), noServer)).risk).toBe('high')
+  })
+
+  it('treats someone getting too close as urgent, even before they ask for anything', async () => {
+    const result = await pictureResult(facts({ signs: [sign('a stranger getting too personal')] }), noServer)
+    expect(result).toMatchObject({ risk: 'high', urgent: true, clues: [{ label: 'Someone getting too close' }] })
+  })
+
+  it('says betting is not for kids, without naming it', async () => {
+    const result = await pictureResult(facts({ signs: [sign('betting or gambling')] }), noServer)
+    expect(result).toMatchObject({ risk: 'high', notForKids: true, clues: [{ label: 'Not for kids' }] })
+  })
+
+  it("names a new kind of trick in the app's own words, never Claude's", async () => {
+    const odd = { ...sign('something else that looks like a trick'), about: 'chain message threatening to delete the account' }
+    const result = await pictureResult(facts({ signs: [odd] }), noServer)
+    expect(result).toMatchObject({ risk: 'medium', clues: [{ label: 'Something else looks wrong' }] })
+    expect(JSON.stringify(result)).not.toContain('chain message')
+  })
+
   it('makes one clue for a sign seen in two places, with both boxes', async () => {
     const result = await pictureResult(facts({ signs: [sign('rushes you', 'hurry'), sign('rushes you', 'only 2 left')] }), noServer)
     expect(result.clues).toHaveLength(1)
@@ -70,9 +94,15 @@ describe('pictureResult', () => {
 
   it('checks the links in the picture with the link checker', async () => {
     const result = await pictureResult(facts({ links: [link('rbx-free-robux.xyz/claim')] }), noServer)
-    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'A trick link', reason: 'Pretending to be Roblox: rbx-free-robux.xyz', boxes: [box] }] })
+    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'A trick link', reason: 'This link goes to rbx-free-robux.xyz. It puts Roblox\'s name next to the word "free" to trick you.', boxes: [box] }] })
     const odd = await pictureResult(facts({ links: [link('games-unblocked-4u.top')] }), noServer)
-    expect(odd).toMatchObject({ risk: 'medium', clues: [{ label: 'A link to be careful with', reason: 'An unusual ending: games-unblocked-4u.top' }] })
+    expect(odd).toMatchObject({ risk: 'medium', clues: [{ label: 'A link to be careful with', reason: expect.stringMatching(/^This link goes to games-unblocked-4u\.top\. /) }] })
+  })
+
+  // "Uses Roblox's name: gamehack.co" read as if gamehack.co were Roblox
+  it('says where a link goes, and that it is not the real website', async () => {
+    const result = await pictureResult(facts({ links: [link('roblox.gamehack.co')] }), noServer)
+    expect(result.clues[0].reason).toBe("This link goes to gamehack.co. This isn't Roblox's own website (that's roblox.com).")
   })
 
   it("uses the link checker's server for links too", async () => {
@@ -85,7 +115,7 @@ describe('pictureResult', () => {
       page: null,
     })
     const result = await pictureResult(facts({ links: [link('example-games.com')] }), listed)
-    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'A trick link', reason: 'On a list of dangerous websites: example-games.com' }] })
+    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'A trick link', reason: expect.stringMatching(/^This link goes to example-games\.com\. Google checks millions of websites/) }] })
   })
 
   it("says a link to a website that isn't for kids is that, not a scam", async () => {

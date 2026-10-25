@@ -19,6 +19,14 @@ export const SIGNS = [
   'threatens you',
   'asks you to move to another app or keep a secret',
   'wants you to download something',
+  'a stranger getting too personal',
+  'easy money or investment',
+  'a trade where you go first',
+  'says your account is in trouble',
+  'betting or gambling',
+  // Any other scam or trick: Claude says what it is in `about`, for grown-ups and
+  // tests only; kids see the app's own words for it
+  'something else that looks like a trick',
 ] as const
 
 export type Sign = (typeof SIGNS)[number]
@@ -30,8 +38,9 @@ export type PictureFacts = {
   // Clear enough to read what it says
   readable: boolean
   kind: 'text message' | 'chat or game chat' | 'email' | 'website' | 'ad or pop-up' | 'social media post' | 'video' | 'other'
-  // Each warning sign, with the exact words and a box around them (0 to 1000)
-  signs: { sign: Sign; words: string; box: Box }[]
+  // Each warning sign, with the exact words and a box around them (0 to 1000), and
+  // for "something else that looks like a trick", what it is (never shown to kids)
+  signs: { sign: Sign; words: string; box: Box; about?: string }[]
   // Web addresses written in the picture, as written, with a box around each
   links: { address: string; box: Box }[]
   // Someone threatens the child or asks for photos of them
@@ -45,7 +54,7 @@ export type PictureFacts = {
 // that show each (to highlight) instead of boxes
 export type MessageFacts = {
   kind: 'text message' | 'chat or game chat' | 'email' | 'social media post' | 'other'
-  signs: { sign: Sign; words: string }[]
+  signs: { sign: Sign; words: string; about?: string }[]
   // Web addresses in the message, as written
   links: string[]
   threatOrPhotos: boolean

@@ -24,13 +24,21 @@ const MESSAGES = {
     text: "Hey it's Jake from school, I accidentally sent my login code to your number. Can you send it back to me? It's a 6 digit code [code]",
     expect: 'scam: asks for a login code, maybe pretends to be a friend',
   },
+  grooming: {
+    text: "ur so pretty and mature for ur age 😍 how old r u? r ur parents home rn? dont tell them we talk, ur my special friend",
+    expect: 'urgent: a stranger getting too personal, keep a secret',
+  },
+  easyMoney: {
+    text: 'I made $3,000 this week from my phone with no work 💸 I can show you how to double your money with crypto. DM me START, only 10 spots!',
+    expect: 'scam: easy money or investment, rushes you',
+  },
   lookalike: {
     text: 'Microsoft: your account will be closed today. Verify now at rnicrosoft-account.com/verify',
     expect: 'scam: pretends to be a company, rushes you; link rnicrosoft-account.com/verify (exactly)',
   },
   sadStory: {
     text: "My grandpa is 82 and carves these toys by hand. Nobody came to his shop today 😢 Please help him, buy one before they're gone, only 15 left! Link in bio",
-    expect: 'be careful: sad story to buy, rushes you',
+    expect: 'scam: sad story to buy, rushes you',
   },
   threat: {
     text: 'i know ur password lol. send me a photo of urself or i will delete ur fortnite account and tell everyone at ur school. dont tell ur parents. u have 1 hour',
@@ -80,7 +88,7 @@ for (const { name, text, facts, seconds } of results) {
   for (const s of facts.signs) {
     // The app only highlights words it can find in the message
     const found = text.includes(s.words) ? '' : '  (WORDS NOT FOUND IN THE MESSAGE)'
-    console.log(`          - ${s.sign} ("${s.words.slice(0, 50)}")${found}`)
+    console.log(`          - ${s.sign} ("${s.words.slice(0, 50)}")${s.about ? ` [${s.about}]` : ''}${found}`)
   }
   if (facts.links.length) console.log(`          links: ${facts.links.join(', ')}`)
 }

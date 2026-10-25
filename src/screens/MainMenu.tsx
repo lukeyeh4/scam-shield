@@ -9,7 +9,7 @@ type MainMenuProps = {
 
 // The home screen: the logo with a gear for grown-ups, then two big warm cards:
 // Check something (opens the chat with Shield Buddy, which leads to the right
-// checker) and Learn about scams (the game)
+// checker) and Learn about scams (the game, with progress and badges)
 export function MainMenu({ onCheck, onLearn, onGrownUps }: MainMenuProps) {
   return (
     <main className="home">
@@ -25,14 +25,8 @@ export function MainMenu({ onCheck, onLearn, onGrownUps }: MainMenuProps) {
       </header>
 
       <nav className="home-cards" aria-label="What do you want to do?">
-        <OptionCard
-          icon={<ScanIcon />}
-          tone="orange"
-          title="Check something"
-          hint="A picture, a message or a link"
-          onClick={onCheck}
-        />
-        <OptionCard icon={<BookIcon />} tone="amber" title="Learn about scams" hint="Play the scam game" onClick={onLearn} />
+        <OptionCard icon={<ScanIcon />} tone="orange" title="Check something" onClick={onCheck} />
+        <OptionCard icon={<BookIcon />} tone="amber" title="Learn about scams" onClick={onLearn} />
       </nav>
     </main>
   )

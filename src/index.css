@@ -430,7 +430,7 @@ button:active {
   gap: 12px;
 }
 
-/* A big, warm card to tap (OptionCard): on the home screen and in the chat */
+/* A big, warm card to tap (OptionCard): on the home and Learn screens, and in the chat */
 .option-card {
   display: flex;
   align-items: center;
@@ -484,22 +484,12 @@ button:active {
   background: linear-gradient(135deg, #e5975a 0%, #efb47e 100%);
 }
 
-.option-text {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-}
-
 .option-title {
+  flex: 1;
+  min-width: 0;
   font-size: var(--text-large);
   font-weight: 800;
   line-height: 1.25;
-}
-
-.option-hint {
-  color: var(--muted);
-  font-size: var(--text-small);
 }
 
 .option-arrow {
@@ -600,6 +590,20 @@ button:active {
 
 .back:hover {
   box-shadow: var(--shadow-md);
+}
+
+/* The × that closes a screen asking for a grown-up: round, like the read-aloud switch on phones */
+/* (.back.back-close, so the phones' padding for .back doesn't push the × off centre) */
+.back.back-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  padding: 0;
+}
+
+.back-close svg {
+  width: 22px;
+  height: 22px;
 }
 
 /* Read-aloud switch, in the top corner on every screen (headers leave room for it) */
@@ -758,6 +762,26 @@ button:active {
 
 /* Phones: tighter spacing so the fake phone keeps as much room as possible */
 @media (max-width: 560px) {
+  /* Choices that wait for Buddy slide up over Buddy's row when it has finished,
+     instead of keeping empty room below it the whole time */
+  .scenario:has(> .scenario-footer-over) {
+    position: relative;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .scenario-footer-over {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  /* Buddy has finished, and its row is under the choices: keep its room, so the
+     fake screen doesn't jump, but don't let a bubble peek out above them */
+  .scenario:has(> .scenario-footer-over:not(.scenario-footer-hidden)) .scenario-buddy {
+    visibility: hidden;
+  }
+
   .scenario-footer {
     gap: 10px;
     padding: 14px 12px 16px;
@@ -781,8 +805,37 @@ button:active {
     display: none;
   }
 
+  /* A smaller title, so a scam's name fits on one line beside Menu */
   .scenario-header {
+    gap: 12px;
     padding-right: 72px;
+  }
+
+  .scenario-title {
+    font-size: 1.1em;
+    line-height: 1.2;
+  }
+
+  .back {
+    padding: 0 16px;
+  }
+
+  /* A smaller Buddy beside the fake screen, with room for its newest bubble (older
+     ones scroll up behind a shorter fade), so the fake screen stays as big as it can */
+  .scenario-buddy .buddy-image {
+    width: 88px;
+    height: 88px;
+    margin: -8px -6px 1em;
+  }
+
+  .scenario-buddy .buddy-messages {
+    max-height: 7.5em;
+    padding-top: 1.5em;
+    mask-image: linear-gradient(to bottom, transparent, #000 1.5em, #000 calc(100% - 1em), transparent);
+  }
+
+  .scenario-buddy .buddy-bubble {
+    padding: 10px 14px;
   }
 
   .home {
@@ -817,23 +870,28 @@ button:active {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
-  max-width: 360px;
+  min-width: 0;
   height: 100%;
+  min-height: 0;
   font-size: 18px;
   line-height: 1.35;
 }
 
-/* Phone: a modern smartphone with a black bezel, at a real phone's proportions.
-   It grows to fill the height available. */
+/* The device, drawn at one size and scaled as a whole to fit (useFit in Mockup.tsx) */
+.mockup-device {
+  flex: none;
+}
+
+/* Phone: a modern smartphone with a black bezel, at a real phone's proportions
+   (a 19.5:9 screen), always drawn at this size and scaled to fit */
 .phone {
   --phone-bg: #ffffff;
-  height: 100%;
-  max-height: 720px;
-  aspect-ratio: 292 / 536;
-  max-width: 100%;
-  padding: 9px;
-  border-radius: 52px;
+  width: 300px;
+  height: 629px;
+  padding: 10px;
+  border-radius: 50px;
   background: #0f0f11;
   box-shadow:
     0 0 0 2.5px #c9ccd1,
@@ -845,7 +903,7 @@ button:active {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-radius: 43px;
+  border-radius: 40px;
   background: var(--phone-bg);
   color: #000;
   overflow: hidden;
@@ -862,13 +920,13 @@ button:active {
   font-weight: 600;
 }
 
-/* The camera notch scales with the phone so it never covers the time or icons */
+/* The Dynamic Island, at a real iPhone's size for this screen */
 .phone-island {
   position: absolute;
-  top: 10px;
+  top: 9px;
   left: 50%;
-  width: 28%;
-  height: 26px;
+  width: 90px;
+  height: 27px;
   border-radius: 999px;
   background: #000;
   transform: translateX(-50%);
@@ -908,6 +966,68 @@ button:active {
   margin: 8px 0 8px;
   border-radius: 999px;
   background: #000;
+}
+
+/* Phones: no fake phone or iPad inside the real phone. The fake screen loses its
+   frame, status bar and home bar and fills the space, as if the player were in the
+   app (useFit in Mockup.tsx sets the size). It sits in the game like one of its
+   cards (rounded, softly shadowed, a little in from the edges) and rises into place,
+   so going from the cream game to a white or black app isn't a jolt */
+.mockup-bare :is(.phone, .tablet) {
+  width: var(--bare-width);
+  height: var(--bare-height);
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.mockup-bare :is(.phone-screen, .tablet-screen) {
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px rgb(90 55 20 / 0.08),
+    var(--shadow-md);
+}
+
+.mockup-bare :is(.phone-status, .phone-home-bar, .tablet-camera, .tablet-status, .tablet-home-bar) {
+  display: none;
+}
+
+.mockup-bare .phone-compose {
+  padding-bottom: 10px;
+}
+
+/* Pages longer than the space show a thin scroll bar, so it's clear there's more
+   (light on the dark websites) */
+.mockup-bare :is(.search-page, .sms-thread) {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(0 0 0 / 0.3) transparent;
+}
+
+.mockup-bare :is(.scam-page, .msite-page) {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.4) transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mockup-bare .mockup-device {
+    animation: app-in 500ms var(--ease) both;
+  }
+}
+
+@keyframes app-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}
+
+/* Nearly edge to edge: just in from the screen's sides */
+.scenario-main > .mockup-bare,
+.scenario-main > .spot-screen:has(> .mockup-bare) {
+  align-self: stretch;
+  width: auto;
+  margin-inline: -8px;
 }
 
 /* Text messages */
@@ -1203,16 +1323,10 @@ button:active {
   }
 }
 
-/* iPad, held sideways. The mockup box is a size container, so the iPad can be
-   as large as fits while keeping a real iPad's shape (2360 × 1640). */
-.mockup-tablet {
-  max-width: none;
-  align-items: center;
-  container-type: size;
-}
-
+/* iPad, held sideways, at a real iPad's shape (2360 × 1640): always drawn at this
+   size and scaled to fit (useFit in Mockup.tsx) */
 .tablet {
-  --w: min(100cqw, calc(100cqh * 1.439));
+  --w: 820px;
   position: relative;
   flex: none;
   width: var(--w);
@@ -1573,14 +1687,6 @@ button:active {
   background: #b5bac1;
   color: #383a40;
   font-weight: 800;
-}
-
-/* Narrow screens: let the phone fill the width so its text stays readable */
-@media (max-width: 560px) {
-  .phone {
-    width: 100%;
-    aspect-ratio: auto;
-  }
 }
 
 .fake-link {

@@ -33,7 +33,8 @@ export type DevJump =
 const CHOICES: Choice[] = ['do', 'check', 'tell']
 
 // A small panel for testing: jump to any screen, and turn on fast mode to skip
-// waiting for Buddy. Open it with the "Dev" button or the ` key.
+// waiting for Buddy. Open and close it with the ` key (no button, so it never
+// covers the app).
 // Only rendered while running `npm run dev`.
 export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
   const [open, setOpen] = useState(false)
@@ -57,13 +58,7 @@ export function DevConsole({ onJump }: { onJump: (jump: DevJump) => void }) {
     setFastState(!fast)
   }
 
-  if (!open) {
-    return (
-      <button className="dev-toggle" type="button" onClick={() => setOpen(true)}>
-        Dev
-      </button>
-    )
-  }
+  if (!open) return null
 
   const go = (start?: ScenarioStart) => onJump({ to: 'scenario', index, start })
 

@@ -52,7 +52,7 @@ Every result works the same way:
 
 ### Check a link
 
-Kids paste a link (or a whole message with a link in it), and each clue is marked in the link and explained: what the trick is, and what the real website looks like. Betting, adult and pirated streaming websites are red too, headed "This website isn't for kids", and by default only say that, not what's there (a grown-up can turn on "Name the type of unsafe website").
+Kids paste a link (or a whole message with a link in it), and each clue is marked in the link and explained: what the trick is, and what the real website looks like. Betting, adult and pirated streaming websites are red too, headed "This isn't for kids", and by default only say that, not what's there (a grown-up can turn on "Name the type of unsafe website").
 
 It checks in three layers, and never opens the link on the kid's device:
 
@@ -68,17 +68,17 @@ Tested against 140 real websites (no false alarms) and 40 live phishing links (3
 
 *The practice check in the game, where the clues are the scam's own. A real picture check draws numbered boxes around each warning sign.*
 
-Kids take a screenshot or photo of anything that worries them (a text, a game chat, an ad, a website, a pop-up, a short video), with up to two more of the same thing (like a video's comments or the shop it links to), and can say where it's from (someone they don't know, a friend, a game, an ad). Claude looks for warning signs from a fixed list: asking for a password, code, money or photos, free prizes, pretending to be a company or family, rushing, threats, secrets, downloads, sad stories used to sell, and product photos that may not be the real thing. Links in the picture go through the link checker.
+Kids take a screenshot or photo of anything that worries them (a text, a game chat, an ad, a website, a pop-up, a short video), with up to two more of the same thing (like a video's comments or the shop it links to), and can say where it's from (someone they don't know, a friend, a game, an ad). Claude looks for warning signs from a fixed list: asking for a password, code, money or photos, free prizes, pretending to be a company or family, rushing, threats, secrets, downloads, sad stories used to sell, product photos that may not be the real thing, easy money and crypto offers, trades where you go first, "your account is in trouble" tricks, and betting. A stranger getting too personal (compliments, asking your age or if your parents are home) gets "Show a grown-up right now", even before they ask for anything. Any other trick Claude spots is shown as "Something else looks wrong", in the app's own words: Claude's description of it is never shown to kids. A sad story on its own is only "Be careful" (real people share sad stories), but one that also rushes you or moves you to another app is a sympathy scam. Links in the picture go through the link checker.
 
 The result shows each picture with numbered boxes around the warning signs, and a magnifier to see it big.
 
-Tested on 17 made-up screenshots and 48 made-up photos of screens (angled, glare, dim): every scam caught, no false alarms, and look-alike links (dlscord, rnicrosoft, paypa1) copied exactly.
+Tested on 28 made-up screenshots (including seven sad stories, a stranger getting too personal, a trick trade, a fake "you've been reported" message, a crypto post, a betting ad and a chain message) and 48 made-up photos of screens (angled, glare, dim): every scam caught, no false alarms, and look-alike links (dlscord, rnicrosoft, paypa1) copied exactly.
 
 ### Check a message
 
 <img src="docs/screenshots/check-message-result.png" alt="A message result: the Mom text with three highlighted, numbered clues" width="50%">
 
-Kids paste a text, chat, email or post. Phone numbers, emails, codes and addresses are blanked out on the device before anything is sent. Claude names the same warning signs as for pictures and quotes the words that show them, which are highlighted and numbered in the message. Tested on 12 made-up messages: every scam caught, no false alarms.
+Kids paste a text, chat, email or post. Phone numbers, emails, codes and addresses are blanked out on the device before anything is sent. Claude names the same warning signs as for pictures and quotes the words that show them, which are highlighted and numbered in the message. Tested on 14 made-up messages: every scam caught, no false alarms.
 
 ## Learn about scams
 

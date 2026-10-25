@@ -89,8 +89,12 @@ export function ScenarioScreen({ scenario, isLast, onBack, onNext, start }: Scen
         </div>
       </main>
 
-      {/* Always takes its space, so nothing jumps when it slides in */}
-      <footer className={showChoices ? 'scenario-footer' : 'scenario-footer scenario-footer-hidden'} inert={!showChoices}>
+      {/* Always takes its space, so nothing jumps when it slides in (on phones it
+          slides up over Buddy instead) */}
+      <footer
+        className={showChoices ? 'scenario-footer scenario-footer-over' : 'scenario-footer scenario-footer-over scenario-footer-hidden'}
+        inert={!showChoices}
+      >
         <h2 className="choices-question">What would you do?</h2>
         <div className="choices">
           {CHOICES.map((c) => (
