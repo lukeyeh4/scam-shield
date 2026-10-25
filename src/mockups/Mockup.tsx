@@ -33,10 +33,11 @@ const DEVICES = {
   tablet: { width: 820, height: 570, most: 1.25 },
 }
 
-// On a phone, a fake phone inside the real one looks odd, so the fake phone screens
-// drop their frame and fill the space, as if the player were in the app themselves
-// (the "bare" look; must match the phone breakpoint in index.css)
-const BARE_QUERY = '(max-width: 560px)'
+// On a phone or tablet, a fake device inside the real one looks odd, so the fake
+// screens drop their frame and fill the space, as if the player were in the app
+// themselves (the "bare" look). Touch screens get it, and so do narrow windows (a
+// phone-sized window, or the phone demo); computers keep the fake device.
+const BARE_QUERY = '(pointer: coarse), (max-width: 560px)'
 // How much bigger than the drawn size the bare screens show, for realistic text
 // (a tablet's apps already have phone-sized text)
 const BARE_SCALE = { phone: 1.1, tablet: 1 }

@@ -968,7 +968,8 @@ button:active {
   background: #000;
 }
 
-/* Phones: no fake phone or iPad inside the real phone. The fake screen loses its
+/* Phones and tablets (BARE_QUERY in Mockup.tsx): no fake phone or iPad inside the
+   real device. The fake screen loses its
    frame, status bar and home bar and fills the space, as if the player were in the
    app (useFit in Mockup.tsx sets the size). It sits in the game like one of its
    cards (rounded, softly shadowed, a little in from the edges) and rises into place,
@@ -1022,12 +1023,14 @@ button:active {
   }
 }
 
-/* Nearly edge to edge: just in from the screen's sides */
-.scenario-main > .mockup-bare,
-.scenario-main > .spot-screen:has(> .mockup-bare) {
-  align-self: stretch;
-  width: auto;
-  margin-inline: -8px;
+/* Phones: nearly edge to edge, just in from the screen's sides */
+@media (max-width: 560px) {
+  .scenario-main > .mockup-bare,
+  .scenario-main > .spot-screen:has(> .mockup-bare) {
+    align-self: stretch;
+    width: auto;
+    margin-inline: -8px;
+  }
 }
 
 /* Text messages */
