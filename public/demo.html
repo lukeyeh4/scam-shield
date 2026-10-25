@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The phone demo: the real app inside an iPhone 16 Pro frame, for showing on a
+     computer. It's on the same site as the app, so everything the app does
+     (Buddy's answers, picture and message checks, Buddy's voice) works here too. -->
+<title>Scam Shield Phone Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600..800&display=swap">
+<style>
+  /* Layout: one stage, the phone centred and scaled to fit the window, a slim bar of demo controls above it */
+  /* One light look on purpose: the background is whatever colour the demo picks */
+  :root {
+    --stage: #fbf1e2;
+    --ink: #3b2a1e;
+    --muted: #6f5b4b;
+    --chip: #fffaf2;
+    --chip-line: #e4d4bd;
+    --accent: #d9622b;
+    --screen: #fbf1e1;
+    --font: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  }
+
+  html, body { height: 100%; margin: 0; }
+  body {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    box-sizing: border-box;
+    background: var(--stage);
+    color: var(--ink);
+    font-family: var(--font);
+  }
+
+  .bar {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-block: 12px 4px;
+  }
+  .bar button, .bar select {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--chip-line);
+    border-radius: 999px;
+    background: var(--chip);
+    color: var(--ink);
+    font: 700 14px/1 var(--font);
+    cursor: pointer;
+  }
+  .bar select { padding-right: 10px; }
+  .bar button:focus-visible, .bar select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .bar .colour { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 6px 0 14px; border: 1px solid var(--chip-line); border-radius: 999px; background: var(--chip); font: 700 14px/1 var(--font); }
+  .bar .colour input { width: 28px; height: 24px; padding: 0; border: 1px solid var(--chip-line); border-radius: 6px; background: none; cursor: pointer; }
+  .bar .colour code { font: 600 13px/1 ui-monospace, Menlo, monospace; color: var(--muted); }
+  .bar label.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+  .stage {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    padding-block: 12px 20px;
+  }
+  /* Takes the scaled size, so centring works; the phone inside is drawn at its real size and scaled */
+  .fit { position: relative; }
+  .phone {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 434px;
+    height: 898px;
+    transform-origin: 0 0;
+    --frame: #2b2b2d;
+  }
+
+  /* iPhone 16 Pro: 402 × 874 pt screen, 62 pt corners, 3 pt titanium band, 9 pt black bezel */
+  .btn { position: absolute; width: 6px; background: var(--frame); }
+  .btn.l { left: 0; border-radius: 3px 0 0 3px; }
+  .btn.r { right: 0; border-radius: 0 3px 3px 0; }
+  .body {
+    position: absolute;
+    left: 4px;
+    top: 0;
+    width: 426px;
+    height: 898px;
+    box-sizing: border-box;
+    padding: 3px;
+    border-radius: 74px;
+    background: var(--frame);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2);
+  }
+  .bezel { width: 420px; height: 892px; box-sizing: border-box; padding: 9px; border-radius: 71px; background: #0b0b0c; }
+  .screen {
+    position: relative;
+    width: 402px;
+    height: 874px;
+    overflow: hidden;
+    border-radius: 62px;
+    background-color: #fbf1e1;
+    background-image: radial-gradient(circle at 10% 0%, rgb(253 214 170 / 0.55) 0, transparent 38%), radial-gradient(circle at 100% 100%, rgb(250 222 150 / 0.45) 0, transparent 34%);
+    isolation: isolate;
+  }
+  /* The app sits between the top safe area (status bar, 62 pt) and the bottom one (home indicator, 34 pt) */
+  .app {
+    position: absolute;
+    left: 0;
+    top: 62px;
+    width: 402px;
+    height: 778px;
+    border: 0;
+    display: block;
+    background: transparent;
+  }
+  .status {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 0 30px 2px 50px;
+    font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+    color: #000;
+    pointer-events: none;
+  }
+  .time { width: 46px; text-align: center; font-size: 17px; font-weight: 600; letter-spacing: -0.2px; font-variant-numeric: tabular-nums; }
+  .icons { display: flex; align-items: center; gap: 7px; }
+  .island { position: absolute; left: 138px; top: 11px; width: 126px; height: 37px; border-radius: 19px; background: #000; pointer-events: none; }
+  .home-bar { position: absolute; left: 131px; bottom: 8px; width: 140px; height: 5px; border-radius: 3px; background: #000; pointer-events: none; }
+</style>
+
+</head>
+<body>
+<div class="bar" role="toolbar" aria-label="Demo controls">
+  <button type="button" id="go-home">Home screen</button>
+  <button type="button" id="go-chat">Open Buddy chat</button>
+  <button type="button" id="set-up" aria-pressed="false">Turn on Buddy's answers</button>
+  <button type="button" id="start-over">Start over</button>
+  <label class="colour" for="stage-colour">Background <input type="color" id="stage-colour" value="#fbf1e2"> <code id="stage-hex">#fbf1e2</code></label>
+  <button type="button" id="stage-reset">Reset colour</button>
+  <label class="sr" for="finish">Phone colour</label>
+  <select id="finish">
+    <option value="#2b2b2d">Black Titanium</option>
+    <option value="#5b5d61">Graphite</option>
+    <option value="#8e8c88">Natural Titanium</option>
+  </select>
+  <label class="sr" for="size">Size</label>
+  <select id="size">
+    <option value="fit">Fit to window</option>
+    <option value="1">Actual size</option>
+  </select>
+</div>
+
+<div class="stage" id="stage">
+  <div class="fit" id="fit">
+    <div class="phone" id="phone">
+      <div class="btn l" style="top: 178px; height: 34px"></div>
+      <div class="btn l" style="top: 246px; height: 64px"></div>
+      <div class="btn l" style="top: 324px; height: 64px"></div>
+      <div class="btn r" style="top: 270px; height: 100px"></div>
+      <div class="btn r" style="top: 560px; height: 58px"></div>
+      <div class="body">
+        <div class="bezel">
+          <div class="screen">
+            <iframe class="app" id="app" src="./#/" title="Scam Shield app" allow="microphone; autoplay"></iframe>
+            <div class="status" aria-hidden="true">
+              <span class="time">9:41</span>
+              <span class="icons">
+                <svg width="19" height="12" viewBox="0 0 19 12"><rect x="0" y="8" width="3.2" height="4" rx="1" fill="#000"></rect><rect x="5" y="5.5" width="3.2" height="6.5" rx="1" fill="#000"></rect><rect x="10" y="3" width="3.2" height="9" rx="1" fill="#000"></rect><rect x="15" y="0" width="3.2" height="12" rx="1" fill="#000"></rect></svg>
+                <svg width="17" height="12" viewBox="0 0 17 12"><!-- Three pieces of one 90° fan around the same centre, so both sides mirror exactly: two bars and the bottom wedge, with clear gaps --><path d="M0.01 3.51A12 12 0 0 1 16.99 3.51L15.15 5.35A9.4 9.4 0 0 0 1.85 5.35ZM2.91 6.41A7.9 7.9 0 0 1 14.09 6.41L12.25 8.25A5.3 5.3 0 0 0 4.75 8.25ZM5.81 9.31A3.8 3.8 0 0 1 11.19 9.31L8.5 12Z" fill="#000"></path></svg>
+                <svg width="28" height="13" viewBox="0 0 28 13"><rect x="0.5" y="0.5" width="24" height="12" rx="3.8" fill="none" stroke="#000" stroke-opacity="0.35"></rect><rect x="2" y="2" width="21" height="9" rx="2.5" fill="#000"></rect><path d="M26 4.3v4.4c.8-.3 1.4-1.2 1.4-2.2s-.6-1.9-1.4-2.2z" fill="#000" fill-opacity="0.4"></path></svg>
+              </span>
+            </div>
+            <div class="island" aria-hidden="true"></div>
+            <div class="home-bar" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const PHONE_W = 434, PHONE_H = 898
+  const stage = document.getElementById('stage')
+  const fit = document.getElementById('fit')
+  const phone = document.getElementById('phone')
+  const app = document.getElementById('app')
+  const size = document.getElementById('size')
+  const finish = document.getElementById('finish')
+
+  const load = (key) => { try { return localStorage.getItem(key) } catch { return null } }
+  const save = (key, value) => { try { localStorage.setItem(key, value) } catch { /* fine without */ } }
+
+  // Scale the whole phone as one picture, so its shape and the app's layout never change
+  function layout() {
+    const box = stage.getBoundingClientRect()
+    const cs = getComputedStyle(stage)
+    const w = box.width
+    const h = box.height - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)
+    const scale = size.value === 'fit' ? Math.max(0.2, Math.min(w / PHONE_W, h / PHONE_H, 1.6)) : 1
+    phone.style.transform = `scale(${scale})`
+    fit.style.width = PHONE_W * scale + 'px'
+    fit.style.height = PHONE_H * scale + 'px'
+    stage.style.overflow = size.value === 'fit' ? 'hidden' : 'auto'
+    stage.style.placeItems = size.value === 'fit' ? 'center' : 'start center'
+  }
+  new ResizeObserver(layout).observe(stage)
+
+  const stageColour = document.getElementById('stage-colour')
+  const stageHex = document.getElementById('stage-hex')
+  const DEFAULT_STAGE = '#fbf1e2'
+  function setStage(value) {
+    document.documentElement.style.setProperty('--stage', value)
+    stageColour.value = value
+    stageHex.textContent = value
+    save('demo-stage', value)
+  }
+  setStage(load('demo-stage') || DEFAULT_STAGE)
+  stageColour.addEventListener('input', () => setStage(stageColour.value))
+  document.getElementById('stage-reset').addEventListener('click', () => setStage(DEFAULT_STAGE))
+
+  const savedFrame = load('demo-frame')
+  if (savedFrame && [...finish.options].some((o) => o.value === savedFrame)) finish.value = savedFrame
+  size.value = load('demo-size') || size.value
+  phone.style.setProperty('--frame', finish.value)
+  finish.addEventListener('change', () => { phone.style.setProperty('--frame', finish.value); save('demo-frame', finish.value) })
+  size.addEventListener('change', () => { save('demo-size', size.value); layout() })
+
+  document.getElementById('go-home').addEventListener('click', () => {
+    try { app.contentWindow.location.hash = '#/' } catch { app.src = './#/' }
+    app.focus()
+  })
+  const goTo = (hash) => {
+    try { app.contentWindow.location.hash = hash } catch { app.src = './' + hash }
+    app.focus()
+  }
+  document.getElementById('go-chat').addEventListener('click', () => goTo('#/ask'))
+
+  // The grown-up setup in one tap, for demos: the agreement, Buddy's answers and
+  // the microphone (the same switches as in For grown-ups; this page shares the app's storage)
+  const SETUP_KEYS = ['scam-shield-set-up', 'scam-shield-questions', 'scam-shield-voice']
+  const setUp = document.getElementById('set-up')
+  const isSetUp = () => SETUP_KEYS.every((k) => load(k) === '1')
+  function showSetUp() {
+    const on = isSetUp()
+    setUp.setAttribute('aria-pressed', String(on))
+    setUp.textContent = on ? "Buddy's answers: on" : "Turn on Buddy's answers"
+  }
+  function reloadApp(hash) {
+    try {
+      if (hash) app.contentWindow.location.hash = hash
+      app.contentWindow.location.reload()
+    } catch {
+      app.src = './' + (hash || '#/')
+    }
+  }
+  setUp.addEventListener('click', () => {
+    const on = !isSetUp()
+    for (const k of SETUP_KEYS) {
+      try { on ? localStorage.setItem(k, '1') : localStorage.removeItem(k) } catch { /* storage blocked */ }
+    }
+    showSetUp()
+    reloadApp()
+  })
+  showSetUp()
+
+  // Clears the app's progress, badges and settings, then reopens it (keeps this
+  // page's own choices, and the setup if it's on)
+  document.getElementById('start-over').addEventListener('click', () => {
+    const wasSetUp = isSetUp()
+    try {
+      for (const k of Object.keys(localStorage)) if (k.startsWith('scam-shield-')) localStorage.removeItem(k)
+      if (wasSetUp) for (const k of SETUP_KEYS) localStorage.setItem(k, '1')
+    } catch { /* nothing stored */ }
+    showSetUp()
+    reloadApp('#/')
+  })
+  layout()
+</script>
+</body>
+</html>
