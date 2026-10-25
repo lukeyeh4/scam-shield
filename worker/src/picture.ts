@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { z } from 'zod'
 import { type PictureFacts, SIGNS, isSign } from '../../src/tools/pictureSigns'
+import { cachedSystem } from './cache'
 
 // Check a picture: Claude looks at a screenshot or photo a kid took (a text, a
 // game chat, an ad, a website, a pop-up) and answers fixed questions: what it is,
@@ -130,7 +131,7 @@ export async function judgePicture(check: PictureCheck, apiKey: string, model = 
   const response = await client.messages.parse({
     model,
     max_tokens: 4000,
-    system: SYSTEM,
+    system: cachedSystem(SYSTEM),
     output_config: { effort: 'low', format: zodOutputFormat(Answers) },
     messages: [
       {

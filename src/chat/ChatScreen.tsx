@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { type FormEvent, useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import { IMAGES } from '../buddy/moods'
 import { useDots } from '../buddy/useDots'
 import { readingPause, useTypewriter } from '../buddy/useTypewriter'
@@ -20,6 +20,7 @@ import {
   STEPS,
   type StepId,
   TOPIC_STEPS,
+  UPSET_OPENER,
 } from './script'
 import { checkSinceChat, type Entry, forgetCheck, saveChat, savedChat, takeAskAbout } from './session'
 import './chat.css'
@@ -114,6 +115,9 @@ type ChatScreenProps = {
 // Everything else Buddy says is in script.ts. With a grown-up's OK, the player can also
 // tap the microphone and ask out loud: the words fill the box as they're heard,
 // to check before sending (voiceInput.ts).
+// The tallest the message box grows (about five lines), in pixels
+const MAX_FIELD = 148
+
 export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const [start] = useState(resume)
   const [step, setStep] = useState<StepId>(start.step)
@@ -132,6 +136,7 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   const talkingAllowed = useTalkingAllowed() && setUp
   const [stopListening, setStopListening] = useState<(() => void) | null>(null)
   const [listenProblem, setListenProblem] = useState<ListenProblem>()
+  const placeholder = stopListening ? 'Listening…' : PLACEHOLDERS[listenProblem ?? 'none']
   // Asking the AI: whether a grown-up allows it, and whether Buddy is working on an answer
   const questionsAllowed = useQuestionsAllowed()
   const [waiting, setWaiting] = useState(false)
@@ -172,6 +177,20 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   // Keep the newest message in view as messages arrive and grow (and as the answers
   // appear below), unless the player has scrolled up to read older ones
   const logRef = useRef<HTMLDivElement>(null)
+  const field = useRef<HTMLTextAreaElement>(null)
+  const measure = useRef<HTMLTextAreaElement>(null)
+  const [fieldHeight, setFieldHeight] = useState<number>()
+  // The box's height follows its words (or the placeholder), measured on the hidden
+  // copy so the change can slide instead of jumping; past MAX_FIELD it scrolls
+  useLayoutEffect(() => {
+    const copy = measure.current
+    if (!copy) return
+    const fit = () => setFieldHeight(Math.min(copy.scrollHeight, MAX_FIELD))
+    fit()
+    const observer = new ResizeObserver(fit)
+    observer.observe(copy)
+    return () => observer.disconnect()
+  }, [draft, placeholder])
   const following = useRef(true)
   useEffect(() => {
     const log = logRef.current
@@ -240,7 +259,8 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
   // details or something upsetting get Buddy's scripted lines (never sent);
   // anything else is answered by the AI when allowed, with Buddy's typing dots
   // while it works. The AI's own words are only shown for questions about scams
-  // and staying safe; other kinds get scripted lines too (TOPIC_STEPS).
+  // and staying safe, and (between scripted lines) for upsetting things the AI
+  // noticed; other kinds get scripted lines too (TOPIC_STEPS).
   const send = async (e: FormEvent) => {
     e.preventDefault()
     stopListening?.()
@@ -259,10 +279,21 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
     const answer = await askBuddy(asked)
     setWaiting(false)
     const safety = answer?.topic === 'safety'
-    const next = !answer ? 'askFailed' : safety ? ANSWERED[answer.offer] : TOPIC_STEPS[answer.topic as keyof typeof TOPIC_STEPS]
+    const upsetWords = answer?.topic === 'upset' && answer.lines.length > 0
+    const next = !answer
+      ? 'askFailed'
+      : safety
+        ? ANSWERED[answer.offer]
+        : upsetWords
+          ? 'upsetAnswered'
+          : TOPIC_STEPS[answer.topic as keyof typeof TOPIC_STEPS]
     // Which time the player has asked, so the line after the answer varies
     const turn = asked.filter((entry) => entry.from === 'kid').length - 1
-    const said: Entry[] = safety ? answer.lines.map((line) => ({ from: 'buddy', text: line, mood: answer.mood })) : []
+    const aiLines = safety || upsetWords ? answer.lines : []
+    const said: Entry[] = [
+      ...(upsetWords ? [{ from: 'buddy' as const, text: UPSET_OPENER, mood: 'neutral' as const }] : []),
+      ...aiLines.map((line) => ({ from: 'buddy' as const, text: line, mood: upsetWords ? ('neutral' as const) : answer!.mood })),
+    ]
     setStep(next)
     setEntries([...asked, ...said, ...buddyLines(next, turn)])
   }
@@ -389,18 +420,32 @@ export function ChatScreen({ onBack, onLeave }: ChatScreenProps) {
           <label className="sr-only" htmlFor="ask-question">
             Type a question
           </label>
-          <input
-            id="ask-question"
-            type="text"
-            placeholder={stopListening ? 'Listening…' : PLACEHOLDERS[listenProblem ?? 'none']}
-            autoComplete="off"
-            maxLength={300}
-            value={draft}
-            onChange={(e) => {
-              setDraft(e.target.value)
-              setListenProblem(undefined)
-            }}
-          />
+          {/* Grows a line at a time as the question gets longer, like a phone's
+              message box: the hidden copy measures how tall the words are */}
+          <div className="ask-field">
+            <textarea
+              ref={field}
+              id="ask-question"
+              rows={1}
+              placeholder={placeholder}
+              autoComplete="off"
+              maxLength={300}
+              value={draft}
+              style={{ height: fieldHeight }}
+              onChange={(e) => {
+                setDraft(e.target.value)
+                setListenProblem(undefined)
+              }}
+              onKeyDown={(e) => {
+                // Enter sends, Shift+Enter starts a new line (not while choosing letters in a keyboard's word list)
+                if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  e.preventDefault()
+                  e.currentTarget.form?.requestSubmit()
+                }
+              }}
+            />
+            <textarea ref={measure} className="ask-measure" rows={1} aria-hidden tabIndex={-1} readOnly value={draft || placeholder} />
+          </div>
           {/* Ask out loud instead of typing; turned off until a grown-up allows it,
               and not shown in browsers that can't listen */}
           {canTalk && (

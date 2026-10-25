@@ -14,8 +14,10 @@ const KEY = 'scam-shield-questions'
 
 export type AskEntry = { from: 'kid' | 'buddy'; text: string }
 export type BuddyAnswer = {
-  // What kind of question it was. Only 'safety' questions get the AI's own words;
-  // the others get Buddy's scripted lines (TOPIC_STEPS in script.ts), and `lines` is empty
+  // What kind of question it was. 'safety' questions get the AI's own words, and
+  // 'upset' ones may get one or two of its lines between scripted ones
+  // (upsetAnswered in script.ts); the others get Buddy's scripted lines
+  // (TOPIC_STEPS), and `lines` is empty
   topic: 'safety' | 'offTopic' | 'personal' | 'upset'
   lines: string[]
   mood: 'happy' | 'curious' | 'thinking' | 'worried'

@@ -55,7 +55,7 @@ const NEVER = [
     why: 'says not to worry',
   },
   // Scary
-  { rule: /\b(kill\w*|die|dead|death|kidnap\w*|stalk\w*|find you|come to your house|police|jail|arrest\w*|hacker\w* will)\b/i, why: 'scary words' },
+  { rule: /\b(kill\w*|die|dead|death|kidnap\w*|stalk\w*|find you|know where you live|come to your house|police|jail|arrest\w*|hacker\w* will)\b/i, why: 'scary words' },
 ]
 
 // Free game money is always a scam, so Buddy says so in no uncertain terms. A

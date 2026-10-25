@@ -22,6 +22,25 @@ describe('checkLink', () => {
     expect(checkLink(link)).toMatchObject({ risk: 'none', clues: [] })
   })
 
+  it.each([
+    ['youtube.com/@MrBeast_Giveaway', 'MrBeast'],
+    ['https://www.youtube.com/@MrBea5t/videos', 'MrBeast'],
+    ['tiktok.com/@ishowspeed.free.robux', 'IShowSpeed'],
+    ['instagram.com/mrbeastt', 'MrBeast'],
+    ['https://www.youtube.com/@mrb%D0%B5ast', 'MrBeast'],
+  ])('catches an account pretending to be a famous creator on a real website: %s', (link, name) => {
+    expect(checkLink(link)).toMatchObject({ risk: 'high', clues: [{ label: `Pretending to be ${name}` }] })
+  })
+
+  it("never says an account is real, only the website", () => {
+    expect(checkLink('youtube.com/@MrBeast')).toMatchObject({
+      risk: 'none',
+      clues: [],
+      good: ['This is the real YouTube website, but anyone can make an account on it, with any name.'],
+    })
+    expect(checkLink('youtube.com/watch?v=dQw4w9WgXcQ')?.good).toEqual(['This is the real YouTube website.'])
+  })
+
   it('catches a website pretending to be Roblox, and the bait word after it', () => {
     const result = checkLink('roblox-giveaway-official.net/claim')
     expect(result?.risk).toBe('high')
@@ -209,7 +228,8 @@ describe('checkLink', () => {
       ['fb.me/someone', 'Facebook'],
       ['twitch.tv/somestreamer', 'Twitch'],
     ])('knows the official website %s', (link, brand) => {
-      expect(checkLink(link)).toMatchObject({ risk: 'none', good: [`This is the real ${brand} website.`] })
+      expect(checkLink(link)).toMatchObject({ risk: 'none' })
+      expect(checkLink(link)?.good?.[0]).toMatch(new RegExp(`^This is the real ${brand} website`))
     })
   })
 

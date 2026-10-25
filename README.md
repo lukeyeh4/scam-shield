@@ -30,7 +30,7 @@ An app that helps kids aged 8–12 spot scams, with two parts:
   </tr>
 </table>
 
-- **A link:** checked without ever opening it on the kid's device. The address itself is checked on the device (copies of brands like rob1ox, hidden addresses, short links, betting and adult websites). Then a small server adds Google Safe Browsing, Cloudflare's filters, how new the website is and where short links really go, and Claude reads the page with fixed yes/no questions.
+- **A link:** checked without ever opening it on the kid's device. The address itself is checked on the device (copies of brands like rob1ox, fake accounts of famous creators like youtube.com/@MrBeast_Giveaway, hidden addresses, short links, betting and adult websites). Then a small server adds Google Safe Browsing, Cloudflare's filters, how new the website is and where short links really go, and Claude reads the page with fixed yes/no questions.
 - **A picture:** a screenshot or photo, plus up to two more of the same thing. Claude looks for warning signs from a fixed list (asking for a password, code, money or photos, free prizes, pretending to be someone, rushing, threats, and more) and the result draws numbered boxes around them.
 - **A message:** a pasted text, chat, email or post. Phone numbers, emails, codes and addresses are blanked out on the device first, and the words that show each warning sign are highlighted.
 
@@ -57,7 +57,7 @@ The Learn screen shows how many scams are done, lets kids pick any scam, and sho
 
 ## Shield Buddy
 
-A friendly yellow shield who guides every scam and the checkers. It never hints before a choice, and it always sends kids to a real grown-up. Everything it says is written in the app, except its answers to questions kids type: those come from AI, only about scams and staying safe, are checked in code, and are always followed by a line pointing to a grown-up. **Read aloud** (off by default, in the top corner) reads Buddy's lines in its own voice.
+A friendly yellow shield who guides every scam and the checkers. It never hints before a choice, and it always sends kids to a real grown-up. Everything it says is written in the app, except its answers to questions kids type: those come from AI, only about scams and staying safe, are checked in code, and are always followed by a line pointing to a grown-up. If a child says something upsetting, like a stranger asking them to get in a car, Buddy calmly names what happened and the rule for next time, then tells them to tell a grown-up right now. **Read aloud** (off by default, in the top corner) reads Buddy's lines in its own voice.
 
 ## For grown-ups
 
