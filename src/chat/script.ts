@@ -11,6 +11,10 @@ import { hasPersonalDetails, soundsUpset } from './askRules'
 // scripted line after it (the `answered` steps) still sends the kid to a grown-up.
 // Keep it short: a line or two from Buddy, and as few answers as possible.
 
+// What Buddy says when something upsetting comes up: first, then last
+export const UPSET_OPENER = 'Thank you for telling me. You are not in trouble.'
+const UPSET_TELL = 'Please tell a grown-up you trust right now, like a parent or teacher. They can help.'
+
 export type StepId =
   | 'start'
   | 'again'
@@ -28,6 +32,7 @@ export type StepId =
   | 'offTopic'
   | 'personal'
   | 'upset'
+  | 'upsetAnswered'
   | 'backScam'
   | 'backCareful'
   | 'backNotForKids'
@@ -182,7 +187,14 @@ export const STEPS: Record<StepId, ChatStep> = {
   },
   upset: {
     mood: 'neutral',
-    buddy: ['Thank you for telling me. You are not in trouble.', 'Please tell a grown-up you trust right now, like a parent or teacher. They can help.'],
+    buddy: [UPSET_OPENER, UPSET_TELL],
+    options: [{ label: 'Check something', next: 'again' }],
+  },
+  // After the AI's lines about something upsetting it noticed (the chat puts
+  // UPSET_OPENER before them)
+  upsetAnswered: {
+    mood: 'neutral',
+    buddy: [UPSET_TELL],
     options: [{ label: 'Check something', next: 'again' }],
   },
 
@@ -305,6 +317,7 @@ export const TYPED_STEPS: StepId[] = [
   'offTopic',
   'personal',
   'upset',
+  'upsetAnswered',
 ]
 
 // The step after the AI's answer, by the checker it suggested

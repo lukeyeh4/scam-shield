@@ -50,7 +50,7 @@ describe('chat script', () => {
   })
 
   it("sends a kid to a grown-up after every AI answer, or when the AI can't answer", () => {
-    for (const id of [...Object.values(ANSWERED), ...Object.values(TOPIC_STEPS), 'askFailed' as const]) {
+    for (const id of [...Object.values(ANSWERED), ...Object.values(TOPIC_STEPS), 'upsetAnswered' as const, 'askFailed' as const]) {
       for (const lines of [STEPS[id].buddy, ...(STEPS[id].alternatives ?? [])]) expect(lines.join(' '), id).toContain('grown-up')
     }
   })

@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { z } from 'zod'
 import type { PageFacts } from '../../src/tools/linkLookup'
+import { cachedSystem } from './cache'
 
 // The AI layer of the link checker: reads the page a link leads to and asks Claude
 // what's on it (copying a brand, asking for a password, free prizes, ...). Only
@@ -168,7 +169,7 @@ export async function judgePage(page: Page, apiKey: string): Promise<PageFacts |
   const response = await client.messages.parse({
     model: MODEL,
     max_tokens: 2000,
-    system: SYSTEM,
+    system: cachedSystem(SYSTEM),
     output_config: { effort: 'low', format: zodOutputFormat(Answers) },
     messages: [{ role: 'user', content: facts }],
   })
@@ -204,7 +205,7 @@ export async function judgeName(url: string, apiKey: string): Promise<PageFacts 
   const response = await client.messages.parse({
     model: MODEL,
     max_tokens: 500,
-    system: NAME_SYSTEM,
+    system: cachedSystem(NAME_SYSTEM),
     output_config: { effort: 'low', format: zodOutputFormat(NameAnswers) },
     messages: [{ role: 'user', content: `Address: ${new URL(url).hostname}` }],
   })

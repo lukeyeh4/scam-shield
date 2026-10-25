@@ -104,6 +104,7 @@ describe("the AI's answer", () => {
     [["Don't worry about it."], 'says not to worry'],
     [['Scammers could find you.'], 'scary words'],
     [['You could call the police.'], 'scary words'],
+    [['Someone online said they know where you live.'], 'scary words'],
     [['My name is Sam, nice to meet you.'], 'personal details'],
   ])('throws away %j (%s)', (lines, why) => {
     expect(answerProblem(lines)).toBe(why)

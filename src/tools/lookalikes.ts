@@ -70,3 +70,25 @@ export function mixesAlphabets(label: string): boolean {
   const latin = /[a-z]/i.test(label)
   return latin && /[Ͱ-ϿЀ-ӿԀ-ԯ]/.test(label)
 }
+
+// Characters that look like letters: rob1ox, g00gle, paypa1
+const LOOKALIKES: [RegExp, string][] = [
+  [/0/g, 'o'], [/1/g, 'l'], [/i/g, 'l'], [/3/g, 'e'], [/4/g, 'a'], [/5/g, 's'], [/7/g, 't'], [/rn/g, 'm'], [/vv/g, 'w'],
+]
+export const plain = (word: string) => LOOKALIKES.reduce((w, [from, to]) => w.replace(from, to), word)
+
+// One letter added, missing, changed or swapped: robloxx, robox, ronlox, rbolox
+export function oneSlip(a: string, b: string) {
+  if (a === b) return false
+  if (Math.abs(a.length - b.length) > 1) return false
+  if (a.length === b.length) {
+    const diff = [...a].flatMap((c, i) => (c === b[i] ? [] : [i]))
+    if (diff.length === 1) return true
+    return diff.length === 2 && diff[1] === diff[0] + 1 && a[diff[0]] === b[diff[1]] && a[diff[1]] === b[diff[0]]
+  }
+  const [long, short] = a.length > b.length ? [a, b] : [b, a]
+  for (let i = 0; i < long.length; i++) {
+    if (long.slice(0, i) + long.slice(i + 1) === short) return true
+  }
+  return false
+}

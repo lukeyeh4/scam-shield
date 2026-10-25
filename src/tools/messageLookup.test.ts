@@ -47,6 +47,18 @@ describe('messageResult', () => {
     expect(result.clues.every((c) => c.why?.length)).toBe(true)
   })
 
+  it('catches an account pretending to be a famous creator, instead of the general sign', async () => {
+    const message = '@MrBeast_Giveaway: you won! DM me to claim'
+    const result = await messageResult(
+      facts({ signs: [{ sign: 'pretends to be a company, game or famous person', words: '@MrBeast_Giveaway' }] }),
+      message,
+      noServer,
+    )
+    expect(result).toMatchObject({ risk: 'high', clues: [{ label: 'Pretending to be MrBeast', highlight: '@MrBeast_Giveaway' }] })
+    expect(result.clues).toHaveLength(1)
+    expect(result.clues[0].why?.length).toBeGreaterThan(0)
+  })
+
   it("doesn't highlight words that aren't in the message", async () => {
     const result = await messageResult(facts({ signs: [{ sign: 'rushes you', words: 'hurry up now' }] }), text, noServer)
     expect(result.clues[0]).toMatchObject({ label: 'Rushing you', highlight: undefined })

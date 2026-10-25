@@ -1,7 +1,8 @@
 import { parse } from 'tldts'
 import { type Brand, BRANDS, EVERYDAY_WORDS, NEAR_BRAND_WORDS, officialBrand } from './brands'
+import { fakeHandle } from './creators'
 import type { CheckResult, Clue } from './examples'
-import { decodePunycode, mixesAlphabets, skeleton } from './lookalikes'
+import { decodePunycode, mixesAlphabets, oneSlip, plain, skeleton } from './lookalikes'
 import { isWebsiteKind } from './websiteKind'
 
 // Checks a link on the device, from the address alone: nothing is opened or sent
@@ -91,28 +92,6 @@ const IMPERSONATION_WORDS = [
   ...BAIT_WORDS, 'login', 'signin', 'sign-in', 'account', 'secure', 'security', 'support', 'password', 'auth', 'recover',
   'wallet', 'official', 'billing', 'update', 'nitro',
 ]
-
-// Characters that look like letters: rob1ox, g00gle, paypa1
-const LOOKALIKES: [RegExp, string][] = [
-  [/0/g, 'o'], [/1/g, 'l'], [/i/g, 'l'], [/3/g, 'e'], [/4/g, 'a'], [/5/g, 's'], [/7/g, 't'], [/rn/g, 'm'], [/vv/g, 'w'],
-]
-const plain = (word: string) => LOOKALIKES.reduce((w, [from, to]) => w.replace(from, to), word)
-
-// One letter added, missing, changed or swapped: robloxx, robox, ronlox, rbolox
-function oneSlip(a: string, b: string) {
-  if (a === b) return false
-  if (Math.abs(a.length - b.length) > 1) return false
-  if (a.length === b.length) {
-    const diff = [...a].flatMap((c, i) => (c === b[i] ? [] : [i]))
-    if (diff.length === 1) return true
-    return diff.length === 2 && diff[1] === diff[0] + 1 && a[diff[0]] === b[diff[1]] && a[diff[1]] === b[diff[0]]
-  }
-  const [long, short] = a.length > b.length ? [a, b] : [b, a]
-  for (let i = 0; i < long.length; i++) {
-    if (long.slice(0, i) + long.slice(i + 1) === short) return true
-  }
-  return false
-}
 
 // How one part of a website's name (already in plain a to z) uses a brand word:
 // 'exact' (roblox), 'lookalike' (rob1ox, ronlox, robloxx: a fan website wouldn't
@@ -265,6 +244,15 @@ function copiedBrand(address: Address): Copy | null {
     if (real) found.unshift({ brand, strong: true, startsWith: real, fakeLetters: false })
   }
   return found.find((f) => f.strong) ?? found[0] ?? null
+}
+
+// Websites where anyone can make an account, and how a link names one: the part
+// of the path after youtube.com/@ or tiktok.com/@, or instagram.com/ or twitch.tv/
+const ACCOUNT_SITES: Record<string, RegExp> = {
+  'youtube.com': /^\/@([^/?#]+)/,
+  'tiktok.com': /^\/@([^/?#]+)/,
+  'instagram.com': /^\/([^/?#]+)/,
+  'twitch.tv': /^\/([^/?#]+)/,
 }
 
 export type LinkCheck = CheckResult & {
@@ -453,12 +441,39 @@ function checkOne(typed: string): LinkCheck | null {
     })
   }
 
+  // An account on a real website, named to look like a famous creator's
+  // (youtube.com/@MrBeast_Giveaway). A real website says nothing about who made
+  // the account, so that's said too.
+  const account = official && ACCOUNT_SITES[site]?.exec(url.pathname)?.[1]
+  const handle = account ? decoded(account) : undefined
+  const fake = handle ? fakeHandle(handle) : null
+  if (handle && fake) {
+    strong.push({
+      label: `Pretending to be ${fake.creator.name}`,
+      reason: fake.reason,
+      highlight: inText(typed, handle),
+    })
+  }
+
   const clues = [...strong, ...others]
-  const good = official ? [`This is the real ${official.name} website.`] : []
+  const good = !official
+    ? []
+    : handle
+      ? [`This is the real ${official.name} website, but anyone can make an account on it, with any name.`]
+      : [`This is the real ${official.name} website.`]
   // A website that isn't for kids is red too, with its own heading unless it's also a scam
   const notForKids = !strong.length && clues.some(isWebsiteKind)
   const risk = strong.length || notForKids ? 'high' : others.length ? 'medium' : 'none'
   return { risk, clues, good, notForKids, site, url: url.href }
+}
+
+// A part of a link with its %xx letters turned back (Cyrillic letters come as %D0%B0)
+function decoded(part: string) {
+  try {
+    return decodeURIComponent(part)
+  } catch {
+    return part
+  }
 }
 
 // Brackets and punctuation around a link in a sentence: (roblox.com), "bit.ly/x".

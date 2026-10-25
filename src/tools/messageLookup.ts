@@ -1,5 +1,6 @@
 import { isSetUp } from '../setup'
-import type { CheckResult } from './examples'
+import { fakeHandle, handlesIn } from './creators'
+import type { CheckResult, Clue } from './examples'
 import { checkLink } from './linkCheck'
 import { lookUpLink } from './linkLookup'
 import type { MessageFacts, Sign } from './pictureSigns'
@@ -96,5 +97,23 @@ export async function messageResult(facts: MessageFacts | null, text: string, lo
     if (!addresses.has(shown.toLowerCase())) addresses.set(shown.toLowerCase(), shown)
   }
   const links = await linkClues([...addresses.values()].map((address) => ({ address })), lookUp)
-  return resultFrom(signs, links, facts.threatOrPhotos)
+  const fakes = fakeAccounts(text)
+  // A fake account says who it's pretending to be, so it replaces the AI's more general sign
+  const kept = fakes.length ? signs.filter(({ sign }) => sign !== 'pretends to be a company, game or famous person') : signs
+  return resultFrom(kept, { ...links, clues: [...fakes, ...links.clues], strong: links.strong || fakes.length > 0 }, facts.threatOrPhotos)
+}
+
+// Accounts in the message named to look like a famous creator's (@MrBeast_Giveaway),
+// found on the device: one clue each
+function fakeAccounts(text: string): Clue[] {
+  return handlesIn(text).flatMap((handle) => {
+    const fake = fakeHandle(handle)
+    if (!fake) return []
+    return [{
+      label: `Pretending to be ${fake.creator.name}`,
+      reason: fake.reason,
+      why: ['Anyone can give an account a famous name.', fake.reason, "Don't answer it. Show a grown-up."],
+      highlight: inMessage(text, `@${handle}`),
+    }]
+  })
 }

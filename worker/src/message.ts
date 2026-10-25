@@ -3,6 +3,7 @@ import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod'
 import { z } from 'zod'
 import { isSign, type MessageFacts, SIGNS } from '../../src/tools/pictureSigns'
 import { MAX_CONTEXT, PICTURE_MODEL, SIGN_RULES } from './picture'
+import { cachedSystem } from './cache'
 
 // Check a message: Claude reads a text, chat, email or post a kid pasted, and
 // answers the same fixed questions as for pictures (picture.ts), quoting the exact
@@ -51,7 +52,7 @@ export async function judgeMessage(message: Message, apiKey: string, model = PIC
   const response = await client.messages.parse({
     model,
     max_tokens: 3000,
-    system: SYSTEM,
+    system: cachedSystem(SYSTEM),
     output_config: { effort: 'low', format: zodOutputFormat(Answers) },
     messages: [
       {
